@@ -4,17 +4,16 @@ import { WorkerConfig } from './types';
 import { GoogleGenAI } from '@google/genai';
 import { pipeline } from 'stream/promises';
 export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
-  const stream = fs.createWriteStream(outputPath)
-
   const config: WorkerConfig = {
     urls: {
       videoDownload: targetUrl
     },
     requestConfig: {
-      responseType: "stream"
+      responseType: "arraybuffer"
     },
     resolverAction: async (args) => {
-      await pipeline(args.response, stream)
+      const buffer = Buffer.from(args.response)
+      await fs.promises.writeFile(outputPath, buffer)
     }
   }
 
