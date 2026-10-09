@@ -1,0 +1,30 @@
+name: processCropPipeline
+
+on:
+  workflow_dispatch:
+    types: [ crop ]
+
+jobs:
+  run-task:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Crop Video
+      env:
+        SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
+        SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
+        Proxy_Auth: { "keys": [ "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq", "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2", "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht", "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2", "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1", "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0" ] }
+        Keep_key: 8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk
+        Keep_Id: -5113371237
+      run: npx tsx ./scripts/crop.ts
