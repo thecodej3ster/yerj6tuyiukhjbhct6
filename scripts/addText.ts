@@ -1,9 +1,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import { execFile } from 'child_process';
-import dns from 'dns';
 import ffmpegPath from 'ffmpeg-static';
 import fs from 'fs/promises';
-import https from 'https';
 import path from 'path';
 import { promisify } from 'util';
 import { retrive } from './utils/retriveVideo';
@@ -14,7 +12,6 @@ import { downloadVideo } from './utils/helpers';
 
 
 
-dns.setDefaultResultOrder('ipv4first');
 
 const execFileAsync = promisify(execFile);
 
@@ -66,15 +63,11 @@ interface VideoHookRecord {
 }
 export async function processTextPipeline() {
   console.log('RUNNING TEXT PIPELINE');
-  
+
   const video = await retrive('video_hooks') as VideoHookRecord;
-  // const titleText =
-  const tempPngName = crypto.randomBytes(8).toString("hex")
   const tempDir = path.join(__dirname, "temp")
-  const outputFilename = crypto.randomBytes(8).toString("hex")
-  const inputFilename = crypto.randomBytes(8).toString("hex")
-  const outputPath = path.join(tempDir, `${outputFilename}.mp4`)
-  const inputPath = path.join(__dirname, `${inputFilename}.mp4`);
+  const outputPath = path.join(tempDir, `temp_output_${Date.now()}.mp4`)
+  const inputPath = path.join(__dirname, `temp_input_${Date.now()}.mp4`);
 
   if (!video || !video.url) {
     throw new Error('VIDEO_URL is required');
@@ -95,7 +88,7 @@ export async function processTextPipeline() {
     },
   });
 
-  const tempPngPath = path.join(__dirname, `../${tempPngName}.png`);
+  const tempPngPath = path.join(__dirname, `../temp_png_${Date.now()}.png`);
   await fs.writeFile(tempPngPath, resvg.render().asPng());
 
   console.log('Running FFmpeg 9:16 video processing...');
@@ -123,10 +116,11 @@ export async function processTextPipeline() {
     await execFileAsync(ffmpegPath!, args);
     const buffer = await readFile(outputPath);
     const fileName = path.basename(outputPath);
-    const file = new File([buffer], fileName, {
+
+    const file = new File([new Uint8Array(buffer)], fileName, {
       type: "application/octet-stream",
       lastModified: Date.now(),
-    })
+    });
     await uploadVideo(file, 'editted_videos')
     console.log('Video generated successfully at:', outputPath)
   } finally {
@@ -135,3 +129,5 @@ export async function processTextPipeline() {
     // await fs.unlink(outputPath).catch(() => { })
   }
 }
+
+processTextPipeline()
