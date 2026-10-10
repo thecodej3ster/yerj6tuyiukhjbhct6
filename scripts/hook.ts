@@ -267,6 +267,6 @@ export async function processHookPipeline() {
   }
 
 }
-
+processHookPipeline()
 // wrapText("The moment a difficult question instantly turned into a brilliant lesson.")
 // wrapText("He challenged him to a fight, but got a brilliant response.")

@@ -6,7 +6,7 @@ on:
       type:
         description: 'Enter Step '
         required: false
-        default: 'pip'
+        default: 'hook'
 
 jobs:
   run-task:
