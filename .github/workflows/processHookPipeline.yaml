@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Pip Video
+    - name: hook Video
       env:
         SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
         SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
