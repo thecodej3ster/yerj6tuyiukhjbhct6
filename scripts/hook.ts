@@ -159,11 +159,11 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
 export async function processHookPipeline() {
   console.log('RUNNING HOOK PIPELINE');
-  const hookPromptFilePath = path.resolve("utils", "onScreenTextPrompt.txt")
+  const hookPromptFilePath = path.join(__dirname, "utils", "onScreenTextPrompt.txt")
   const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
   const hookPrompt = hookPromptFile.toString()
 
-  const videoDescriptionPromptFilePath = path.resolve("utils", "videoDescriptionPrompt.txt")
+  const videoDescriptionPromptFilePath = path.join(__dirname, "utils", "videoDescriptionPrompt.txt")
   const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
   const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
