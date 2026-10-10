@@ -4,16 +4,17 @@ import { WorkerConfig } from './types';
 import { GoogleGenAI } from '@google/genai';
 import { pipeline } from 'stream/promises';
 export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
+  const stream = fs.createWriteStream(outputPath)
+
   const config: WorkerConfig = {
     urls: {
       videoDownload: targetUrl
     },
     requestConfig: {
-      responseType: "arraybuffer"
+      responseType: "stream"
     },
     resolverAction: async (args) => {
-      const buffer = Buffer.from(args.response)
-      await fs.promises.writeFile(outputPath, buffer)
+      await pipeline(args.response, stream)
     }
   }
 
@@ -29,7 +30,7 @@ interface StorageCleanupSummary {
 }
 
 export async function emptyGeminiStorage(): Promise<StorageCleanupSummary> {
-  const apiKey = 'AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ';
+  const apiKey = '';
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY environment variable is required.');
   }

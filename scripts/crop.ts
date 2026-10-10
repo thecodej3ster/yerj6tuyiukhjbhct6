@@ -6,7 +6,7 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
 import { uploadVideo } from './utils/upload';
-import { readFile } from "node:fs/promises";
+import { readFile } from "fs/promises";
 import { worker } from './utils/worker';
 import { WorkerConfig } from './utils/types';
 import { downloadVideo } from './utils/helpers';
@@ -142,7 +142,7 @@ export async function processCropPipeline() {
 
   const config: WorkerConfig = {
     urls: {
-      getVideoUrl: "https://clipfarm-coqgdi1h5-jess-a587.vercel.app/api/videos/select"
+      getVideoUrl: "https://clipfarm-ghivhsr2j-jess-a587.vercel.app/api/videos/select"
     },
     requestConfig: {
       responseType: "json"
@@ -158,9 +158,10 @@ export async function processCropPipeline() {
   const tempOutputPath = path.join(tempDir, `cropped_output_${timestamp}.mp4`);
 
   try {
-    console.log('Downloading Video ...');
     await downloadVideo(video.url, tempVideoPath);
 
+    console.log(tempVideoPath);
+    
     console.log('Extracting frame 1 with FFmpeg...');
     await execFileAsync(ffmpegPath, [
       '-i',
