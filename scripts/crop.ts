@@ -2,11 +2,10 @@ import cvModule from '@techstark/opencv-js';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { execFile } from 'child_process';
 import ffmpegPath from 'ffmpeg-static';
-import fsPromises from 'fs/promises';
+import fsPromises, { readFile } from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
 import { uploadVideo } from './utils/upload';
-import { readFile } from "fs/promises";
 import { worker } from './utils/worker';
 import { WorkerConfig } from './utils/types';
 import { downloadVideo } from './utils/helpers';
@@ -125,10 +124,11 @@ async function uploadOutputFile(
 ): Promise<void> {
   const buffer = await readFile(filePath);
   const fileName = path.basename(filePath);
-  const file = new File([buffer], fileName, {
+
+  const file = new File([new Uint8Array(buffer)], fileName, {
     type: "application/octet-stream",
     lastModified: Date.now(),
-  })
+  });
   await uploadVideo(file, 'cropped_videos')
 }
 
@@ -136,7 +136,7 @@ async function uploadOutputFile(
  * Execution Pipeline: Download -> Extract Frame 1 -> OpenCV Detect -> FFmpeg Crop -> Upload
  */
 export async function processCropPipeline() {
-    console.log('RUNNING CROP PIPELINE');
+  console.log('RUNNING CROP PIPELINE');
 
   if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
@@ -150,7 +150,7 @@ export async function processCropPipeline() {
   }
   const response = await worker(config)
   const video: { url: string } = response.getVideoUrl
-  
+
   const timestamp = Date.now();
   const tempDir = path.join(__dirname, "temp");
   const tempVideoPath = path.join(tempDir, `temp_input_${timestamp}.mp4`);
@@ -158,10 +158,9 @@ export async function processCropPipeline() {
   const tempOutputPath = path.join(tempDir, `cropped_output_${timestamp}.mp4`);
 
   try {
+    console.log('Downloading Video ...');
     await downloadVideo(video.url, tempVideoPath);
 
-    console.log(tempVideoPath);
-    
     console.log('Extracting frame 1 with FFmpeg...');
     await execFileAsync(ffmpegPath, [
       '-i',

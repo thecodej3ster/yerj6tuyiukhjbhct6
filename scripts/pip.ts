@@ -41,7 +41,7 @@ ffmpeg.setFfmpegPath(getFfmpegExecutable());
 
 interface ProcessVideoOptions {
   inputUrl: string;
-  inputPath:string
+  inputPath: string
   outputPath: string;
   targetWidth?: number;
   targetHeight?: number;
@@ -103,10 +103,11 @@ export async function processPipPipeline() {
 
     const buffer = await readFile(outputPath);
     const fileName = path.basename(outputPath);
-    const file = new File([buffer], fileName, {
+
+    const file = new File([new Uint8Array(buffer)], fileName, {
       type: "application/octet-stream",
       lastModified: Date.now(),
-    })
+    });
     await uploadVideo(file, 'pip_videos')
   } catch (error) {
     console.error('Failed to create video:', error);
