@@ -16,9 +16,9 @@ const r = async () => {
 }
 
 (async () => {
-    const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" } }
-    const { t } = await worker(config)
-    console.log(t);
+    // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" } }
+    // const { t } = await worker(config)
+    // console.log(t);
     
     // for (let i = 0; i < 5; i++) {
     //     await r()
@@ -35,7 +35,16 @@ const r = async () => {
     //     ]
     // }
 
-    // console.log(JSON.stringify(o));
+    const o = {
+  keys: [
+    "AQ.Ab8RN6JBLXkIdNG5UNEUZzFjD9ywYZ6bvOLxRqJoDZPaexS8zQ",
+    'AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ',
+    'AQ.Ab8RN6JqYnGOApdqW1U4Jv-oZE07d0HvHd6qqFvBm6cH1oSSCQ',
+    'AQ.Ab8RN6IXQmX7D_6KtqDsT2vw2M4yZ_3DaO9U-IR9pBMAU3E5ag',
+    'AQ.Ab8RN6JY2R5mnOCYIUaspfbRtY235up0jtuLNtsdCVnL6pw_Wg'
+  ]
+}
+    console.log(JSON.stringify(o));
 
     // const hash = "220841651:1:1791473707:303333b8cd219781cf3523057b2a9749f2055a1add:d8aea3f4a63fc2ed516148e516ff20a0cf4dc28c51"
     // const vee = await fetch("https://hibchr.com/api/server/list/", {

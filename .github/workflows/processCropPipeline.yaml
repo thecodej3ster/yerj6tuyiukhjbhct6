@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       crop_type:
-        description: 'Crop type'
+        description: 'Crop Video'
         required: false
         default: 'crop'
 
@@ -34,7 +34,6 @@ jobs:
         env:
           SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
           SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
-          Proxy_Auth: '{ "keys": [ "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq", "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2", "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht", "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2", "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1", "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0" ] }'
           Keep_key: 8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk
           Keep_Id: -5113371237
         run: npx tsx ./scripts/crop.ts
