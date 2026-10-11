@@ -1,1 +1,244 @@
-{"servers":[{"host":"dp-tv-au-syd-pr-p-1.prod.aura-servers.com","auth":"MTBkNWUzNThhZTZjNGQzZmNlN2ZjZTkwNDYwYjExYTA6YjFmODI5YjgxZjQyMTdjNTc2ZjllMDBlMTQzNDNlYTQ="},{"host":"ms-tv-au-syd-pr-p-1.prod.aura-servers.com","auth":"MTBkNWUzNThhZTZjNGQzZmNlN2ZjZTkwNDYwYjExYTA6YjFmODI5YjgxZjQyMTdjNTc2ZjllMDBlMTQzNDNlYTQ="},{"host":"gth-tv-ca-tor-pr-p-1.prod.aura-servers.com","auth":"MTAzZGQxZTM3M2VmMmE5ZmUyZmVjYmZhZWYyZTRmZGE6ZDgyN2FlN2U5NTAyMmNhYTJmNzgyN2IzMTI3YzFhZGE="},{"host":"dp-tv-ca-tor-pr-p-1.prod.aura-servers.com","auth":"MTAzZGQxZTM3M2VmMmE5ZmUyZmVjYmZhZWYyZTRmZGE6ZDgyN2FlN2U5NTAyMmNhYTJmNzgyN2IzMTI3YzFhZGE="},{"host":"ms-tv-cz-prg-pr-p-1.prod.aura-servers.com","auth":"MTA2MTg2YWIwY2M5MGNiMGFjMmEzOGI5MjA4NDQ4Mzg6NDFjN2RlNzIxNDM1ZDNkYWU3MjE2YTdhNDFiNWYyZGQ="},{"host":"dp-tv-cz-prg-pr-p-1.prod.aura-servers.com","auth":"MTA2MTg2YWIwY2M5MGNiMGFjMmEzOGI5MjA4NDQ4Mzg6NDFjN2RlNzIxNDM1ZDNkYWU3MjE2YTdhNDFiNWYyZGQ="},{"host":"ms-tv-dk-cph-pr-p-3.prod.aura-servers.com","auth":"MTA5MTAyNWE5MmYyM2VkYmJiMjhmNzcxODRjMTE2MmI6ODMwMjFiMDMwYTBjN2U2YWQwZjMwNDhlYjBkZWE3MWQ="},{"host":"dp-tv-dk-cph-pr-p-1.prod.aura-servers.com","auth":"MTA5MTAyNWE5MmYyM2VkYmJiMjhmNzcxODRjMTE2MmI6ODMwMjFiMDMwYTBjN2U2YWQwZjMwNDhlYjBkZWE3MWQ="},{"host":"ms-tv-fr-par-pr-p-3.prod.aura-servers.com","auth":"MTBjMzAzNThhYTI0NmM2ODg2ZWNhZmVhNDYyM2NkMTQ6NGViOTJhMzlhMTlmYWVjYzYwZTllZTNkNTUxMjlhNDU="},{"host":"dp-tv-fr-par-pr-p-1.prod.aura-servers.com","auth":"MTBjMzAzNThhYTI0NmM2ODg2ZWNhZmVhNDYyM2NkMTQ6NGViOTJhMzlhMTlmYWVjYzYwZTllZTNkNTUxMjlhNDU="},{"host":"mh-tv-de-fra-pr-p-2.prod.aura-servers.com","auth":"MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="},{"host":"ms-tv-de-fra-pr-p-4.prod.aura-servers.com","auth":"MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="},{"host":"mh-tv-de-fra-pr-p-1.prod.aura-servers.com","auth":"MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="},{"host":"ms-tv-de-fra-pr-p-5.prod.aura-servers.com","auth":"MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="},{"host":"ms-tv-hk-hkg-pr-p-1.prod.aura-servers.com","auth":"MTBiMjdmMmMyNTBmY2IwZDU2YmQ0ZDA1YTAwYTk2OGQ6ODZmMzk3YmNjZjhjOGRjZDdiMDExYWVmNjk2NWMwMWM="},{"host":"gh-tv-hk-hkg-pr-p-2.prod.aura-servers.com","auth":"MTBiMjdmMmMyNTBmY2IwZDU2YmQ0ZDA1YTAwYTk2OGQ6ODZmMzk3YmNjZjhjOGRjZDdiMDExYWVmNjk2NWMwMWM="},{"host":"dp-tv-ie-dub-pr-p-1.prod.aura-servers.com","auth":"MTBhYjNhMGQ1OWIyNWFiNzY1ODUyMDcxYzRmYzdlNWE6ZmQ5YWY5NTA0OGM1ZjA1NjhiZmUxOTMzM2E3ZDdmOWY="},{"host":"bs-tv-ie-dub-pr-p-1.prod.aura-servers.com","auth":"MTBhYjNhMGQ1OWIyNWFiNzY1ODUyMDcxYzRmYzdlNWE6ZmQ5YWY5NTA0OGM1ZjA1NjhiZmUxOTMzM2E3ZDdmOWY="},{"host":"dp-tv-it-mxp-pr-p-1.prod.aura-servers.com","auth":"MTBhYzJkYzI0YWQ0ZGNmMzUyMTFkNTZkMDQyYzNkMDE6NDg4NDkyMzdiYmMxYjQ4Njk1NTFjZjgzODAzMjc3NWQ="},{"host":"ms-tv-it-mxp-pr-p-2.prod.aura-servers.com","auth":"MTBhYzJkYzI0YWQ0ZGNmMzUyMTFkNTZkMDQyYzNkMDE6NDg4NDkyMzdiYmMxYjQ4Njk1NTFjZjgzODAzMjc3NWQ="},{"host":"dp-tv-jp-tyo-pr-p-1.prod.aura-servers.com","auth":"MTA4NjhhNmFiZjk5YjMzNDY0ZGYwODMzZTRiNzQwMGQ6NzQ3YTUzYzRiYTZjNWIyMWQ3ZDRkM2JiMDI2ODQ1Yzg="},{"host":"mh-tv-mx-mex-pr-p-1.prod.aura-servers.com","auth":"MTA5ODIxODBlMjM1NjI0YjEzZTRiNDBkZGI5ODJlMDA6N2NlZDNkMGUzZGU0N2ZjY2I0MDZmNjQ3MzA3NTAwNDI="},{"host":"dp-tv-mx-que-pr-p-1.prod.aura-servers.com","auth":"MTA5ODIxODBlMjM1NjI0YjEzZTRiNDBkZGI5ODJlMDA6N2NlZDNkMGUzZGU0N2ZjY2I0MDZmNjQ3MzA3NTAwNDI="},{"host":"zx-tv-nl-ams-pr-p-5.prod.aura-servers.com","auth":"MTA3MGYzZDRhN2I2OWQwNmFjZjFkM2MyYzQzMDY0YmY6MmU3Y2ViNTZjOTRmNmI2ZDBmZGFiYmE2NTE5Y2NlZmY="},{"host":"ms-tv-nl-ams-pr-p-2.prod.aura-servers.com","auth":"MTA3MGYzZDRhN2I2OWQwNmFjZjFkM2MyYzQzMDY0YmY6MmU3Y2ViNTZjOTRmNmI2ZDBmZGFiYmE2NTE5Y2NlZmY="},{"host":"dp-tv-no-osl-pr-p-1.prod.aura-servers.com","auth":"MTBjNDhiOTgzN2MyYjYwZWQ3OWI2N2UyNmY1NmViMjM6MjczOWY5NTliZmNkNTBlMTgyMjQ2MmIxYmQ0NGFiMWY="},{"host":"ms-tv-no-osl-pr-p-3.prod.aura-servers.com","auth":"MTBjNDhiOTgzN2MyYjYwZWQ3OWI2N2UyNmY1NmViMjM6MjczOWY5NTliZmNkNTBlMTgyMjQ2MmIxYmQ0NGFiMWY="},{"host":"dp-tv-ro-buh-pr-p-1.prod.aura-servers.com","auth":"MTA0OTQwYjg0ODVlMzA1NWUwMzI1MmJkNzVkNmU0YTg6OThlNTk5MTQ5YjcwMTE0YWJlZWVjZmEwZTJlYjI5NTg="},{"host":"ms-tv-ro-buh-pr-p-4.prod.aura-servers.com","auth":"MTA0OTQwYjg0ODVlMzA1NWUwMzI1MmJkNzVkNmU0YTg6OThlNTk5MTQ5YjcwMTE0YWJlZWVjZmEwZTJlYjI5NTg="},{"host":"zx-tv-nl-ams-pr-p-5.prod.aura-servers.com","auth":"MTBjZjQyZjhkNzA3N2RkM2QzOGYzNzA2YmNlM2JkNTg6ODI3Mjg2ZTg4Zjc1Y2ZmNjI4YTIzMWQ4NDU3YjBkNjI="},{"host":"ms-tv-nl-ams-pr-p-2.prod.aura-servers.com","auth":"MTBjZjQyZjhkNzA3N2RkM2QzOGYzNzA2YmNlM2JkNTg6ODI3Mjg2ZTg4Zjc1Y2ZmNjI4YTIzMWQ4NDU3YjBkNjI="},{"host":"ms-tv-sg-sin-pr-p-18.prod.aura-servers.com","auth":"MTBiYjE0ZjRiMzlmN2Y1ZWQwMjA3NGYwNmE2YTBhZGM6YThmMzA1ODdlYjEzYmQyZWZlYjA0MzdhNzYyODUzNzU="},{"host":"dp-tv-sg-sin-pr-p-1.prod.aura-servers.com","auth":"MTBiYjE0ZjRiMzlmN2Y1ZWQwMjA3NGYwNmE2YTBhZGM6YThmMzA1ODdlYjEzYmQyZWZlYjA0MzdhNzYyODUzNzU="},{"host":"dp-tv-es-mad-pr-p-1.prod.aura-servers.com","auth":"MTAyMTRjNTYyMTk1ZWM2M2ZjMTJjNDA0ZjY4NTFlODk6ZTA3ZjNhMDg3OGUxODQ1MmIzOWFmYzRlNzE2MjgxY2E="},{"host":"ms-tv-es-mad-pr-p-3.prod.aura-servers.com","auth":"MTAyMTRjNTYyMTk1ZWM2M2ZjMTJjNDA0ZjY4NTFlODk6ZTA3ZjNhMDg3OGUxODQ1MmIzOWFmYzRlNzE2MjgxY2E="},{"host":"ms-tv-se-sto-pr-p-5.prod.aura-servers.com","auth":"MTA0MDNjYWZmZDhhZGViOTM3ODYxYjg0YmFiMmJlMzQ6M2Y5ZDI1OTBkNjIwODI1YzYyMTNiNmQ3ZjExMjE5ZDQ="},{"host":"dp-tv-se-sto-pr-p-1.prod.aura-servers.com","auth":"MTA0MDNjYWZmZDhhZGViOTM3ODYxYjg0YmFiMmJlMzQ6M2Y5ZDI1OTBkNjIwODI1YzYyMTNiNmQ3ZjExMjE5ZDQ="},{"host":"ms-tv-ch-zur-pr-p-2.prod.aura-servers.com","auth":"MTA2ODIyOTlkODExYWRmN2M0YmRlM2RhNGUzODQ1YTE6ZWIyYmYxZGRkYmQyNTI1MTkyYzdlYWEwMjMzYWRhODU="},{"host":"prl-tv-ch-zur-pr-p-2.prod.aura-servers.com","auth":"MTA2ODIyOTlkODExYWRmN2M0YmRlM2RhNGUzODQ1YTE6ZWIyYmYxZGRkYmQyNTI1MTkyYzdlYWEwMjMzYWRhODU="},{"host":"ms-tv-bg-sof-pr-p-3.prod.aura-servers.com","auth":"MTAxMmI4Mjk1ZTY3ZDU0MDg4NzlmOWI2ZjI1NDc2MDY6OGZhNDBhMTk4MmMzOTk5ZjhmMTRkZTViZWVkOGE1YWY="},{"host":"dp-tv-tr-ist-pr-p-1.prod.aura-servers.com","auth":"MTAxMmI4Mjk1ZTY3ZDU0MDg4NzlmOWI2ZjI1NDc2MDY6OGZhNDBhMTk4MmMzOTk5ZjhmMTRkZTViZWVkOGE1YWY="},{"host":"dp-tv-ua-kbp-pr-p-1.prod.aura-servers.com","auth":"MTBmNjFkNmM5OGFhNTk1ODEzYTRmNDFiNWZkNWRmYWY6ZmZlMzMyMDQ1MDYzMGQxMjNiM2MzYmE3Njk4Njc4ZWU="},{"host":"dp-tv-gb-lon-pr-p-1.prod.aura-servers.com","auth":"MTBiNmRlY2RiYTc1NzBjOTY3YjRkNGEwM2FkZDcxZmE6ZTJjYmY5N2ZkOTk3M2IzODk4NjUyNzk1N2JhMWNiYmY="},{"host":"mh-cr-gb-lon-pr-p-5.prod.aura-servers.com","auth":"MTBiNmRlY2RiYTc1NzBjOTY3YjRkNGEwM2FkZDcxZmE6ZTJjYmY5N2ZkOTk3M2IzODk4NjUyNzk1N2JhMWNiYmY="},{"host":"ms-tv-gb-man-pr-p-2.prod.aura-servers.com","auth":"MTA4NTc3YmIzNDYzZDMwMDkzMGUzMGJmYjg5MGQ1OTk6ZTdlMTEyOTEyYTk2N2U4N2FlMjQ4MmMyYTdkOGFmYzM="},{"host":"ms-cr-gb-man-pr-p-6.prod.aura-servers.com","auth":"MTA4NTc3YmIzNDYzZDMwMDkzMGUzMGJmYjg5MGQ1OTk6ZTdlMTEyOTEyYTk2N2U4N2FlMjQ4MmMyYTdkOGFmYzM="},{"host":"ms-tv-us-lax-pr-p-9.prod.aura-servers.com","auth":"MTBkYTAxZWIzN2NkOWEzZGZhNDZiMmU4YTFlYTVkNDA6MDkzYzViMDdmNDc4N2I1NWVmNjRmMTQ3MTM2MWVhYjI="},{"host":"dp-tv-us-lax-pr-p-1.prod.aura-servers.com","auth":"MTBkYTAxZWIzN2NkOWEzZGZhNDZiMmU4YTFlYTVkNDA6MDkzYzViMDdmNDc4N2I1NWVmNjRmMTQ3MTM2MWVhYjI="},{"host":"ms-tv-us-mia-pr-p-10.prod.aura-servers.com","auth":"MTBlYzU3YWFkNDY2YjlhYTM5OGU2MDMwOTM3YmZhNDc6ZWUwNGIyZmIzMzhlYzE5MWEyYzJhMjA0MmY2ZWJiMTY="},{"host":"mh-tv-us-mia-pr-p-2.prod.aura-servers.com","auth":"MTBlYzU3YWFkNDY2YjlhYTM5OGU2MDMwOTM3YmZhNDc6ZWUwNGIyZmIzMzhlYzE5MWEyYzJhMjA0MmY2ZWJiMTY="},{"host":"dp-tv-us-nyc-pr-p-1.prod.aura-servers.com","auth":"MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="},{"host":"ln-tv-us-njs-pr-p-1.prod.aura-servers.com","auth":"MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="},{"host":"gth-tv-us-njs-pr-p-1.prod.aura-servers.com","auth":"MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="},{"host":"ms-tv-us-nyc-pr-p-6.prod.aura-servers.com","auth":"MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="},{"host":"gth-tv-us-njs-pr-p-1.prod.aura-servers.com","auth":"MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="},{"host":"dp-tv-us-nyc-pr-p-1.prod.aura-servers.com","auth":"MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="},{"host":"ms-tv-us-nyc-pr-p-6.prod.aura-servers.com","auth":"MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="},{"host":"ln-tv-us-njs-pr-p-1.prod.aura-servers.com","auth":"MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="},{"host":"gth-tv-us-sjc-pr-p-1.prod.aura-servers.com","auth":"MTA2NjM4NTgxZjc2Y2ZiMDNjNWE3N2IyODEyMDJmNDA6ZjhmNmRmYmFlY2JkNzViYTM4YTMwMjc3OTA1NjQ1YmM="},{"host":"dp-tv-us-sjc-pr-p-1.prod.aura-servers.com","auth":"MTA2NjM4NTgxZjc2Y2ZiMDNjNWE3N2IyODEyMDJmNDA6ZjhmNmRmYmFlY2JkNzViYTM4YTMwMjc3OTA1NjQ1YmM="}]}
+{
+    "servers": [
+        {
+            "host": "dp-tv-au-syd-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBkNWUzNThhZTZjNGQzZmNlN2ZjZTkwNDYwYjExYTA6YjFmODI5YjgxZjQyMTdjNTc2ZjllMDBlMTQzNDNlYTQ="
+        },
+        {
+            "host": "ms-tv-au-syd-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBkNWUzNThhZTZjNGQzZmNlN2ZjZTkwNDYwYjExYTA6YjFmODI5YjgxZjQyMTdjNTc2ZjllMDBlMTQzNDNlYTQ="
+        },
+        {
+            "host": "gth-tv-ca-tor-pr-p-1.prod.aura-servers.com",
+            "auth": "MTAzZGQxZTM3M2VmMmE5ZmUyZmVjYmZhZWYyZTRmZGE6ZDgyN2FlN2U5NTAyMmNhYTJmNzgyN2IzMTI3YzFhZGE="
+        },
+        {
+            "host": "dp-tv-ca-tor-pr-p-1.prod.aura-servers.com",
+            "auth": "MTAzZGQxZTM3M2VmMmE5ZmUyZmVjYmZhZWYyZTRmZGE6ZDgyN2FlN2U5NTAyMmNhYTJmNzgyN2IzMTI3YzFhZGE="
+        },
+        {
+            "host": "ms-tv-cz-prg-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA2MTg2YWIwY2M5MGNiMGFjMmEzOGI5MjA4NDQ4Mzg6NDFjN2RlNzIxNDM1ZDNkYWU3MjE2YTdhNDFiNWYyZGQ="
+        },
+        {
+            "host": "dp-tv-cz-prg-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA2MTg2YWIwY2M5MGNiMGFjMmEzOGI5MjA4NDQ4Mzg6NDFjN2RlNzIxNDM1ZDNkYWU3MjE2YTdhNDFiNWYyZGQ="
+        },
+        {
+            "host": "ms-tv-dk-cph-pr-p-3.prod.aura-servers.com",
+            "auth": "MTA5MTAyNWE5MmYyM2VkYmJiMjhmNzcxODRjMTE2MmI6ODMwMjFiMDMwYTBjN2U2YWQwZjMwNDhlYjBkZWE3MWQ="
+        },
+        {
+            "host": "dp-tv-dk-cph-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA5MTAyNWE5MmYyM2VkYmJiMjhmNzcxODRjMTE2MmI6ODMwMjFiMDMwYTBjN2U2YWQwZjMwNDhlYjBkZWE3MWQ="
+        },
+        {
+            "host": "ms-tv-fr-par-pr-p-3.prod.aura-servers.com",
+            "auth": "MTBjMzAzNThhYTI0NmM2ODg2ZWNhZmVhNDYyM2NkMTQ6NGViOTJhMzlhMTlmYWVjYzYwZTllZTNkNTUxMjlhNDU="
+        },
+        {
+            "host": "dp-tv-fr-par-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBjMzAzNThhYTI0NmM2ODg2ZWNhZmVhNDYyM2NkMTQ6NGViOTJhMzlhMTlmYWVjYzYwZTllZTNkNTUxMjlhNDU="
+        },
+        {
+            "host": "mh-tv-de-fra-pr-p-2.prod.aura-servers.com",
+            "auth": "MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="
+        },
+        {
+            "host": "ms-tv-de-fra-pr-p-4.prod.aura-servers.com",
+            "auth": "MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="
+        },
+        {
+            "host": "mh-tv-de-fra-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="
+        },
+        {
+            "host": "ms-tv-de-fra-pr-p-5.prod.aura-servers.com",
+            "auth": "MTBkOTBmYjE0NzQyNjAyNzA0NjE1ODRhZWZhYjI5Yzg6NmU5MDdmZDNiZmMzODNiZTE3YmU5MmMwZWI1ODI1ZmQ="
+        },
+        {
+            "host": "ms-tv-hk-hkg-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBiMjdmMmMyNTBmY2IwZDU2YmQ0ZDA1YTAwYTk2OGQ6ODZmMzk3YmNjZjhjOGRjZDdiMDExYWVmNjk2NWMwMWM="
+        },
+        {
+            "host": "gh-tv-hk-hkg-pr-p-2.prod.aura-servers.com",
+            "auth": "MTBiMjdmMmMyNTBmY2IwZDU2YmQ0ZDA1YTAwYTk2OGQ6ODZmMzk3YmNjZjhjOGRjZDdiMDExYWVmNjk2NWMwMWM="
+        },
+        {
+            "host": "dp-tv-ie-dub-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBhYjNhMGQ1OWIyNWFiNzY1ODUyMDcxYzRmYzdlNWE6ZmQ5YWY5NTA0OGM1ZjA1NjhiZmUxOTMzM2E3ZDdmOWY="
+        },
+        {
+            "host": "bs-tv-ie-dub-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBhYjNhMGQ1OWIyNWFiNzY1ODUyMDcxYzRmYzdlNWE6ZmQ5YWY5NTA0OGM1ZjA1NjhiZmUxOTMzM2E3ZDdmOWY="
+        },
+        {
+            "host": "dp-tv-it-mxp-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBhYzJkYzI0YWQ0ZGNmMzUyMTFkNTZkMDQyYzNkMDE6NDg4NDkyMzdiYmMxYjQ4Njk1NTFjZjgzODAzMjc3NWQ="
+        },
+        {
+            "host": "ms-tv-it-mxp-pr-p-2.prod.aura-servers.com",
+            "auth": "MTBhYzJkYzI0YWQ0ZGNmMzUyMTFkNTZkMDQyYzNkMDE6NDg4NDkyMzdiYmMxYjQ4Njk1NTFjZjgzODAzMjc3NWQ="
+        },
+        {
+            "host": "dp-tv-jp-tyo-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA4NjhhNmFiZjk5YjMzNDY0ZGYwODMzZTRiNzQwMGQ6NzQ3YTUzYzRiYTZjNWIyMWQ3ZDRkM2JiMDI2ODQ1Yzg="
+        },
+        {
+            "host": "mh-tv-mx-mex-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA5ODIxODBlMjM1NjI0YjEzZTRiNDBkZGI5ODJlMDA6N2NlZDNkMGUzZGU0N2ZjY2I0MDZmNjQ3MzA3NTAwNDI="
+        },
+        {
+            "host": "dp-tv-mx-que-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA5ODIxODBlMjM1NjI0YjEzZTRiNDBkZGI5ODJlMDA6N2NlZDNkMGUzZGU0N2ZjY2I0MDZmNjQ3MzA3NTAwNDI="
+        },
+        {
+            "host": "zx-tv-nl-ams-pr-p-5.prod.aura-servers.com",
+            "auth": "MTA3MGYzZDRhN2I2OWQwNmFjZjFkM2MyYzQzMDY0YmY6MmU3Y2ViNTZjOTRmNmI2ZDBmZGFiYmE2NTE5Y2NlZmY="
+        },
+        {
+            "host": "ms-tv-nl-ams-pr-p-2.prod.aura-servers.com",
+            "auth": "MTA3MGYzZDRhN2I2OWQwNmFjZjFkM2MyYzQzMDY0YmY6MmU3Y2ViNTZjOTRmNmI2ZDBmZGFiYmE2NTE5Y2NlZmY="
+        },
+        {
+            "host": "dp-tv-no-osl-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBjNDhiOTgzN2MyYjYwZWQ3OWI2N2UyNmY1NmViMjM6MjczOWY5NTliZmNkNTBlMTgyMjQ2MmIxYmQ0NGFiMWY="
+        },
+        {
+            "host": "ms-tv-no-osl-pr-p-3.prod.aura-servers.com",
+            "auth": "MTBjNDhiOTgzN2MyYjYwZWQ3OWI2N2UyNmY1NmViMjM6MjczOWY5NTliZmNkNTBlMTgyMjQ2MmIxYmQ0NGFiMWY="
+        },
+        {
+            "host": "dp-tv-ro-buh-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA0OTQwYjg0ODVlMzA1NWUwMzI1MmJkNzVkNmU0YTg6OThlNTk5MTQ5YjcwMTE0YWJlZWVjZmEwZTJlYjI5NTg="
+        },
+        {
+            "host": "ms-tv-ro-buh-pr-p-4.prod.aura-servers.com",
+            "auth": "MTA0OTQwYjg0ODVlMzA1NWUwMzI1MmJkNzVkNmU0YTg6OThlNTk5MTQ5YjcwMTE0YWJlZWVjZmEwZTJlYjI5NTg="
+        },
+        {
+            "host": "zx-tv-nl-ams-pr-p-5.prod.aura-servers.com",
+            "auth": "MTBjZjQyZjhkNzA3N2RkM2QzOGYzNzA2YmNlM2JkNTg6ODI3Mjg2ZTg4Zjc1Y2ZmNjI4YTIzMWQ4NDU3YjBkNjI="
+        },
+        {
+            "host": "ms-tv-nl-ams-pr-p-2.prod.aura-servers.com",
+            "auth": "MTBjZjQyZjhkNzA3N2RkM2QzOGYzNzA2YmNlM2JkNTg6ODI3Mjg2ZTg4Zjc1Y2ZmNjI4YTIzMWQ4NDU3YjBkNjI="
+        },
+        {
+            "host": "ms-tv-sg-sin-pr-p-18.prod.aura-servers.com",
+            "auth": "MTBiYjE0ZjRiMzlmN2Y1ZWQwMjA3NGYwNmE2YTBhZGM6YThmMzA1ODdlYjEzYmQyZWZlYjA0MzdhNzYyODUzNzU="
+        },
+        {
+            "host": "dp-tv-sg-sin-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBiYjE0ZjRiMzlmN2Y1ZWQwMjA3NGYwNmE2YTBhZGM6YThmMzA1ODdlYjEzYmQyZWZlYjA0MzdhNzYyODUzNzU="
+        },
+        {
+            "host": "dp-tv-es-mad-pr-p-1.prod.aura-servers.com",
+            "auth": "MTAyMTRjNTYyMTk1ZWM2M2ZjMTJjNDA0ZjY4NTFlODk6ZTA3ZjNhMDg3OGUxODQ1MmIzOWFmYzRlNzE2MjgxY2E="
+        },
+        {
+            "host": "ms-tv-es-mad-pr-p-3.prod.aura-servers.com",
+            "auth": "MTAyMTRjNTYyMTk1ZWM2M2ZjMTJjNDA0ZjY4NTFlODk6ZTA3ZjNhMDg3OGUxODQ1MmIzOWFmYzRlNzE2MjgxY2E="
+        },
+        {
+            "host": "ms-tv-se-sto-pr-p-5.prod.aura-servers.com",
+            "auth": "MTA0MDNjYWZmZDhhZGViOTM3ODYxYjg0YmFiMmJlMzQ6M2Y5ZDI1OTBkNjIwODI1YzYyMTNiNmQ3ZjExMjE5ZDQ="
+        },
+        {
+            "host": "dp-tv-se-sto-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA0MDNjYWZmZDhhZGViOTM3ODYxYjg0YmFiMmJlMzQ6M2Y5ZDI1OTBkNjIwODI1YzYyMTNiNmQ3ZjExMjE5ZDQ="
+        },
+        {
+            "host": "ms-tv-ch-zur-pr-p-2.prod.aura-servers.com",
+            "auth": "MTA2ODIyOTlkODExYWRmN2M0YmRlM2RhNGUzODQ1YTE6ZWIyYmYxZGRkYmQyNTI1MTkyYzdlYWEwMjMzYWRhODU="
+        },
+        {
+            "host": "prl-tv-ch-zur-pr-p-2.prod.aura-servers.com",
+            "auth": "MTA2ODIyOTlkODExYWRmN2M0YmRlM2RhNGUzODQ1YTE6ZWIyYmYxZGRkYmQyNTI1MTkyYzdlYWEwMjMzYWRhODU="
+        },
+        {
+            "host": "ms-tv-bg-sof-pr-p-3.prod.aura-servers.com",
+            "auth": "MTAxMmI4Mjk1ZTY3ZDU0MDg4NzlmOWI2ZjI1NDc2MDY6OGZhNDBhMTk4MmMzOTk5ZjhmMTRkZTViZWVkOGE1YWY="
+        },
+        {
+            "host": "dp-tv-tr-ist-pr-p-1.prod.aura-servers.com",
+            "auth": "MTAxMmI4Mjk1ZTY3ZDU0MDg4NzlmOWI2ZjI1NDc2MDY6OGZhNDBhMTk4MmMzOTk5ZjhmMTRkZTViZWVkOGE1YWY="
+        },
+        {
+            "host": "dp-tv-ua-kbp-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBmNjFkNmM5OGFhNTk1ODEzYTRmNDFiNWZkNWRmYWY6ZmZlMzMyMDQ1MDYzMGQxMjNiM2MzYmE3Njk4Njc4ZWU="
+        },
+        {
+            "host": "dp-tv-gb-lon-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBiNmRlY2RiYTc1NzBjOTY3YjRkNGEwM2FkZDcxZmE6ZTJjYmY5N2ZkOTk3M2IzODk4NjUyNzk1N2JhMWNiYmY="
+        },
+        {
+            "host": "mh-cr-gb-lon-pr-p-5.prod.aura-servers.com",
+            "auth": "MTBiNmRlY2RiYTc1NzBjOTY3YjRkNGEwM2FkZDcxZmE6ZTJjYmY5N2ZkOTk3M2IzODk4NjUyNzk1N2JhMWNiYmY="
+        },
+        {
+            "host": "ms-tv-gb-man-pr-p-2.prod.aura-servers.com",
+            "auth": "MTA4NTc3YmIzNDYzZDMwMDkzMGUzMGJmYjg5MGQ1OTk6ZTdlMTEyOTEyYTk2N2U4N2FlMjQ4MmMyYTdkOGFmYzM="
+        },
+        {
+            "host": "ms-cr-gb-man-pr-p-6.prod.aura-servers.com",
+            "auth": "MTA4NTc3YmIzNDYzZDMwMDkzMGUzMGJmYjg5MGQ1OTk6ZTdlMTEyOTEyYTk2N2U4N2FlMjQ4MmMyYTdkOGFmYzM="
+        },
+        {
+            "host": "ms-tv-us-lax-pr-p-9.prod.aura-servers.com",
+            "auth": "MTBkYTAxZWIzN2NkOWEzZGZhNDZiMmU4YTFlYTVkNDA6MDkzYzViMDdmNDc4N2I1NWVmNjRmMTQ3MTM2MWVhYjI="
+        },
+        {
+            "host": "dp-tv-us-lax-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBkYTAxZWIzN2NkOWEzZGZhNDZiMmU4YTFlYTVkNDA6MDkzYzViMDdmNDc4N2I1NWVmNjRmMTQ3MTM2MWVhYjI="
+        },
+        {
+            "host": "ms-tv-us-mia-pr-p-10.prod.aura-servers.com",
+            "auth": "MTBlYzU3YWFkNDY2YjlhYTM5OGU2MDMwOTM3YmZhNDc6ZWUwNGIyZmIzMzhlYzE5MWEyYzJhMjA0MmY2ZWJiMTY="
+        },
+        {
+            "host": "mh-tv-us-mia-pr-p-2.prod.aura-servers.com",
+            "auth": "MTBlYzU3YWFkNDY2YjlhYTM5OGU2MDMwOTM3YmZhNDc6ZWUwNGIyZmIzMzhlYzE5MWEyYzJhMjA0MmY2ZWJiMTY="
+        },
+        {
+            "host": "dp-tv-us-nyc-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="
+        },
+        {
+            "host": "ln-tv-us-njs-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="
+        },
+        {
+            "host": "gth-tv-us-njs-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="
+        },
+        {
+            "host": "ms-tv-us-nyc-pr-p-6.prod.aura-servers.com",
+            "auth": "MTBmNjY1ZTI5OGEyNmRlNWY0Y2M3MjYzODRiNzlhYTQ6ZmIxZmMxNmNmYTI1OTE1ODBlOWI2NmQ1ODIwZmIzOWM="
+        },
+        {
+            "host": "gth-tv-us-njs-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="
+        },
+        {
+            "host": "dp-tv-us-nyc-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="
+        },
+        {
+            "host": "ms-tv-us-nyc-pr-p-6.prod.aura-servers.com",
+            "auth": "MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="
+        },
+        {
+            "host": "ln-tv-us-njs-pr-p-1.prod.aura-servers.com",
+            "auth": "MTBhNjljY2E5ZGI2NjVhZDhjNzUzZTlhNWVjYWI2YzM6NjFlZTE0OGUzNmQ5N2FkYTMwOTZmZjBkMDJmZjgzNzE="
+        },
+        {
+            "host": "gth-tv-us-sjc-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA2NjM4NTgxZjc2Y2ZiMDNjNWE3N2IyODEyMDJmNDA6ZjhmNmRmYmFlY2JkNzViYTM4YTMwMjc3OTA1NjQ1YmM="
+        },
+        {
+            "host": "dp-tv-us-sjc-pr-p-1.prod.aura-servers.com",
+            "auth": "MTA2NjM4NTgxZjc2Y2ZiMDNjNWE3N2IyODEyMDJmNDA6ZjhmNmRmYmFlY2JkNzViYTM4YTMwMjc3OTA1NjQ1YmM="
+        }
+    ]
+}

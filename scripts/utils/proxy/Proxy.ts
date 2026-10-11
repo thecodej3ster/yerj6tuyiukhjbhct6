@@ -2,8 +2,9 @@ import tls from "node:tls";
 import { Agent as HttpsAgent } from "node:https";
 import fs from 'fs/promises'
 import path from "node:path";
+import serverList from "./serverList.json"
 
-let serverList: { servers: { host: string, auth: string }[] }
+// let serverList: { servers: { host: string, auth: string }[] }
 
 interface ConnectionOptions {
     host: string;
@@ -30,10 +31,6 @@ export function selectKey(list: { keys: string[] }) {
  */
 async function getProxySocket(): Promise<tls.TLSSocket> {
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
-
-    const serverListPath = path.resolve(path.join(__dirname,"serverList.json"))
-    const serverListFIle = await fs.readFile(serverListPath)
-    serverList = JSON.parse(serverListFIle.toString())
 
     const shuffledServerList = [...serverList.servers].sort(() => Math.random() - 0.5);
 
