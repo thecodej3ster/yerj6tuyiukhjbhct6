@@ -142,7 +142,7 @@ export async function processCropPipeline() {
 
   const config: WorkerConfig = {
     urls: {
-      getVideoUrl: "https://clipfarm-ghivhsr2j-jess-a587.vercel.app/api/videos/select"
+      getVideoUrl: "https://clipfarm-6klaemsp4-jess-a587.vercel.app/api/videos/select"
     },
     requestConfig: {
       responseType: "json"
