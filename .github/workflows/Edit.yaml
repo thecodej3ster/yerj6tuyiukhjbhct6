@@ -8,6 +8,7 @@ on:
         default: 'edit'
 jobs:
   edit:
+    runs-on: ubuntu-latest
     env:
       SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
       SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
@@ -16,31 +17,31 @@ jobs:
       Keep_Id: -5113371237
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js 22
-      uses: actions/setup-node@v4
-      with:
-        node-version: "22"
-        cache: 'npm'
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: 'npm'
 
-    - name: Set up FFmpeg
-      uses: federicocarboni/setup-ffmpeg@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up FFmpeg
+        uses: federicocarboni/setup-ffmpeg@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: processCropPipeline
-      run: npx tsx ./scripts/crop.ts
+      - name: processCropPipeline
+        run: npx tsx ./scripts/crop.ts
 
-    - name: processPipPipeline
-      run: npx tsx ./scripts/pip.ts
+      - name: processPipPipeline
+        run: npx tsx ./scripts/pip.ts
 
-    - name: processHookPipeline
-      run: npx tsx ./scripts/hook.ts
+      - name: processHookPipeline
+        run: npx tsx ./scripts/hook.ts
 
-    - name: processTextPipeline
-      run: npx tsx ./scripts/addText.ts
+      - name: processTextPipeline
+        run: npx tsx ./scripts/addText.ts
