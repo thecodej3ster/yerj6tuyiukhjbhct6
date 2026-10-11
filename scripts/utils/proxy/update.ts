@@ -30,7 +30,7 @@ const setProxyCreds = async () => {
         const serverInfo: ProxyCreds = await serverData.json()
         const authLife = { name: "", expires: 0 }
 
-        console.log(serverInfo);
+        // console.log(serverInfo);
         if (serverInfo.result === 'SERVER_UNAVAILABLE') {
             if (i < locationList.length) {
                 i++
