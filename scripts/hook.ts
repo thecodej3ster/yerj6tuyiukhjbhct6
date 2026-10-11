@@ -16,20 +16,6 @@ interface Clip {
 
 
 const geminiKeys = JSON.parse(process.env.Ai_Key!)
-//  || 'AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ';
-
-
-// const geminiKeys = {
-//   keys: [
-//     "AQ.Ab8RN6JBLXkIdNG5UNEUZzFjD9ywYZ6bvOLxRqJoDZPaexS8zQ",
-//     'AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ',
-//     'AQ.Ab8RN6JqYnGOApdqW1U4Jv-oZE07d0HvHd6qqFvBm6cH1oSSCQ',
-//     'AQ.Ab8RN6IXQmX7D_6KtqDsT2vw2M4yZ_3DaO9U-IR9pBMAU3E5ag',
-//     'AQ.Ab8RN6JY2R5mnOCYIUaspfbRtY235up0jtuLNtsdCVnL6pw_Wg'
-//   ]
-// }
-
-
 
 function wrapText(text: string, maxCharsPerLine: number = 24): string[] {
   const words = text.trim().replace('.', '').split(/\s+/)
@@ -270,5 +256,3 @@ export async function processHookPipeline() {
 
 }
 processHookPipeline()
-// wrapText("The moment a difficult question instantly turned into a brilliant lesson.")
-// wrapText("He challenged him to a fight, but got a brilliant response.")

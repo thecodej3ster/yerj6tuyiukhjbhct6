@@ -5,10 +5,8 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from "path"
 import fsPromises, { readFile } from 'fs/promises';
-// import dns from 'dns';
 import { uploadVideo } from './utils/upload';
 import { downloadVideo } from './utils/helpers';
-// dns.setDefaultResultOrder('ipv4first');
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);

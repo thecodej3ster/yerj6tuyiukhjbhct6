@@ -7,7 +7,6 @@ import { promisify } from 'util';
 import { retrive } from './utils/retriveVideo';
 import { uploadVideo } from './utils/upload';
 import { readFile } from 'fs/promises';
-import crypto from 'crypto'
 import { downloadVideo } from './utils/helpers';
 
 
@@ -126,7 +125,7 @@ export async function processTextPipeline() {
   } finally {
     await fs.unlink(tempPngPath).catch(() => { });
     await fs.unlink(inputPath).catch(() => { });
-    // await fs.unlink(outputPath).catch(() => { })
+    await fs.unlink(outputPath).catch(() => { })
   }
 }
 
