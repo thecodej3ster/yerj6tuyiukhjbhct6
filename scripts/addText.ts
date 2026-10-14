@@ -129,4 +129,4 @@ export async function processTextPipeline() {
   }
 }
 
-processTextPipeline()
+// processTextPipeline()
