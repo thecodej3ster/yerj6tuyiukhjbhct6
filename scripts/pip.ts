@@ -87,7 +87,7 @@ export function createVerticalVideoFromRemote({
 
 
 export async function processPipPipeline() {
-  const video = await retrive('cropped_videos')
+  const video = await retrive({ table: 'cropped_videos' })
   const tempDir = path.join(__dirname, "temp")
   const inputPath = path.join(tempDir, `temp_input_${Date.now()}.mp4`)
   const outputPath = path.join(tempDir, `temp_output_${Date.now()}.mp4`)

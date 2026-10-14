@@ -9,6 +9,7 @@ import { uploadVideo } from './utils/upload';
 import { worker } from './utils/worker';
 import { WorkerConfig } from './utils/types';
 import { downloadVideo } from './utils/helpers';
+import { getVideo } from './utils/getVideo';
 
 const execFileAsync = promisify(execFile);
 
@@ -140,9 +141,15 @@ export async function processCropPipeline() {
 
   if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
+  const clip = await getVideo({ table: 'editting_queue', autoDelete: true })
+
+  if (!clip || !clip.url) {
+    return
+  }
+
   const config: WorkerConfig = {
     urls: {
-      getVideoUrl: "https://clipfarm-6klaemsp4-jess-a587.vercel.app/api/videos/select"
+      getVideoUrl: clip.url
     },
     requestConfig: {
       responseType: "json"

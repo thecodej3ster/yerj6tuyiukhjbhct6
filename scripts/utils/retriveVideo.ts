@@ -1,54 +1,76 @@
-import { PostgrestError, createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { worker } from './worker';
 import crypto from "node:crypto"
 import { WorkerConfig } from './types';
 import FormData from 'form-data';
 
-const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
-const tkn = process.env.Keep_key
-const keepId = process.env.Keep_Id
+// const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+// const tkn = process.env.Keep_key
+
+const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
+const tkn = "8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk"
+const keepId = "-5113371237"
+
+export async function retrive(
+  { table, autoDelete, id }
+    : { table: string, autoDelete?: boolean, id?: string }
+) {
 
 
-async function getSingleRowFromTable(table: string) {
-  const getRandomIndex = (max: number) => {
-    if (max <= 0) return 0;
-    const array = new Uint32Array(1);
-    crypto.getRandomValues(array);
-    return array[0] % max;
+  const getSingleRowFromTable = async () => {
+    const getRandomIndex = (max: number) => {
+      if (max <= 0) return 0;
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      return array[0] % max;
+    }
+
+    const { count, error: countError } = await db
+      .from(table)
+      .select('*', { count: 'exact', head: true });
+
+    if (countError || !count) {
+      console.error('Error:', countError || `NO ${table.toUpperCase()} FOUND`);
+      return null;
+    }
+
+    let video, error
+
+    if (id) {
+      const { data, error: videoInfoError } = await db
+        .from(table)
+        .select('*')
+        .eq("video_id", id)
+        .limit(1)
+        .single()
+      video = data
+      error = videoInfoError
+    } else {
+      const randomIndex = getRandomIndex(count);
+      const { data, error: videoInfoError } = await db
+        .from(table)
+        .select('*')
+        .order("updated_at", { ascending: false })
+        .range(randomIndex, randomIndex)
+        .limit(1)
+        .maybeSingle()
+      video = data
+      error = videoInfoError
+    }
+
+
+
+    const videoInfo = video as { video_id: string } & Record<string, any>
+
+    if (error || !videoInfo) {
+      console.error('Error:', error || "NO EDITTED VIDEO FOUND");
+      return null;
+    }
+
+    return videoInfo;
   }
 
-  const { count, error: countError } = await db
-    .from(table)
-    .select('*', { count: 'exact', head: true });
-
-  if (countError || !count) {
-    console.error('Error:', countError || `NO ${table.toUpperCase()} FOUND`);
-    return null;
-  }
-
-  const randomIndex = getRandomIndex(count);
-  const { data, error: videoInfoError } = await db
-    .from(table)
-    .select('*')
-    .order("updated_at", { ascending: false })
-    .range(randomIndex, randomIndex)
-    .limit(1)
-    .maybeSingle()
-
-
-  const videoInfo = data as { video_id: string } & Record<string, any>
-
-  if (videoInfoError || !videoInfo) {
-    console.error('Error:', videoInfoError || "NO EDITTED VIDEO FOUND");
-    return null;
-  }
-
-  return videoInfo;
-}
-
-
-export async function retrive(table: string, autoDelete = false) {
-  const row = await getSingleRowFromTable(table)
+  const row = await getSingleRowFromTable()
 
   if (!row) {
     throw new Error(`No  ${table} Found`)
@@ -170,7 +192,7 @@ export async function retrive(table: string, autoDelete = false) {
   const downloadLinkSearch = fileUploadResponse.fileUpload.match(/(?<=data=).+(?=\")/)
   if (!downloadLinkSearch) {
     console.log(fileUploadResponse);
-    
+
     throw new Error("unable to get url")
   }
 

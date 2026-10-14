@@ -17,7 +17,7 @@ interface Clip {
 
 const geminiKeys = JSON.parse(process.env.Ai_Key!)
 
-function wrapText(text: string, maxCharsPerLine: number = 24): string[] {
+function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
   const words = text.trim().replace('.', '').split(/\s+/)
   const resultLines: string[] = [];
   let line = ""
@@ -153,7 +153,7 @@ export async function processHookPipeline() {
   const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
   const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
-  const clip: Clip = await retrive("pip_videos")
+  const clip: Clip = await retrive({ table: "pip_videos" })
   const tempDir = path.join(__dirname, 'temp');
   await fsPromises.mkdir(tempDir, { recursive: true });
   const tempFilePath = path.join(tempDir, `temp_input_${Date.now()}.mp4`);
@@ -178,13 +178,13 @@ export async function processHookPipeline() {
     }
 
     const hooks = onScreenTextResult.split("\n")
-
+    const descriptionCount = 1
     hooks.map(async hook => {
       if (hook && !hook.toLowerCase().includes("titles")) {
         descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
         const formatedHook = wrapText(hook)
 
-        if (formatedHook.length && formatedHook.length < 5) {
+        if (formatedHook.length && formatedHook.length < descriptionCount) {
           const hookLines = { lines: formatedHook }
           const { error } = await db.from("video_hooks")
             .insert([{

@@ -63,7 +63,7 @@ interface VideoHookRecord {
 export async function processTextPipeline() {
   console.log('RUNNING TEXT PIPELINE');
 
-  const video = await retrive('video_hooks') as VideoHookRecord;
+  const video = await retrive({ table: 'video_hooks' }) as VideoHookRecord;
   const tempDir = path.join(__dirname, "temp")
   const outputPath = path.join(tempDir, `temp_output_${Date.now()}.mp4`)
   const inputPath = path.join(__dirname, `temp_input_${Date.now()}.mp4`);
