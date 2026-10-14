@@ -1,4 +1,4 @@
-namename: SchedulePost
+name: SchedulePost
 on:
   workflow_dispatch:
 jobs:
