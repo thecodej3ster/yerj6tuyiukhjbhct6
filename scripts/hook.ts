@@ -153,7 +153,7 @@ export async function processHookPipeline() {
   const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
   const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
-  const clip: Clip = await retrive({ table: "pip_videos" })
+  const clip: Clip = await retrive({ table: "pip_videos", autoDelete: true })
   const tempDir = path.join(__dirname, 'temp');
   await fsPromises.mkdir(tempDir, { recursive: true });
   const tempFilePath = path.join(tempDir, `temp_input_${Date.now()}.mp4`);
@@ -186,7 +186,6 @@ export async function processHookPipeline() {
         return
       }
       if (hook && !hook.toLowerCase().includes("titles")) {
-        descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
         const formatedHook = wrapText(hook)
 
         if (formatedHook.length && formatedHook.length < 5) {
@@ -197,6 +196,7 @@ export async function processHookPipeline() {
               hook: JSON.stringify(hookLines)
             }])
           console.log(error);
+          descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
           hookFound = true
         }
       }

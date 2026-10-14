@@ -32,7 +32,7 @@ async function getVideo() {
 
 
     await db
-        .from("video_description")
+        .from("video_descriptions")
         .delete()
         .eq("video_id", video.video_id)
 
