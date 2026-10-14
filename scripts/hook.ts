@@ -244,6 +244,9 @@ export async function processHookPipeline() {
     descriptonFileUploadRequsets.map(async (uploadInfo) => {
       const info = await uploadInfo
 
+      console.log(info);
+      
+
       if (!info) return
       config.urls.deleteFile = `https://generativelanguage.googleapis.com/v1beta/${info.file.name}`
       if (config.requestConfig) {
