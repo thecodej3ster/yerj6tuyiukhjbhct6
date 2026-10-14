@@ -145,18 +145,18 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
 export async function processHookPipeline() {
   console.log('RUNNING HOOK PIPELINE');
-  const hookPromptFilePath = path.resolve(__dirname, "utils", "onScreenTextPrompt.txt")
+  const hookPromptFilePath = path.join(__dirname, "utils", "onScreenTextPrompt.txt")
   const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
   const hookPrompt = hookPromptFile.toString()
 
-  const videoDescriptionPromptFilePath = path.resolve(__dirname, "utils", "videoDescriptionPrompt.txt")
+  const videoDescriptionPromptFilePath = path.join(__dirname, "utils", "videoDescriptionPrompt.txt")
   const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
   const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
   const clip: Clip = await retrive({ table: "pip_videos" })
-  const tempDir = path.resolve(__dirname, 'temp');
+  const tempDir = path.join(__dirname, 'temp');
   await fsPromises.mkdir(tempDir, { recursive: true });
-  const tempFilePath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
+  const tempFilePath = path.join(tempDir, `temp_input_${Date.now()}.mp4`);
   await downloadVideo(clip.url, tempFilePath)
 
   const hookPromptFileUpload = await uploadFile(tempFilePath)
@@ -179,12 +179,17 @@ export async function processHookPipeline() {
 
     const hooks = onScreenTextResult.split("\n")
     const descriptionCount = 1
+
+    let hookFound = false
     hooks.map(async hook => {
+      if (hookFound) {
+        return
+      }
       if (hook && !hook.toLowerCase().includes("titles")) {
         descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
         const formatedHook = wrapText(hook)
 
-        if (formatedHook.length && formatedHook.length < descriptionCount) {
+        if (formatedHook.length && formatedHook.length < 5) {
           const hookLines = { lines: formatedHook }
           const { error } = await db.from("video_hooks")
             .insert([{
@@ -192,7 +197,7 @@ export async function processHookPipeline() {
               hook: JSON.stringify(hookLines)
             }])
           console.log(error);
-
+          hookFound = true
         }
       }
     })
