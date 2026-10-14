@@ -3,10 +3,15 @@ import { WorkerConfig } from './types';
 import crypto from "node:crypto"
 import { createClient } from '@supabase/supabase-js';
 
-const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+// const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
-const tkn = process.env.Keep_key
-const keepId = process.env.Keep_Id
+// const tkn = process.env.Keep_key
+// const keepId = process.env.Keep_Id
+
+
+const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
+const tkn = "8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk"
+const keepId = "-5113371237"
 
 export async function uploadVideo(file: File, table: string) {
   const bytes = await file.arrayBuffer();

@@ -20,7 +20,7 @@ export async function worker({ requestConfig, urls, resolverAction, resolverArgs
 
 
     const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
-        if (resolverAction) {
+        if (resolverAction) {            
             if (resolverArgs) {
                 return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             } else {

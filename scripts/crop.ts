@@ -147,26 +147,13 @@ export async function processCropPipeline() {
     return
   }
 
-  const config: WorkerConfig = {
-    urls: {
-      getVideoUrl: clip.url
-    },
-    requestConfig: {
-      responseType: "json"
-    }
-  }
-  const response = await worker(config)
-  const video: { url: string } = response.getVideoUrl
-
-  const timestamp = Date.now();
   const tempDir = path.join(__dirname, "temp");
-  const tempVideoPath = path.join(tempDir, `temp_input_${timestamp}.mp4`);
-  const tempFramePath = path.join(tempDir, `temp_frame_${timestamp}.jpg`);
-  const tempOutputPath = path.join(tempDir, `cropped_output_${timestamp}.mp4`);
+  const tempVideoPath = path.join(tempDir, `temp_input_${Date.now()}.mp4`);
+  const tempFramePath = path.join(tempDir, `temp_frame_${Date.now()}.jpg`);
+  const tempOutputPath = path.join(tempDir, `cropped_output_${Date.now()}.mp4`);
 
   try {
-    console.log('Downloading Video ...');
-    await downloadVideo(video.url, tempVideoPath);
+    await downloadVideo(clip.url, tempVideoPath);
 
     console.log('Extracting frame 1 with FFmpeg...');
     await execFileAsync(ffmpegPath, [
@@ -206,4 +193,4 @@ export async function processCropPipeline() {
 }
 
 
-// processCropPipeline()
+processCropPipeline()

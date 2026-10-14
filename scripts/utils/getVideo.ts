@@ -78,6 +78,7 @@ export async function getVideo(
             return null
         }
 
+
         return video
     }
 
@@ -107,6 +108,7 @@ export async function getVideo(
             console.log(error);
         }
     }
-
+    
     return { url: cleanUrl(videoUrl) }
 }
+// getVideo({ table: "videos", isRandom: true })
