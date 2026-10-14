@@ -147,10 +147,10 @@ export async function processCropPipeline() {
     return
   }
 
-  const tempDir = path.join(__dirname, "temp");
-  const tempVideoPath = path.join(tempDir, `temp_input_${Date.now()}.mp4`);
-  const tempFramePath = path.join(tempDir, `temp_frame_${Date.now()}.jpg`);
-  const tempOutputPath = path.join(tempDir, `cropped_output_${Date.now()}.mp4`);
+  const tempDir = path.resolve(__dirname, "temp");
+  const tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
+  const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
+  const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
 
   try {
     await downloadVideo(clip.url, tempVideoPath);

@@ -64,9 +64,9 @@ export async function processTextPipeline() {
   console.log('RUNNING TEXT PIPELINE');
 
   const video = await retrive({ table: 'video_hooks', autoDelete: true }) as VideoHookRecord;
-  const tempDir = path.join(__dirname, "temp")
-  const outputPath = path.join(tempDir, `temp_output_${Date.now()}.mp4`)
-  const inputPath = path.join(__dirname, `temp_input_${Date.now()}.mp4`);
+  const tempDir = path.resolve(__dirname, "temp")
+  const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
+  const inputPath = path.resolve(__dirname, `temp_input_${Date.now()}.mp4`);
 
   if (!video || !video.url) {
     throw new Error('VIDEO_URL is required');
@@ -76,7 +76,7 @@ export async function processTextPipeline() {
 
   console.log('Rendering title PNG with Resvg...');
   const svgContent = await generateTitleSvg(video.hook);
-  const fontPath = path.join(__dirname, '../fonts/InterDisplay-ExtraBold.ttf');
+  const fontPath = path.resolve(__dirname, '../fonts/InterDisplay-ExtraBold.ttf');
 
   const resvg = new Resvg(svgContent, {
     fitTo: { mode: 'width', value: 1080 },
@@ -87,7 +87,7 @@ export async function processTextPipeline() {
     },
   });
 
-  const tempPngPath = path.join(__dirname, `../temp_png_${Date.now()}.png`);
+  const tempPngPath = path.resolve(__dirname, `../temp_png_${Date.now()}.png`);
   await fs.writeFile(tempPngPath, resvg.render().asPng());
 
   console.log('Running FFmpeg 9:16 video processing...');
