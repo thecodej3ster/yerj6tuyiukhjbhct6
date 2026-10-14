@@ -6,9 +6,9 @@ import { pipeline } from 'stream/promises';
 import path from 'path';
 export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
 
-  const formatedPath = path.resolve("scripts", '../temp', path.basename(outputPath))
+  const formatedPath = path.resolve('../scripts/temp', path.basename(outputPath))
 
-  const stream = fs.createWriteStream(formatedPath)  
+  const stream = fs.createWriteStream(outputPath)  
 
   const config: WorkerConfig = {
     urls: {
