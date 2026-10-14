@@ -141,7 +141,7 @@ export async function processCropPipeline() {
 
   if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
-  const clip = await getVideo({ table: 'videos', autoDelete: true })
+  const clip = await getVideo({ table: 'videos', isRandom: true })
 
   if (!clip || !clip.url) {
     return
