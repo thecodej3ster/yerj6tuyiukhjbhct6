@@ -4,9 +4,9 @@ import crypto from "node:crypto"
 import { createClient } from '@supabase/supabase-js';
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+
 const tkn = process.env.Keep_key
 const keepId = process.env.Keep_Id
-
 
 export async function uploadVideo(file: File, table: string) {
   const bytes = await file.arrayBuffer();

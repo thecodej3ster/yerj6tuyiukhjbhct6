@@ -7,8 +7,8 @@ import store from './store.json'
 async function schedulePost({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
 
     const postID = `Post_${Date.now()}`
-    const token = "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"
-    const url = `https://api.github.com/repos/thecodej3ster/editor/actions/workflows/schedule.yaml/dispatches`;
+    const token = "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"
+    const url = `https://api.github.com/repos/thecodej3ster/editor/actions/workflows/Publish.yaml/dispatches`;
     const payload = {
         ref: 'main',
         inputs: {
@@ -45,7 +45,6 @@ async function schedulePost({ hours, minutes, username }: { hours: number, minut
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/vnd.github+json',
-                    'User-Agent': 'NodeJS-Workflow-Trigger',
                     'Content-Type': 'application/json'
                 }
             },
@@ -143,7 +142,7 @@ async function startSchedule() {
     }
 
     await createSchedule()
-    
+
     if (currentPostingHour === 23) {
         config.lastPost = -1
     } else {

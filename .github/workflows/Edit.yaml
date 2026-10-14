@@ -1,4 +1,4 @@
-name: Process Video Edit PipeLine
+name: Process Clipping PipeLine
 on:
   workflow_dispatch:
     inputs:
@@ -35,13 +35,4 @@ jobs:
         run: npm ci
 
       - name: processCropPipeline
-        run: npx tsx ./scripts/crop.ts
-
-      - name: processPipPipeline
-        run: npx tsx ./scripts/pip.ts
-
-      - name: processHookPipeline
-        run: npx tsx ./scripts/hook.ts
-
-      - name: processTextPipeline
-        run: npx tsx ./scripts/addText.ts
+        run: npx tsx ./scripts/publish/publish.ts
