@@ -55,7 +55,7 @@ export function createVerticalVideoFromRemote({
   backgroundColor = 'white',
 }: ProcessVideoOptions): Promise<string> {
   return new Promise(async (resolve, reject) => {
-    const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+50:${backgroundColor}`;
+    const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
 
     await downloadVideo(inputUrl, inputPath)
     ffmpeg()
