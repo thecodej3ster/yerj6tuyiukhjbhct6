@@ -1,9 +1,6 @@
 import { retrive } from "../utils/retriveVideo";
 import { createClient } from "@supabase/supabase-js";
 import { processCropPipeline } from "../crop";
-import { processPipPipeline } from "../pip";
-import { processHookPipeline } from "../hook";
-import { processTextPipeline } from "../addText";
 
 const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
@@ -16,11 +13,8 @@ async function getVideo() {
     }
 
     await processCropPipeline()
-    // await processPipPipeline()
-    // await processHookPipeline()
-    // await processTextPipeline()
 
-    const video = await retrive({ table: "editted_videos", autoDelete: true })
+    const video = await retrive({ table: "editted_videos", autoDelete: true, download: true })
 
     const { data: videoDescription } = await db
         .from("video_description")
@@ -37,9 +31,9 @@ async function getVideo() {
         .eq("video_id", video.video_id)
 
 
-
+    const videoUrl = video.url
     console.log(videoDescription);
-    console.log(video.url);
+    console.log(videoUrl);
     // console.log();
 
 
