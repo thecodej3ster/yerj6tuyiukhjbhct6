@@ -26,11 +26,13 @@ const setProxyCreds = async () => {
 
     let i = 0
     const updateInfo = async () => {
-        const serverData = await fetch(`https://api.pango-cloud.com/user/provide?access_token=CAESKAoIdG91Y2h2cG4Q4LLK3AcYmLjXgQgiEDk1OTdlNjZlZmYyMDgwOTcaIKJUNaNxIS7emG1qtuxHfKDz1t-Vpb-1O4se2EtMdVEs&type=proxy&location=${locationList[i]}`)
+        console.log("serverInfo");
+        const tkn = "CAESKAoIdG91Y2h2cG4Q6NKI3QcY4r6VgggiEGYyOTQ3MzUwNjg2NmMzMjMaINPkTO4z7bYGbNBz8-cSeZ3VUpPR27q8BRhWC1_isoPx"
+        const serverData = await fetch(`https://api.pango-cloud.com/user/provide?access_token=${tkn}&type=proxy&location=${locationList[i]}`)
         const serverInfo: ProxyCreds = await serverData.json()
         const authLife = { name: "", expires: 0 }
 
-        // console.log(serverInfo);
+        console.log(serverInfo);
         if (serverInfo.result === 'SERVER_UNAVAILABLE') {
             if (i < locationList.length) {
                 i++
