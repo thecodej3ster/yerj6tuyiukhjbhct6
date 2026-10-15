@@ -161,7 +161,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   // await downloadVideo(clip.url, tempFilePath)
 
   const hookPromptFileUpload = await uploadFile(tempFilePath)
-  const descriptonFileUploadRequsets: Promise<{ key: string, file: any }>[] = []
+  // const descriptonFileUploadRequsets: Promise<{ key: string, file: any }>[] = []
 
   try {
     if (!hookPromptFileUpload.file.uri) {
@@ -174,12 +174,18 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       key: hookPromptFileUpload.key
     })
 
-    if (!onScreenTextResult) {
+    const description = await sendToAI({
+      prompt: videoDescriptionPrompt,
+      fileUrl: hookPromptFileUpload.file.uri,
+      key: hookPromptFileUpload.key
+    })
+
+    if (!onScreenTextResult || !description) {
       return
     }
 
     const hooks = onScreenTextResult.split("\n")
-    const descriptionCount = 1
+    // const descriptionCount = 1
 
     let hookFound = false
     hooks.map(async hook => {
@@ -190,46 +196,50 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
         const formatedHook = wrapText(hook)
 
         if (formatedHook.length && formatedHook.length < 5) {
+
           const hookLines = { lines: formatedHook }
-          descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
+          // descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
+
           const { error } = await db.from("video_hooks")
             .insert([{
               video_id: clip.video_id,
               hook: JSON.stringify(hookLines)
             }])
+
           console.log(error);
           hookFound = true
         }
       }
     })
 
-    const descriptonFileUploadResponses = await Promise.all(descriptonFileUploadRequsets)
+    // const descriptonFileUploadResponses = await Promise.all(descriptonFileUploadRequsets)
 
-    const descriptionGenerationRequests: Promise<string | null>[] = []
+    // const descriptionGenerationRequests: Promise<string | null>[] = []
 
-    descriptonFileUploadResponses.map(response => {
-      descriptionGenerationRequests.push(sendToAI({
-        prompt: videoDescriptionPrompt,
-        fileUrl: response.file.uri,
-        key: response.key
-      }))
-    })
+    // descriptonFileUploadResponses.map(response => {
+    //   descriptionGenerationRequests.push(sendToAI({
+    //     prompt: videoDescriptionPrompt,
+    //     fileUrl: response.file.uri,
+    //     key: response.key
+    //   }))
+    // })
 
-    const descriptionGenerationResponses = await Promise.all(descriptionGenerationRequests)
-    descriptionGenerationResponses.map(async description => {
-      const { error } = await db.from("video_descriptions")
-        .insert([{ video_id: clip.video_id, content: description }])
-      console.log(error);
-    })
+    // const descriptionGenerationResponses = await Promise.all(descriptionGenerationRequests)
+    // descriptionGenerationResponses.map(async description => {
+    //   const { error } = await db.from("video_descriptions")
+    //     .insert([{ video_id: clip.video_id, content: description }])
+    //   console.log(error);
+    // })
 
 
-    return onScreenTextResult;
+    // return onScreenTextResult;
   }
   finally {
     const fileDeleteRequests: Promise<Record<string, any>>[] = []
 
     const config: WorkerConfig = {
       urls: {
+        // deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
         deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
       },
       requestConfig: {
@@ -240,26 +250,26 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       }
     }
 
-    fileDeleteRequests.push(worker(config))
+    // fileDeleteRequests.push(worker(config))
 
-    descriptonFileUploadRequsets.map(async (uploadInfo) => {
-      const info = await uploadInfo
+    // descriptonFileUploadRequsets.map(async (uploadInfo) => {
+    //   const info = await uploadInfo
 
-      console.log(info);
+    //   console.log(info);
 
 
-      if (!info) return
-      config.urls.deleteFile = `https://generativelanguage.googleapis.com/v1beta/${info.file.name}`
-      if (config.requestConfig) {
-        config.requestConfig.headers = {
-          'x-goog-api-key': `${hookPromptFileUpload.key}`
-        }
-      }
-      fileDeleteRequests.push(worker(config))
-    })
+    //   if (!info) return
+    //   config.urls.deleteFile = `https://generativelanguage.googleapis.com/v1beta/${info.file.name}`
+    //   if (config.requestConfig) {
+    //     config.requestConfig.headers = {
+    //       'x-goog-api-key': `${hookPromptFileUpload.key}`
+    //     }
+    //   }
+    //   fileDeleteRequests.push(worker(config))
+    // })
 
-    await Promise.all(fileDeleteRequests)
-    await processTextPipeline(tempFilePath,id)
+    // await Promise.all(fileDeleteRequests)
+    await processTextPipeline(tempFilePath, id)
     // await fsPromises.unlink(tempFilePath)
   }
 
