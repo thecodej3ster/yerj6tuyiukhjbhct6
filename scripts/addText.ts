@@ -120,7 +120,10 @@ export async function processTextPipeline(inputPath: string, id: string) {
     //   type: "application/octet-stream",
     //   lastModified: Date.now(),
     // });
-    await uploadVideo({ table: 'editted_videos' })
+    await uploadVideo({ table: 'editted_videos', storageUpload: true })
+    const edittedVideo = await retrive({ table: 'editted_videos', id: id })
+    console.log(edittedVideo.url);
+
     console.log('Video generated successfully at:', outputPath)
   } finally {
     await fs.unlink(tempPngPath).catch(() => { });
