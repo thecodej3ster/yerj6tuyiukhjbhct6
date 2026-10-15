@@ -13,7 +13,7 @@ const keepId = "-5113371237"
 
 export async function retrive(
   { table, autoDelete, id, download }
-    : { table: string, autoDelete?: boolean, id?: string, download?: string }
+    : { table: string, autoDelete?: boolean, id?: string, download?: boolean }
 ) {
   const getSingleRowFromTable = async () => {
     const getRandomIndex = (max: number) => {
@@ -23,14 +23,6 @@ export async function retrive(
       return array[0] % max;
     }
 
-    const { count, error: countError } = await db
-      .from(table)
-      .select('*', { count: 'exact', head: true });
-
-    if (countError || !count) {
-      console.error('Error:', countError || `NO ${table.toUpperCase()} FOUND`);
-      return null;
-    }
 
     let video, error
 
@@ -44,6 +36,15 @@ export async function retrive(
       video = data
       error = videoInfoError
     } else {
+      const { count, error: countError } = await db
+        .from(table)
+        .select('*', { count: 'exact', head: true });
+
+      if (countError || !count) {
+        console.error('Error:', countError || `NO ${table.toUpperCase()} FOUND`);
+        return null;
+      }
+
       const randomIndex = getRandomIndex(count);
       const { data, error: videoInfoError } = await db
         .from(table)
