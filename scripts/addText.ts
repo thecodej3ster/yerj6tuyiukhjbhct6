@@ -113,14 +113,14 @@ export async function processTextPipeline(inputPath: string, id: string) {
 
   try {
     await execFileAsync(ffmpegPath!, args);
-    // const buffer = await readFile(outputPath);
-    // const fileName = path.basename(outputPath);
+    const buffer = await readFile(outputPath);
+    const fileName = path.basename(outputPath);
 
-    // const file = new File([new Uint8Array(buffer)], fileName, {
-    //   type: "application/octet-stream",
-    //   lastModified: Date.now(),
-    // });
-    await uploadVideo({ table: 'editted_videos', storageUpload: true })
+    const file = new File([new Uint8Array(buffer)], fileName, {
+      type: "application/octet-stream",
+      lastModified: Date.now(),
+    });
+    await uploadVideo({ table: 'editted_videos', storageUpload: true, file: file })
     const edittedVideo = await retrive({ table: 'editted_videos', id: id })
     console.log(edittedVideo.url);
 
