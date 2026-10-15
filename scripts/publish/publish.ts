@@ -16,9 +16,9 @@ async function getVideo() {
     }
 
     await processCropPipeline()
-    await processPipPipeline()
-    await processHookPipeline()
-    await processTextPipeline()
+    // await processPipPipeline()
+    // await processHookPipeline()
+    // await processTextPipeline()
 
     const video = await retrive({ table: "editted_videos", autoDelete: true })
 
