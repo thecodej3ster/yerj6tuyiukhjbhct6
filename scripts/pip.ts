@@ -7,6 +7,7 @@ import path from "path"
 import fsPromises, { readFile } from 'fs/promises';
 import { uploadVideo } from './utils/upload';
 import { downloadVideo } from './utils/helpers';
+import { processHookPipeline } from './hook';
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);
@@ -38,7 +39,6 @@ function getFfmpegExecutable(): string {
 ffmpeg.setFfmpegPath(getFfmpegExecutable());
 
 interface ProcessVideoOptions {
-  inputUrl: string;
   inputPath: string
   outputPath: string;
   targetWidth?: number;
@@ -47,7 +47,6 @@ interface ProcessVideoOptions {
 }
 
 export function createVerticalVideoFromRemote({
-  inputUrl,
   inputPath,
   outputPath,
   targetWidth = 1080,
@@ -57,7 +56,7 @@ export function createVerticalVideoFromRemote({
   return new Promise(async (resolve, reject) => {
     const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
 
-    await downloadVideo(inputUrl, inputPath)
+    // await downloadVideo(inputUrl, inputPath)
     ffmpeg()
       .input(inputPath)
       .videoFilters(filterString)
@@ -86,32 +85,34 @@ export function createVerticalVideoFromRemote({
 };
 
 
-export async function processPipPipeline() {
-  const video = await retrive({ table: 'cropped_videos', autoDelete: true })
+export async function processPipPipeline(inputPath: string) {
+  // const video = await retrive({ table: 'cropped_videos', autoDelete: true, id: videoId })
   const tempDir = path.resolve(__dirname, "temp")
-  const inputPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
+  // const inputPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
   const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
   try {
     await createVerticalVideoFromRemote({
-      inputUrl: video.url,
       inputPath: inputPath,
       outputPath: outputPath,
       backgroundColor: 'white',
     })
 
-    const buffer = await readFile(outputPath);
-    const fileName = path.basename(outputPath);
+    // const buffer = await readFile(outputPath);
+    // const fileName = path.basename(outputPath);
 
-    const file = new File([new Uint8Array(buffer)], fileName, {
-      type: "application/octet-stream",
-      lastModified: Date.now(),
-    });
-    await uploadVideo(file, 'pip_videos')
+    // const file = new File([new Uint8Array(buffer)], fileName, {
+    //   type: "application/octet-stream",
+    //   lastModified: Date.now(),
+    // });
+    const uploadResult = await uploadVideo({ table: 'pip_videos' })
+    if (uploadResult) {
+      await processHookPipeline(outputPath,uploadResult.videoId)
+    }
   } catch (error) {
     console.error('Failed to create video:', error);
   }
   finally {
-    await fsPromises.unlink(outputPath)
+    // await fsPromises.unlink(outputPath)
     await fsPromises.unlink(inputPath)
   }
 }

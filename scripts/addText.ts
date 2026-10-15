@@ -60,19 +60,19 @@ interface VideoHookRecord {
   url: string
   hook: string
 }
-export async function processTextPipeline() {
+export async function processTextPipeline(inputPath: string, id: string) {
   console.log('RUNNING TEXT PIPELINE');
 
-  const video = await retrive({ table: 'video_hooks', autoDelete: true }) as VideoHookRecord;
+  const video = await retrive({ table: 'video_hooks', autoDelete: true, id: id }) as VideoHookRecord;
   const tempDir = path.resolve(__dirname, "temp")
   const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
-  const inputPath = path.resolve(__dirname, `temp_input_${Date.now()}.mp4`);
+  // const inputPath = path.resolve(__dirname, `temp_input_${Date.now()}.mp4`);
 
-  if (!video || !video.url) {
-    throw new Error('VIDEO_URL is required');
+  if (!video) {
+    throw new Error('VIDEO HOOK NOT FOUND');
   }
 
-  await downloadVideo(video.url, inputPath);
+  // await downloadVideo(video.url, inputPath);
 
   console.log('Rendering title PNG with Resvg...');
   const svgContent = await generateTitleSvg(video.hook);
@@ -113,14 +113,14 @@ export async function processTextPipeline() {
 
   try {
     await execFileAsync(ffmpegPath!, args);
-    const buffer = await readFile(outputPath);
-    const fileName = path.basename(outputPath);
+    // const buffer = await readFile(outputPath);
+    // const fileName = path.basename(outputPath);
 
-    const file = new File([new Uint8Array(buffer)], fileName, {
-      type: "application/octet-stream",
-      lastModified: Date.now(),
-    });
-    await uploadVideo(file, 'editted_videos')
+    // const file = new File([new Uint8Array(buffer)], fileName, {
+    //   type: "application/octet-stream",
+    //   lastModified: Date.now(),
+    // });
+    await uploadVideo({ table: 'editted_videos' })
     console.log('Video generated successfully at:', outputPath)
   } finally {
     await fs.unlink(tempPngPath).catch(() => { });

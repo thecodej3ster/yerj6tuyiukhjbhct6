@@ -10,6 +10,7 @@ import { worker } from './utils/worker';
 import { WorkerConfig } from './utils/types';
 import { downloadVideo } from './utils/helpers';
 import { getVideo } from './utils/getVideo';
+import { processPipPipeline } from './pip';
 
 const execFileAsync = promisify(execFile);
 
@@ -130,7 +131,7 @@ async function uploadOutputFile(
     type: "application/octet-stream",
     lastModified: Date.now(),
   });
-  await uploadVideo(file, 'cropped_videos')
+  // await uploadVideo(file, 'cropped_videos')
 }
 
 /**
@@ -183,12 +184,16 @@ export async function processCropPipeline() {
       tempOutputPath,
     ]);
 
-    await uploadOutputFile(tempOutputPath);
+    // const uploadResult = await uploadVideo({ table: 'cropped_videos' })
+    await processPipPipeline(tempOutputPath)
+
+    // uploadOutputFile();
+
   } finally {
     // Clean up all temporary files from system temp folder
     await fsPromises.unlink(tempVideoPath).catch(() => { });
     await fsPromises.unlink(tempFramePath).catch(() => { });
-    await fsPromises.unlink(tempOutputPath).catch(() => { });
+    // await fsPromises.unlink(tempOutputPath).catch(() => { });
   }
 }
 

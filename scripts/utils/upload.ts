@@ -13,11 +13,10 @@ const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publisha
 const tkn = "8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk"
 const keepId = "-5113371237"
 
-export async function uploadVideo(file: File, table: string) {
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const CHUNK_SIZE = 15 * 1024 * 1024;
-  const totalChunks = Math.ceil(buffer.length / CHUNK_SIZE);
+export async function uploadVideo({ file, table, storageUpload }: { file?: File, table: string, storageUpload?: boolean }) {
+
+
+
   const videoId = crypto.randomBytes(8).toString("hex")
 
   await db
@@ -25,6 +24,14 @@ export async function uploadVideo(file: File, table: string) {
     .insert([{ video_id: videoId }])
     .select()
 
+  if (!storageUpload || !file) {
+    return { videoId: videoId }
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const CHUNK_SIZE = 15 * 1024 * 1024;
+  const totalChunks = Math.ceil(buffer.length / CHUNK_SIZE);
   const chunkUploadWorkers: Promise<{ [key: string]: string }>[] = []
 
   for (let i = 0; i < totalChunks; i++) {

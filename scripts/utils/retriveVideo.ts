@@ -12,11 +12,9 @@ const tkn = "8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk"
 const keepId = "-5113371237"
 
 export async function retrive(
-  { table, autoDelete, id }
-    : { table: string, autoDelete?: boolean, id?: string }
+  { table, autoDelete, id, download }
+    : { table: string, autoDelete?: boolean, id?: string, download?: string }
 ) {
-
-
   const getSingleRowFromTable = async () => {
     const getRandomIndex = (max: number) => {
       if (max <= 0) return 0;
@@ -74,6 +72,9 @@ export async function retrive(
 
   if (!row) {
     throw new Error(`No  ${table} Found`)
+  }
+  if (!download) {
+    return row
   }
 
   interface VideoChunk {

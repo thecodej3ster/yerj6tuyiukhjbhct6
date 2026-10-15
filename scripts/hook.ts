@@ -5,6 +5,7 @@ import { retrive } from './utils/retriveVideo';
 import { worker } from './utils/worker';
 import { WorkerConfig } from './utils/types';
 import { downloadVideo, selectKey } from './utils/helpers';
+import { processTextPipeline } from './addText';
 
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
@@ -143,7 +144,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 }
 
 
-export async function processHookPipeline() {
+export async function processHookPipeline(tempFilePath: string, id: string) {
   console.log('RUNNING HOOK PIPELINE');
   const hookPromptFilePath = path.resolve(__dirname, "utils", "onScreenTextPrompt.txt")
   const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
@@ -153,11 +154,11 @@ export async function processHookPipeline() {
   const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
   const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
-  const clip: Clip = await retrive({ table: "pip_videos", autoDelete: true })
+  const clip = await retrive({ table: "pip_videos", autoDelete: true, id: id })
   const tempDir = path.resolve(__dirname, 'temp');
   await fsPromises.mkdir(tempDir, { recursive: true });
-  const tempFilePath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
-  await downloadVideo(clip.url, tempFilePath)
+  // const tempFilePath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
+  // await downloadVideo(clip.url, tempFilePath)
 
   const hookPromptFileUpload = await uploadFile(tempFilePath)
   const descriptonFileUploadRequsets: Promise<{ key: string, file: any }>[] = []
@@ -245,7 +246,7 @@ export async function processHookPipeline() {
       const info = await uploadInfo
 
       console.log(info);
-      
+
 
       if (!info) return
       config.urls.deleteFile = `https://generativelanguage.googleapis.com/v1beta/${info.file.name}`
@@ -258,7 +259,8 @@ export async function processHookPipeline() {
     })
 
     await Promise.all(fileDeleteRequests)
-    await fsPromises.unlink(tempFilePath)
+    await processTextPipeline(tempFilePath,id)
+    // await fsPromises.unlink(tempFilePath)
   }
 
 }
