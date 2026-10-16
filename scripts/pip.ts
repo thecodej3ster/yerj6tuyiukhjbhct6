@@ -105,9 +105,8 @@ export async function processPipPipeline(inputPath: string, video_id: string) {
     //   lastModified: Date.now(),
     // });
     const uploadResult = await uploadVideo({ table: 'pip_videos', id: video_id })
-    if (uploadResult) {
-      await processHookPipeline(outputPath, uploadResult.videoId)
-    }
+    await processHookPipeline(outputPath, video_id)
+
   } catch (error) {
     console.error('Failed to create video:', error);
   }
