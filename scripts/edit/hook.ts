@@ -1,10 +1,10 @@
 import path from 'path';
 import fsPromises from 'fs/promises';
 import { createClient } from '@supabase/supabase-js';
-import { retrive } from './utils/retriveVideo';
-import { worker } from './utils/worker';
-import { WorkerConfig } from './utils/types';
-import { downloadVideo, selectKey } from './utils/helpers';
+import { retrive } from '../utils/retriveVideo';
+import { worker } from '../utils/worker';
+import { WorkerConfig } from '../utils/types';
+import { selectKey } from '../utils/helpers';
 import { processTextPipeline } from './addText';
 
 
@@ -97,15 +97,17 @@ async function uploadFile(filePath: string) {
 }
 
 let retries = 0
-async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: string, key: string }): Promise<string | null> {
+async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: string, key?: string }): Promise<{ content: string, key: string } | null> {
   const geminiAPi = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent`
+  const selectedKey = key || selectKey(geminiKeys)
+
   const config: WorkerConfig = {
     urls: {
       chat: geminiAPi
     },
     requestConfig: {
       headers: {
-        'x-goog-api-key': `${key}`,
+        'x-goog-api-key': `${selectedKey}`,
         "Content-Type": "application/json"
       },
       method: "POST",
@@ -131,21 +133,38 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
   const { chat } = await worker(config)
 
-  if (chat.candidates) {
-    const response: string | null = chat?.candidates[0]?.content?.parts[0]?.text || null
-    return response
+  const rules = [
+    chat.candidates,
+    chat.candidates.length,
+    chat.candidates[0],
+    chat.candidates[0].content,
+    chat.candidates[0].content.parts,
+    chat.candidates[0].content.parts.length,
+    chat.candidates[0].content.parts[0].textdescription
+  ]
+  if (rules.every(r => r)) {
+    const response: string = chat.candidates[0].content.parts[0].text
+    return { content: response, key: selectedKey }
   } else {
     retries++
     if (retries === 3) {
       return null
     }
-    return await sendToAI({ prompt: prompt, fileUrl: fileUrl, key: key })
+
+    return await new Promise<{ content: string, key: string } | null>((resolve) => {
+      setTimeout(async () => {
+        const data = await sendToAI({ prompt: prompt, fileUrl: fileUrl })
+        resolve(data)
+      }, 5000)
+    })
+
   }
 }
 
 
 export async function processHookPipeline(tempFilePath: string, id: string) {
   console.log('RUNNING HOOK PIPELINE');
+
   const hookPromptFilePath = path.resolve(__dirname, "utils", "onScreenTextPrompt.txt")
   const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
   const hookPrompt = hookPromptFile.toString()
@@ -157,35 +176,34 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   const clip = await retrive({ table: "pip_videos", autoDelete: true, id: id })
   const tempDir = path.resolve(__dirname, 'temp');
   await fsPromises.mkdir(tempDir, { recursive: true });
-  // const tempFilePath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
-  // await downloadVideo(clip.url, tempFilePath)
-
   const hookPromptFileUpload = await uploadFile(tempFilePath)
-  // const descriptonFileUploadRequsets: Promise<{ key: string, file: any }>[] = []
 
   try {
     if (!hookPromptFileUpload.file.uri) {
       return
     }
 
-    const onScreenTextResult = await sendToAI({
+
+    const onScreenTextResponse = await sendToAI({
       prompt: hookPrompt,
-      fileUrl: hookPromptFileUpload.file.uri,
-      key: hookPromptFileUpload.key
-    })
+      fileUrl: hookPromptFileUpload.file.uri
+    })!
 
-    const description = await sendToAI({
-      prompt: videoDescriptionPrompt,
-      fileUrl: hookPromptFileUpload.file.uri,
-      key: hookPromptFileUpload.key
-    })
-
-    if (!onScreenTextResult || !description) {
-      return
+    if (!onScreenTextResponse) {
+      throw new Error("Could Not Generate Hook")
     }
 
+    const descriptionResponse = await sendToAI({
+      prompt: videoDescriptionPrompt,
+      fileUrl: hookPromptFileUpload.file.uri,
+      key: onScreenTextResponse.key
+    })
+
+    if (!descriptionResponse) {
+      throw new Error("Could Not Generate Description")
+    }
+    const onScreenTextResult = onScreenTextResponse.content
     const hooks = onScreenTextResult.split("\n")
-    // const descriptionCount = 1
 
     let hookFound = false
     hooks.map(async hook => {
@@ -196,54 +214,34 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
         const formatedHook = wrapText(hook)
 
         if (formatedHook.length && formatedHook.length < 5) {
-
           const hookLines = { lines: formatedHook }
-          // descriptonFileUploadRequsets.push(uploadFile(tempFilePath))
-
           const { error } = await db.from("video_hooks")
             .insert([{
               video_id: id,
               hook: JSON.stringify(hookLines)
             }])
 
-          console.log(error);
+          if (error) {
+            throw error
+          }
+
           hookFound = true
         }
       }
     })
 
     const { error } = await db.from("video_descriptions")
-      .insert([{ video_id: clip.video_id, content: description }])
-    console.log(error);
+      .insert([{ video_id: clip.video_id, content: descriptionResponse.content }])
 
-    // const descriptonFileUploadResponses = await Promise.all(descriptonFileUploadRequsets)
+    if (error) {
+      throw error
+    }
 
-    // const descriptionGenerationRequests: Promise<string | null>[] = []
-
-    // descriptonFileUploadResponses.map(response => {
-    //   descriptionGenerationRequests.push(sendToAI({
-    //     prompt: videoDescriptionPrompt,
-    //     fileUrl: response.file.uri,
-    //     key: response.key
-    //   }))
-    // })
-
-    // const descriptionGenerationResponses = await Promise.all(descriptionGenerationRequests)
-    // descriptionGenerationResponses.map(async description => {
-    // const { error } = await db.from("video_descriptions")
-    //   .insert([{ video_id: clip.video_id, content: description }])
-    // console.log(error);
-    // })
-
-
-    // return onScreenTextResult;
   }
   finally {
-    const fileDeleteRequests: Promise<Record<string, any>>[] = []
 
     const config: WorkerConfig = {
       urls: {
-        // deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
         deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
       },
       requestConfig: {
@@ -254,28 +252,8 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       }
     }
 
-    // fileDeleteRequests.push(worker(config))
-
-    // descriptonFileUploadRequsets.map(async (uploadInfo) => {
-    //   const info = await uploadInfo
-
-    //   console.log(info);
-
-
-    //   if (!info) return
-    //   config.urls.deleteFile = `https://generativelanguage.googleapis.com/v1beta/${info.file.name}`
-    //   if (config.requestConfig) {
-    //     config.requestConfig.headers = {
-    //       'x-goog-api-key': `${hookPromptFileUpload.key}`
-    //     }
-    //   }
-    //   fileDeleteRequests.push(worker(config))
-    // })
-
-    // await Promise.all(fileDeleteRequests)
+    await worker(config)
     await processTextPipeline(tempFilePath, id)
-    // await fsPromises.unlink(tempFilePath)
   }
 
 }
-// processHookPipeline()

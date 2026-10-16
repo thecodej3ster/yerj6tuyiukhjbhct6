@@ -4,10 +4,10 @@ import ffmpegPath from 'ffmpeg-static';
 import fs from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
-import { retrive } from './utils/retriveVideo';
-import { uploadVideo } from './utils/upload';
+import { retrive } from '../utils/retriveVideo';
+import { uploadVideo } from '../utils/upload';
 import { readFile } from 'fs/promises';
-import { downloadVideo } from './utils/helpers';
+
 
 
 
@@ -23,8 +23,6 @@ function escapeXml(text: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 }
-
-
 
 async function generateTitleSvg(hookJson: string): Promise<string> {
 
@@ -64,19 +62,17 @@ export async function processTextPipeline(inputPath: string, id: string) {
   console.log('RUNNING TEXT PIPELINE');
 
   const video = await retrive({ table: 'video_hooks', autoDelete: true, id: id }) as VideoHookRecord;
-  const tempDir = path.resolve(__dirname, "temp")
+  const tempDir = path.resolve("scripts", "temp")
   const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
-  // const inputPath = path.resolve(__dirname, `temp_input_${Date.now()}.mp4`);
 
   if (!video) {
     throw new Error('VIDEO HOOK NOT FOUND');
   }
 
-  // await downloadVideo(video.url, inputPath);
 
   console.log('Rendering title PNG with Resvg...');
   const svgContent = await generateTitleSvg(video.hook);
-  const fontPath = path.resolve(__dirname, '../fonts/InterDisplay-ExtraBold.ttf');
+  const fontPath = path.resolve("fonts", 'InterDisplay-ExtraBold.ttf');
 
   const resvg = new Resvg(svgContent, {
     fitTo: { mode: 'width', value: 1080 },
@@ -87,7 +83,7 @@ export async function processTextPipeline(inputPath: string, id: string) {
     },
   });
 
-  const tempPngPath = path.resolve(__dirname, `../temp_png_${Date.now()}.png`);
+  const tempPngPath = path.resolve(tempDir, `temp_png_${Date.now()}.png`);
   await fs.writeFile(tempPngPath, resvg.render().asPng());
 
   console.log('Running FFmpeg 9:16 video processing...');
@@ -120,7 +116,8 @@ export async function processTextPipeline(inputPath: string, id: string) {
       type: "application/octet-stream",
       lastModified: Date.now(),
     });
-    const uploadResult = await uploadVideo({ table: 'editted_videos', storageUpload: true, file: file, id: id })
+
+    await uploadVideo({ table: 'editted_videos', storageUpload: true, file: file, id: id })
     console.log('Video generated successfully at:', outputPath)
   } finally {
     await fs.unlink(tempPngPath).catch(() => { });
@@ -128,5 +125,3 @@ export async function processTextPipeline(inputPath: string, id: string) {
     await fs.unlink(outputPath).catch(() => { })
   }
 }
-
-// processTextPipeline()

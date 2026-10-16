@@ -5,11 +5,8 @@ import ffmpegPath from 'ffmpeg-static';
 import fsPromises, { readFile } from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
-import { uploadVideo } from './utils/upload';
-import { worker } from './utils/worker';
-import { WorkerConfig } from './utils/types';
-import { downloadVideo } from './utils/helpers';
-import { getVideo } from './utils/getVideo';
+import { downloadVideo } from '../utils/helpers';
+import { getVideo } from '../utils/getVideo';
 import { processPipPipeline } from './pip';
 import crypto from "crypto"
 
@@ -143,7 +140,7 @@ export async function processCropPipeline() {
 
   if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
-  const tempDir = path.resolve(__dirname, "temp");
+  const tempDir = path.resolve("scripts", "temp");
   let tempVideoPath = "";
   const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
   const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
@@ -203,20 +200,12 @@ export async function processCropPipeline() {
       tempOutputPath,
     ]);
 
-    // const uploadResult = await uploadVideo({ table: 'cropped_videos' })
     await processPipPipeline(tempOutputPath, videoId)
 
     return { videoId: videoId }
-
-    // uploadOutputFile();
-
   } finally {
     // Clean up all temporary files from system temp folder
     await fsPromises.unlink(tempVideoPath).catch(() => { });
     await fsPromises.unlink(tempFramePath).catch(() => { });
-    // await fsPromises.unlink(tempOutputPath).catch(() => { });
   }
 }
-
-
-// processCropPipeline()

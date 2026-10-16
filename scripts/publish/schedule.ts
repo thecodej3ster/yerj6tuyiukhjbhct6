@@ -4,11 +4,31 @@ import fs from 'fs/promises'
 import config from './config.json'
 import store from './store.json'
 
+const baseHeaders = {
+    "accept": "application/json, text/plain, */*",
+    "accept-language": "en-US,en;q=0.8",
+    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3OTE5MzI4MjQsInN1YiI6ODQ0Mzk2LCJzY3AiOiJzZXNzaW9uIn0.oAqAzhZymJ5196_gMyEiheZwlG7N9jNMzVh0ao_do2Y",
+    "cache-control": "no-cache",
+    "content-type": "application/json",
+    "pragma": "no-cache",
+    "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"Linux\"",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site",
+    "sec-gpc": "1",
+    "x-api-method": "",
+    "x-ui-language": "en",
+    "cookie": "refreshToken=3HJtC4hvwVn9KdOTSt9jN6dengGEprxoUK7QbALQnrz7VNIYTk7a0qZgBmCZY6qc",
+    "Referer": "https://console.cron-job.org/"
+}
+
 async function schedulePost({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
 
     const postID = `Post_${Date.now()}`
     const token = "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"
-    const url = `https://api.github.com/repos/thecodej3ster/editor/actions/workflows/Publish.yaml/dispatches`;
+    const url = `https://api.github.com/repos/thecodej3ster/editor/actions/workflows/Clip.yaml/dispatches`;
     const payload = {
         ref: 'main',
         inputs: {
@@ -71,46 +91,45 @@ async function schedulePost({ hours, minutes, username }: { hours: number, minut
         }
     }
 
+    baseHeaders["x-api-method"] = "CreateJob"
+
     const config: WorkerConfig = {
         urls: { job: "https://api.cron-job.org/" },
         requestConfig: {
-            headers: {
-                "accept": "application/json, text/plain, */*",
-                "accept-language": "en-US,en;q=0.8",
-                "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3OTE5MzI4MjQsInN1YiI6ODQ0Mzk2LCJzY3AiOiJzZXNzaW9uIn0.oAqAzhZymJ5196_gMyEiheZwlG7N9jNMzVh0ao_do2Y",
-                "cache-control": "no-cache",
-                "content-type": "application/json",
-                "pragma": "no-cache",
-                "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-platform": "\"Linux\"",
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-site",
-                "sec-gpc": "1",
-                "x-api-method": "CreateJob",
-                "x-ui-language": "en",
-                "cookie": "refreshToken=3HJtC4hvwVn9KdOTSt9jN6dengGEprxoUK7QbALQnrz7VNIYTk7a0qZgBmCZY6qc",
-                "Referer": "https://console.cron-job.org/"
-            },
+            headers: baseHeaders,
             method: "POST",
             body: JSON.stringify(sheduleConfig),
             responseType: "json"
         }
     }
     const { job }: Record<string, { jobId: number }> = await worker(config)
-    store.jobIds.push(job.jobId)
-    console.log(job);
+    // store.jobIds.push(job.jobId)
+    // console.log(job);
+}
+
+
+
+export async function deleteSchedule() {
+    baseHeaders["x-api-method"] = "DeleteJob"
+    const payload = { jobId: '' }
+    const config: WorkerConfig = {
+        urls: { deleteRequest: "https://api.cron-job.org/" },
+        requestConfig: {
+            headers: baseHeaders,
+            method: "POST",
+            body: JSON.stringify(payload),
+            responseType: "json"
+        }
+    }
+    const { deleteRequest }: Record<string, any> = await worker(config)
 }
 
 
 async function startSchedule() {
     const postingHours = [6, 11, 17, 23]
 
-
-
     const accountsConfig = {
-        charliekirkdaily: "",
+        "charliekirkdaily": "",
         'charliekirk.daily': ""
     }
 

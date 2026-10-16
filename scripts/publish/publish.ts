@@ -1,13 +1,11 @@
 import { retrive } from "../utils/retriveVideo";
 import { createClient } from "@supabase/supabase-js";
-import { processCropPipeline } from "../crop";
+import { processCropPipeline } from "../edit/crop";
 import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
 import store from "./config.json"
-import { log } from "util";
 
 const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
-
 
 async function getChannelId(key: string) {
     type OrganizationInfo = {
@@ -105,25 +103,25 @@ async function getVideo(id: string) {
         .limit(1)
         .single()
 
-    console.log(error);
-
     if (error) {
-        console.log(error);
-        return
+        throw error
     }
+
     return { videoUrl: video.url, description: videoDescription.content, id: video.video_id }
 }
 
-let i = 0
 
 async function cleanUp(video_id: string) {
     await db
         .from("video_descriptions")
         .delete()
         .eq("video_id", video_id)
+
+    //delete schedule 
+    //add new schedule
 }
 
-
+let i = 0
 async function publish() {
     const video = await processCropPipeline()
     if (!video) {
@@ -140,9 +138,8 @@ async function publish() {
         return
     }
     console.log(videoUrl);
-    console.log(description);
-
-
+cleanUp(videoInfo.id)
+return
     const publishQuery = `
         mutation ShareReelNow($input: CreatePostInput!) {
           createPost(input: $input) {
@@ -203,8 +200,9 @@ async function publish() {
     }
 
     const { postInfo } = await worker(config)
+    cleanUp(videoInfo.id)
 
-    console.log(postInfo);
+    // console.log(postInfo);
     i++
     if (i < store.accounts.length) {
         await publish()

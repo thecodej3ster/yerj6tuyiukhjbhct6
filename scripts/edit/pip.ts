@@ -1,12 +1,12 @@
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-import { retrive } from './utils/retriveVideo';
+import { retrive } from '../utils/retriveVideo';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from "path"
 import fsPromises, { readFile } from 'fs/promises';
-import { uploadVideo } from './utils/upload';
-import { downloadVideo } from './utils/helpers';
+import { uploadVideo } from '../utils/upload';
+import { downloadVideo } from '../utils/helpers';
 import { processHookPipeline } from './hook';
 
 if (ffmpegPath) {
@@ -86,10 +86,9 @@ export function createVerticalVideoFromRemote({
 
 
 export async function processPipPipeline(inputPath: string, video_id: string) {
-  // const video = await retrive({ table: 'cropped_videos', autoDelete: true, id: videoId })
-  const tempDir = path.resolve(__dirname, "temp")
-  // const inputPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
+  const tempDir = path.resolve("scripts", "temp")
   const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
+
   try {
     await createVerticalVideoFromRemote({
       inputPath: inputPath,
@@ -97,23 +96,13 @@ export async function processPipPipeline(inputPath: string, video_id: string) {
       backgroundColor: 'white',
     })
 
-    // const buffer = await readFile(outputPath);
-    // const fileName = path.basename(outputPath);
-
-    // const file = new File([new Uint8Array(buffer)], fileName, {
-    //   type: "application/octet-stream",
-    //   lastModified: Date.now(),
-    // });
-    const uploadResult = await uploadVideo({ table: 'pip_videos', id: video_id })
+    await uploadVideo({ table: 'pip_videos', id: video_id })
     await processHookPipeline(outputPath, video_id)
 
   } catch (error) {
     console.error('Failed to create video:', error);
   }
   finally {
-    // await fsPromises.unlink(outputPath)
     await fsPromises.unlink(inputPath)
   }
 }
-
-// processPipPipeline()
