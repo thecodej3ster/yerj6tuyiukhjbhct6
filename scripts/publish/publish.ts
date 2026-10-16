@@ -127,8 +127,8 @@ async function publish() {
     if (!videoUrl || !description) {
         return
     }
-    // console.log(videoUrl);
-    // console.log(description);
+    console.log(videoUrl);
+    console.log(description);
 
 
     const publishQuery = `
@@ -160,8 +160,9 @@ async function publish() {
             mode: "shareNow",
             assets: [
                 {
-                    url: videoUrl,
-                    type: "video"
+                    video: {
+                        url: "https://your-temp-storage.com/video.mp4"
+                    }
                 }
             ]
         }
@@ -192,4 +193,3 @@ async function publish() {
 }
 
 publish()
-
