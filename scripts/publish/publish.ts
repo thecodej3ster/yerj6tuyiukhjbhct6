@@ -93,25 +93,29 @@ async function getChannelId(key: string) {
 async function getVideo() {
     const video = await retrive({ table: "editted_videos", autoDelete: true, download: true })
 
-    const { data: videoDescription } = await db
-        .from("video_description")
+    const { data: videoDescription, error } = await db
+        .from("video_descriptions")
         .select("*")
         .eq("video_id", video.video_id)
         .limit(1)
         .single()
 
+    console.log(error);
 
-
-    await db
-        .from("video_descriptions")
-        .delete()
-        .eq("video_id", video.video_id)
-
+    await cleanUp(video.video_id)
 
     return { videoUrl: video.url, description: videoDescription }
 }
 
 let i = 0
+
+async function cleanUp(video_id: string) {
+    await db
+        .from("video_descriptions")
+        .delete()
+        .eq("video_id", video_id)
+
+}
 async function publish() {
     await processCropPipeline()
 
@@ -120,6 +124,7 @@ async function publish() {
     console.log(videoUrl);
     console.log(description);
     return
+
 
     const publishQuery = `
         mutation ShareReelNow($input: CreatePostInput!) {
