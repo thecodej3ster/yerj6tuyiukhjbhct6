@@ -102,9 +102,8 @@ async function getVideo() {
 
     console.log(error);
 
-    await cleanUp(video.video_id)
 
-    return { videoUrl: video.url, description: videoDescription }
+    return { videoUrl: video.url, description: videoDescription, id: video.video_id }
 }
 
 let i = 0
@@ -119,7 +118,9 @@ async function cleanUp(video_id: string) {
 async function publish() {
     await processCropPipeline()
 
-    const { videoUrl, description } = await getVideo()
+    const { videoUrl, description, id } = await getVideo()
+    await cleanUp(id)
+
 
     console.log(videoUrl);
     console.log(description);
@@ -182,6 +183,7 @@ async function publish() {
     if (i < store.accounts.length) {
         await publish()
     }
+
 }
 
 publish()
