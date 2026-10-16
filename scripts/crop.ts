@@ -177,7 +177,7 @@ export async function processCropPipeline() {
       ratio = await detectCropBox(tempFramePath)
 
       const maxHeight = 430
-      if (h > maxHeight) {
+      if (ratio.h > maxHeight) {
         await extractVideoRatio(ffmpegPath)
       }
     }
