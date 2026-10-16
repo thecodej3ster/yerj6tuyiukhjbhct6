@@ -33,6 +33,6 @@ Objective: Generate [5] one-sentence video titles that create intense curiosity 
 ---
 
 ### Output Format RULES
-Deliver exactly  unnumberd 5 titles. Do not include meta-commentary, introductory text, or concluding notes—just the titles as a plain text and do not number the titles 
+Deliver exactly  unnumberd 5 titles. Do not include meta-commentary, introductory text, or concluding notes—just the titles as a plain text ,do not use big grammar and do not number the titles 
 DO NOT include conversational filler, setups, or transitional introductions (e.g., "Sure!", "Here is a list...", "Based on your request..."). Lead directly with the requested output
 When video input is provided, generate the output immediately without acknowledgement.
