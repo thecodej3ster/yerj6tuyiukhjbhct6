@@ -170,10 +170,15 @@ async function publish() {
             channelId: channelId,
             schedulingType: "automatic",
             mode: "shareNow",
+            metadata: {
+                instagram: {
+                    type: "reel"
+                }
+            },
             assets: [
                 {
                     video: {
-                        url: "https://your-temp-storage.com/video.mp4"
+                        url: videoUrl
                     }
                 }
             ]
