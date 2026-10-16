@@ -143,12 +143,6 @@ export async function processCropPipeline() {
 
   if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
-  const clip = await getVideo({ table: 'videos', isRandom: true })
-
-  if (!clip || !clip.url) {
-    return
-  }
-
   const tempDir = path.resolve(__dirname, "temp");
   let tempVideoPath = "";
   const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
@@ -159,7 +153,12 @@ export async function processCropPipeline() {
   try {
 
     const extractVideoRatio = async (ffmpegPath: string) => {
+      const clip = await getVideo({ table: 'videos', isRandom: true })
+
       tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
+      if (!clip || !clip.url) {
+        return
+      }
       await downloadVideo(clip.url, tempVideoPath);
 
       console.log('Extracting frame 1 with FFmpeg...');
