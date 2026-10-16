@@ -178,6 +178,8 @@ export async function processCropPipeline() {
 
       const maxHeight = 430
       if (ratio.h > maxHeight) {
+        console.log(ratio);
+        
         await extractVideoRatio(ffmpegPath)
       }
     }
