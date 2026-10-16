@@ -154,24 +154,40 @@ export async function processCropPipeline() {
   const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
   const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
   const videoId = crypto.randomBytes(8).toString("hex")
+  let ratio: BoundingBox | null = null
 
   try {
-    await downloadVideo(clip.url, tempVideoPath);
 
-    console.log('Extracting frame 1 with FFmpeg...');
-    await execFileAsync(ffmpegPath, [
-      '-i',
-      tempVideoPath,
-      '-vframes',
-      '1',
-      '-q:v',
-      '2',
-      '-y',
-      tempFramePath,
-    ]);
+    const extractVideoRatio = async (ffmpegPath: string) => {
+      await downloadVideo(clip.url, tempVideoPath);
 
-    console.log('Running OpenCV crop detection...');
-    const { x, y, w, h } = await detectCropBox(tempFramePath);
+      console.log('Extracting frame 1 with FFmpeg...');
+      await execFileAsync(ffmpegPath, [
+        '-i',
+        tempVideoPath,
+        '-vframes',
+        '1',
+        '-q:v',
+        '2',
+        '-y',
+        tempFramePath,
+      ]);
+
+      console.log('Running OpenCV crop detection...');
+      ratio = await detectCropBox(tempFramePath)
+
+      const maxHeight = 430
+      if (h > maxHeight) {
+        await extractVideoRatio(ffmpegPath)
+      }
+    }
+
+    await extractVideoRatio(ffmpegPath)
+    if (!ratio) {
+      return
+    }
+    const { x, y, w, h } = ratio as BoundingBox
+
     console.log(`[OpenCV Result] Crop Box -> X:${x}, Y:${y}, W:${w}, H:${h}`);
 
     console.log('Executing FFmpeg crop...');
