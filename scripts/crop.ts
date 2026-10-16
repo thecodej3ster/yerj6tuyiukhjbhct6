@@ -150,7 +150,7 @@ export async function processCropPipeline() {
   }
 
   const tempDir = path.resolve(__dirname, "temp");
-  const tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
+  let tempVideoPath = "";
   const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
   const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
   const videoId = crypto.randomBytes(8).toString("hex")
@@ -159,6 +159,7 @@ export async function processCropPipeline() {
   try {
 
     const extractVideoRatio = async (ffmpegPath: string) => {
+      tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
       await downloadVideo(clip.url, tempVideoPath);
 
       console.log('Extracting frame 1 with FFmpeg...');
@@ -179,7 +180,7 @@ export async function processCropPipeline() {
       const maxHeight = 430
       if (ratio.h > maxHeight) {
         console.log(ratio);
-        
+        await fsPromises.unlink(tempVideoPath)
         await extractVideoRatio(ffmpegPath)
       }
     }
