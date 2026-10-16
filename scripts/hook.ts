@@ -212,6 +212,10 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       }
     })
 
+    const { error } = await db.from("video_descriptions")
+      .insert([{ video_id: clip.video_id, content: description }])
+    console.log(error);
+    
     // const descriptonFileUploadResponses = await Promise.all(descriptonFileUploadRequsets)
 
     // const descriptionGenerationRequests: Promise<string | null>[] = []
@@ -226,9 +230,9 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
 
     // const descriptionGenerationResponses = await Promise.all(descriptionGenerationRequests)
     // descriptionGenerationResponses.map(async description => {
-    //   const { error } = await db.from("video_descriptions")
-    //     .insert([{ video_id: clip.video_id, content: description }])
-    //   console.log(error);
+    // const { error } = await db.from("video_descriptions")
+    //   .insert([{ video_id: clip.video_id, content: description }])
+    // console.log(error);
     // })
 
 
