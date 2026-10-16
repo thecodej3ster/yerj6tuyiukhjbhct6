@@ -176,7 +176,7 @@ export async function processCropPipeline() {
       console.log('Running OpenCV crop detection...');
       ratio = await detectCropBox(tempFramePath)
 
-      const maxHeight = 430
+      const maxHeight = 470
       if (ratio.h > maxHeight) {
         console.log(ratio);
         await fsPromises.unlink(tempVideoPath)
