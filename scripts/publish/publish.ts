@@ -172,7 +172,8 @@ async function publish() {
             mode: "shareNow",
             metadata: {
                 instagram: {
-                    type: "reel"
+                    type: "reel",
+                    shouldShareToFeed: true
                 }
             },
             assets: [
