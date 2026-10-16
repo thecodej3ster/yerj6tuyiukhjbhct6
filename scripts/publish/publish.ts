@@ -4,6 +4,7 @@ import { processCropPipeline } from "../crop";
 import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
 import store from "./config.json"
+import { log } from "util";
 
 const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
@@ -65,6 +66,8 @@ async function getChannelId(key: string) {
 
     const { organizations } = await worker(config) as { organizations: OrganizationInfo }
 
+    console.log(organizations);
+    
     const channelsQuery = `
         query GetChannels($organizationId: OrganizationId!) {
           channels(input: { organizationId: $organizationId }) {
@@ -86,6 +89,8 @@ async function getChannelId(key: string) {
 
     const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
 
+    console.log(channelInfo);
+    
     return channelInfo.data.channels[0].id
 }
 
@@ -178,8 +183,10 @@ async function publish() {
                 "Authorization": `Bearer ${account.key.trim()}`,
             },
             body: JSON.stringify({ query: publishQuery, variables: payload }),
-            responseType: "json"
+            responseType: "json",
+            method:"POST"
         }
+        
     }
 
     const { postInfo } = await worker(config)
