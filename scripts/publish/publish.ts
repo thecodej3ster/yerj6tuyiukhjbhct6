@@ -90,13 +90,13 @@ async function getChannelId(key: string) {
 }
 
 
-async function getVideo() {
+async function getVideo(id: string) {
     const video = await retrive({ table: "editted_videos", autoDelete: true, download: true })
 
     const { data: videoDescription, error } = await db
         .from("video_descriptions")
         .select("*")
-        .eq("video_id", video.video_id)
+        .eq("video_id", id)
         .limit(1)
         .single()
 
@@ -113,14 +113,16 @@ async function cleanUp(video_id: string) {
         .from("video_descriptions")
         .delete()
         .eq("video_id", video_id)
-
 }
+
+
 async function publish() {
-    await processCropPipeline()
+    const video = await processCropPipeline()
+    if (!video) {
+        return
+    }
 
-    const { videoUrl, description, id } = await getVideo()
-    await cleanUp(id)
-
+    const { videoUrl, description } = await getVideo(video.videoId)
 
     console.log(videoUrl);
     console.log(description);

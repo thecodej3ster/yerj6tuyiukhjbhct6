@@ -11,6 +11,7 @@ import { WorkerConfig } from './utils/types';
 import { downloadVideo } from './utils/helpers';
 import { getVideo } from './utils/getVideo';
 import { processPipPipeline } from './pip';
+import crypto from "crypto"
 
 const execFileAsync = promisify(execFile);
 
@@ -152,6 +153,7 @@ export async function processCropPipeline() {
   const tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`);
   const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
   const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
+  const videoId = crypto.randomBytes(8).toString("hex")
 
   try {
     await downloadVideo(clip.url, tempVideoPath);
@@ -185,7 +187,9 @@ export async function processCropPipeline() {
     ]);
 
     // const uploadResult = await uploadVideo({ table: 'cropped_videos' })
-    await processPipPipeline(tempOutputPath)
+    await processPipPipeline(tempOutputPath, videoId)
+
+    return { videoId: videoId }
 
     // uploadOutputFile();
 

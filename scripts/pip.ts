@@ -85,7 +85,7 @@ export function createVerticalVideoFromRemote({
 };
 
 
-export async function processPipPipeline(inputPath: string) {
+export async function processPipPipeline(inputPath: string, video_id: string) {
   // const video = await retrive({ table: 'cropped_videos', autoDelete: true, id: videoId })
   const tempDir = path.resolve(__dirname, "temp")
   // const inputPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
@@ -104,9 +104,9 @@ export async function processPipPipeline(inputPath: string) {
     //   type: "application/octet-stream",
     //   lastModified: Date.now(),
     // });
-    const uploadResult = await uploadVideo({ table: 'pip_videos' })
+    const uploadResult = await uploadVideo({ table: 'pip_videos', id: video_id })
     if (uploadResult) {
-      await processHookPipeline(outputPath,uploadResult.videoId)
+      await processHookPipeline(outputPath, uploadResult.videoId)
     }
   } catch (error) {
     console.error('Failed to create video:', error);

@@ -13,11 +13,11 @@ const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publisha
 const tkn = "8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk"
 const keepId = "-5113371237"
 
-export async function uploadVideo({ file, table, storageUpload }: { file?: File, table: string, storageUpload?: boolean }) {
+export async function uploadVideo({ file, table, storageUpload, id }: { id?: string, file?: File, table: string, storageUpload?: boolean }) {
 
 
 
-  const videoId = crypto.randomBytes(8).toString("hex")
+  const videoId = id || crypto.randomBytes(8).toString("hex")
 
   await db
     .from(table)
