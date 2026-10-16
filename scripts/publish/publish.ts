@@ -67,7 +67,7 @@ async function getChannelId(key: string) {
     const { organizations } = await worker(config) as { organizations: OrganizationInfo }
 
     console.log(organizations);
-    
+
     const channelsQuery = `
         query GetChannels($organizationId: OrganizationId!) {
           channels(input: { organizationId: $organizationId }) {
@@ -90,7 +90,7 @@ async function getChannelId(key: string) {
     const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
 
     console.log(channelInfo);
-    
+
     return channelInfo.data.channels[0].id
 }
 
@@ -107,8 +107,11 @@ async function getVideo(id: string) {
 
     console.log(error);
 
-
-    return { videoUrl: video.url, description: videoDescription, id: video.video_id }
+    if (error) {
+        console.log(error);
+        return
+    }
+    return { videoUrl: video.url, description: videoDescription.content, id: video.video_id }
 }
 
 let i = 0
@@ -127,7 +130,11 @@ async function publish() {
         return
     }
 
-    const { videoUrl, description } = await getVideo(video.videoId)
+    const videoInfo = await getVideo(video.videoId)
+    if (!videoInfo) {
+        return
+    }
+    const { videoUrl, description } = videoInfo
 
     if (!videoUrl || !description) {
         return
@@ -184,9 +191,9 @@ async function publish() {
             },
             body: JSON.stringify({ query: publishQuery, variables: payload }),
             responseType: "json",
-            method:"POST"
+            method: "POST"
         }
-        
+
     }
 
     const { postInfo } = await worker(config)
