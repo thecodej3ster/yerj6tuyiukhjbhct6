@@ -124,9 +124,8 @@ async function publish() {
 
     const { videoUrl, description } = await getVideo(video.videoId)
 
-    console.log(videoUrl);
-    console.log(description);
-    return
+    // console.log(videoUrl);
+    // console.log(description);
 
 
     const publishQuery = `
@@ -181,6 +180,7 @@ async function publish() {
 
     const { postInfo } = await worker(config)
 
+    console.log(postInfo);
     i++
     if (i < store.accounts.length) {
         await publish()
