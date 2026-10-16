@@ -124,6 +124,9 @@ async function publish() {
 
     const { videoUrl, description } = await getVideo(video.videoId)
 
+    if (!videoUrl || !description) {
+        return
+    }
     // console.log(videoUrl);
     // console.log(description);
 
@@ -173,7 +176,7 @@ async function publish() {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${account.key.trim()}`,
             },
-            body: { query: publishQuery, variables: payload },
+            body: JSON.stringify({ query: publishQuery, variables: payload }),
             responseType: "json"
         }
     }
