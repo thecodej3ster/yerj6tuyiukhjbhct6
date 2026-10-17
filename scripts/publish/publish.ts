@@ -3,7 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 import { processCropPipeline } from "../edit/crop";
 import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
-import store from "./config.json"
+import keys from "./keys.json"
+import { createSchedule, deleteSchedule } from "./schedule";
+import jobStore from './jobs.json'
+import { initSchedule } from "./schedule";
+import fs from 'fs'
 
 const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
@@ -111,19 +115,58 @@ async function getVideo(id: string) {
 }
 
 
-async function cleanUp(video_id: string) {
+function rotate(list: any[], currentElement: any) {
+    const currentIndex = list.indexOf(currentElement)
+    let nextIndex = currentIndex === list.length - 1 ? 0 : currentIndex + 1
+    const nextElement = list[nextIndex]
+    return nextElement
+}
+
+interface WorkflowDispatchEvent {
+    inputs: {
+        username: string;
+        time: number;
+        jobId: string
+    };
+}
+
+async function manageSchedule(video_id: string) {
+    const postingHours = [6, 11, 17, 23]
+    const eventPath = process.env.GITHUB_EVENT_PATH;
+
+    if (!eventPath) {
+        throw new Error("GITHUB_EVENT_PATH environment variable is not set.");
+    }
+
+    const rawData = fs.readFileSync(eventPath, 'utf8');
+    const { inputs }: WorkflowDispatchEvent = JSON.parse(rawData);
+
+    await deleteSchedule(inputs.jobId)
+
+    const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
+
+    await createSchedule({ hours: rotate(postingHours, inputs.time), username: inputs.username, minutes: selectedMinutes })
+
     await db
         .from("video_descriptions")
         .delete()
         .eq("video_id", video_id)
 
-    //delete schedule 
-    //add new schedule
+    return {
+        username: inputs.username
+    }
 }
 
-let i = 0
+
 async function publish() {
+    if (!Object.keys(jobStore.jobs).length) {
+        await initSchedule()
+        return
+    }
+
+    return
     const video = await processCropPipeline()
+
     if (!video) {
         return
     }
@@ -138,8 +181,7 @@ async function publish() {
         return
     }
     console.log(videoUrl);
-    cleanUp(videoInfo.id)
-    return
+
     const publishQuery = `
         mutation ShareReelNow($input: CreatePostInput!) {
           createPost(input: $input) {
@@ -156,10 +198,11 @@ async function publish() {
         }
       `;
 
+    const { username } = await manageSchedule(videoInfo.id)
+    const keyStore = keys as Record<string, string>
+    const key = keyStore[username]
 
-
-    const account = store.accounts[i]
-    const channelId = await getChannelId(account.key)
+    const channelId = await getChannelId(key)
 
     const payload = {
         input: {
@@ -190,7 +233,7 @@ async function publish() {
         requestConfig: {
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${account.key.trim()}`,
+                "Authorization": `Bearer ${key}`,
             },
             body: JSON.stringify({ query: publishQuery, variables: payload }),
             responseType: "json",
@@ -200,56 +243,7 @@ async function publish() {
     }
 
     const { postInfo } = await worker(config)
-    cleanUp(videoInfo.id)
-
-    // console.log(postInfo);
-    i++
-    if (i < store.accounts.length) {
-        await publish()
-    }
-
+    console.log(postInfo);
 }
 
-import * as fs from 'fs';
-
-interface WorkflowDispatchEvent {
-    inputs?: {
-        environment?: string;
-        version?: string;
-        [key: string]: any; // Allows custom input fields
-    };
-    // Add other event properties if needed
-}
-
-function readWorkflowInputs() {
-    const eventPath = process.env.GITHUB_EVENT_PATH;
-
-    if (!eventPath) {
-        console.error("GITHUB_EVENT_PATH environment variable is not set.");
-        return;
-    }
-
-    try {
-        // Read and parse the event JSON file provided by GitHub Actions
-        const rawData = fs.readFileSync(eventPath, 'utf8');
-        const eventData: WorkflowDispatchEvent = JSON.parse(rawData);
-
-        // Extract your inputs
-        const inputs = eventData.inputs || {};
-
-        console.log("Received inputs:", inputs);
-
-        // Example: Accessing specific inputs
-        // const environment = inputs.environment || 'default-env';
-        // const version = inputs.version || 'v1.0.0';
-
-        console.log(inputs);
-
-        return inputs;
-    } catch (error) {
-        console.error("Failed to read or parse GitHub event payload:", error);
-    }
-}
-
-readWorkflowInputs();
-// publish()
+publish()

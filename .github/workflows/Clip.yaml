@@ -3,7 +3,10 @@ on:
   workflow_dispatch:
     inputs:
       username:
-        description: 'Account Username'
+        required: true
+      time:
+        required: true
+      jobId:
         required: true
 jobs:
   edit:

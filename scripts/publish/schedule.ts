@@ -1,8 +1,10 @@
 import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
 import fs from 'fs/promises'
-import config from './config.json'
-import store from './store.json'
+import jobStore from './jobs.json'
+import keys from './keys.json'
+import crypto from 'crypto'
+import path from "path";
 
 const baseHeaders = {
     "accept": "application/json, text/plain, */*",
@@ -24,15 +26,21 @@ const baseHeaders = {
     "Referer": "https://console.cron-job.org/"
 }
 
-async function schedulePost({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
+const storeObj = jobStore as { jobs: Record<string, number> }
+
+export async function createSchedule({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
 
     const postID = `Post_${Date.now()}`
     const token = "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"
     const url = `https://api.github.com/repos/thecodej3ster/editor/actions/workflows/Clip.yaml/dispatches`;
+    const jobId = crypto.randomBytes(8).toString("hex")
+
     const payload = {
         ref: 'main',
         inputs: {
-            username: username
+            username: username,
+            time: hours,
+            jobId: jobId
         }
     }
 
@@ -103,15 +111,17 @@ async function schedulePost({ hours, minutes, username }: { hours: number, minut
         }
     }
     const { job }: Record<string, { jobId: number }> = await worker(config)
-    // store.jobIds.push(job.jobId)
-    // console.log(job);
+    storeObj.jobs[jobId] = job.jobId
+    const jobStorePath = path.resolve("scripts/publish/jobs.json")
+    await fs.writeFile(jobStorePath, JSON.stringify(storeObj))
 }
 
 
 
-export async function deleteSchedule() {
+export async function deleteSchedule(id: string) {
+
     baseHeaders["x-api-method"] = "DeleteJob"
-    const payload = { jobId: '' }
+    const payload = { jobId: storeObj.jobs[id] }
     const config: WorkerConfig = {
         urls: { deleteRequest: "https://api.cron-job.org/" },
         requestConfig: {
@@ -124,52 +134,9 @@ export async function deleteSchedule() {
     const { deleteRequest }: Record<string, any> = await worker(config)
 }
 
-
-async function startSchedule() {
-    const postingHours = [6, 11, 17, 23]
-
-    const accountsConfig = {
-        "charliekirkdaily": "",
-        'charliekirk.daily': ""
-    }
-
-    const usernames = Object.keys(accountsConfig)
-    let currentPostingHour = 0
-
-    let i = 0
-    const createSchedule = async () => {
-        const username = usernames[i]
-        let selectedMinutes = 0
-
-        while (selectedMinutes < 5) {
-            selectedMinutes = Math.round(Math.random() * 25)
-        }
-
-        if (config.lastPost === -1) {
-            currentPostingHour = postingHours[0]
-        } else {
-            const nextPostHourIndex = postingHours.indexOf(config.lastPost) + 1
-            currentPostingHour = postingHours[nextPostHourIndex]
-        }
-
-        await schedulePost({ hours: currentPostingHour, minutes: selectedMinutes, username: username })
-        i++
-
-        if (i < usernames.length) {
-            await createSchedule()
-        }
-    }
-
-    await createSchedule()
-
-    if (currentPostingHour === 23) {
-        config.lastPost = -1
-    } else {
-        config.lastPost = currentPostingHour
-    }
-
-    await fs.writeFile('./config.json', JSON.stringify(config))
-    await fs.writeFile('./store.json', JSON.stringify(store))
+let i = 0
+const usernames = Object.keys(keys)
+export async function initSchedule() {
+    const username = usernames[i]
+    console.log(username);
 }
-
-startSchedule()
