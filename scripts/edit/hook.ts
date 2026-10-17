@@ -1,5 +1,5 @@
 import path from 'path';
-import fsPromises, { link } from 'fs/promises';
+import fsPromises from 'fs/promises';
 import { createClient } from '@supabase/supabase-js';
 import { retrive } from '../utils/retriveVideo';
 import { worker } from '../utils/worker';
