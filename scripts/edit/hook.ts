@@ -73,8 +73,7 @@ async function uploadFile(filePath: string) {
       } else {
         return args.response
       }
-    },
-    direct: true
+    }
   }
 
   const { uploadUrl } = await worker(config)
@@ -154,7 +153,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
     retries++
     if (retries === 3) {
       console.log(chat);
-      
+
       return null
     }
 
