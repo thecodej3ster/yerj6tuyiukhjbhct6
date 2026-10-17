@@ -1,10 +1,12 @@
 import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
-import fs from 'fs/promises'
 import jobStore from './jobs.json'
 import keys from './keys.json'
 import crypto from 'crypto'
 import path from "path";
+import { createClient } from "@supabase/supabase-js";
+
+const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
 const baseHeaders = {
     "accept": "application/json, text/plain, */*",
@@ -111,17 +113,24 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
         }
     }
     const { job }: Record<string, { jobId: number }> = await worker(config)
-    storeObj.jobs[jobId] = job.jobId
-    const jobStorePath = path.resolve("scripts/publish/jobs.json")
-    await fs.writeFile(jobStorePath, JSON.stringify(storeObj))
+
+    await db
+        .from("jobs")
+        .insert([{ id: jobId, job_id: job.jobId }])
 }
 
 
 
 export async function deleteSchedule(id: string) {
 
+    const { data } = await db.from("jobs")
+        .select("*")
+        .eq("id", id)
+        .limit(1)
+        .single()
+
     baseHeaders["x-api-method"] = "DeleteJob"
-    const payload = { jobId: storeObj.jobs[id] }
+    const payload = { jobId: data.job_id }
     const config: WorkerConfig = {
         urls: { deleteRequest: "https://api.cron-job.org/" },
         requestConfig: {
@@ -132,6 +141,12 @@ export async function deleteSchedule(id: string) {
         }
     }
     const { deleteRequest }: Record<string, any> = await worker(config)
+
+
+    await db
+        .from("jobs")
+        .delete()
+        .eq("id", id)
 }
 
 let i = 0

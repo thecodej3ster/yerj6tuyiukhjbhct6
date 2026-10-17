@@ -9,7 +9,7 @@ on:
       jobId:
         required: true
 jobs:
-  edit:
+  CLIP:
     runs-on: ubuntu-latest
     env:
       SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
