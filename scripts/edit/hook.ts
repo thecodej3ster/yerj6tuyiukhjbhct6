@@ -147,6 +147,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
   const { chat } = await worker(config)
 
+
   if (
     chat.candidates &&
     chat.candidates.length &&
@@ -154,7 +155,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
     chat.candidates[0].content &&
     chat.candidates[0].content.parts &&
     chat.candidates[0].content.parts.length &&
-    chat.candidates[0].content.parts[0].textdescription
+    chat.candidates[0].content.parts[0].text
   ) {
     const response: string = chat.candidates[0].content.parts[0].text
     return { content: response, key: selectedKey }
