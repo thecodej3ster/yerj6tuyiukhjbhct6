@@ -1,5 +1,5 @@
 import path from 'path';
-import fsPromises from 'fs/promises';
+import fsPromises, { link } from 'fs/promises';
 import { createClient } from '@supabase/supabase-js';
 import { retrive } from '../utils/retriveVideo';
 import { worker } from '../utils/worker';
@@ -179,82 +179,78 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   await fsPromises.mkdir(tempDir, { recursive: true });
   const hookPromptFileUpload = await uploadFile(tempFilePath)
 
-  try {
-    if (!hookPromptFileUpload.file.uri) {
+  if (!hookPromptFileUpload.file.uri) {
+    return
+  }
+
+
+  const onScreenTextResponse = await sendToAI({
+    prompt: hookPrompt,
+    fileUrl: hookPromptFileUpload.file.uri
+  })!
+
+  if (!onScreenTextResponse) {
+    throw new Error("Could Not Generate Hook")
+  }
+
+  const descriptionResponse = await sendToAI({
+    prompt: videoDescriptionPrompt,
+    fileUrl: hookPromptFileUpload.file.uri,
+    key: onScreenTextResponse.key
+  })
+
+  if (!descriptionResponse) {
+    throw new Error("Could Not Generate Description")
+  }
+  const onScreenTextResult = onScreenTextResponse.content
+  const hooks = onScreenTextResult.split("\n")
+
+  let hookFound = false
+  hooks.map(async hook => {
+    if (hookFound) {
       return
     }
+    if (hook && !hook.toLowerCase().includes("titles")) {
+      const formatedHook = wrapText(hook)
 
+      if (formatedHook.length && formatedHook.length < 5) {
+        const hookLines = { lines: formatedHook }
+        const { error } = await db.from("video_hooks")
+          .insert([{
+            video_id: id,
+            hook: JSON.stringify(hookLines)
+          }])
 
-    const onScreenTextResponse = await sendToAI({
-      prompt: hookPrompt,
-      fileUrl: hookPromptFileUpload.file.uri
-    })!
-
-    if (!onScreenTextResponse) {
-      throw new Error("Could Not Generate Hook")
-    }
-
-    const descriptionResponse = await sendToAI({
-      prompt: videoDescriptionPrompt,
-      fileUrl: hookPromptFileUpload.file.uri,
-      key: onScreenTextResponse.key
-    })
-
-    if (!descriptionResponse) {
-      throw new Error("Could Not Generate Description")
-    }
-    const onScreenTextResult = onScreenTextResponse.content
-    const hooks = onScreenTextResult.split("\n")
-
-    let hookFound = false
-    hooks.map(async hook => {
-      if (hookFound) {
-        return
-      }
-      if (hook && !hook.toLowerCase().includes("titles")) {
-        const formatedHook = wrapText(hook)
-
-        if (formatedHook.length && formatedHook.length < 5) {
-          const hookLines = { lines: formatedHook }
-          const { error } = await db.from("video_hooks")
-            .insert([{
-              video_id: id,
-              hook: JSON.stringify(hookLines)
-            }])
-
-          if (error) {
-            throw error
-          }
-
-          hookFound = true
+        if (error) {
+          throw error
         }
+
+        hookFound = true
       }
-    })
-
-    const { error } = await db.from("video_descriptions")
-      .insert([{ video_id: clip.video_id, content: descriptionResponse.content }])
-
-    if (error) {
-      throw error
     }
+  })
 
+  const { error } = await db.from("video_descriptions")
+    .insert([{ video_id: id, content: descriptionResponse.content }])
+
+  if (error) {
+    throw error
   }
-  finally {
 
-    const config: WorkerConfig = {
-      urls: {
-        deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
+
+  const config: WorkerConfig = {
+    urls: {
+      deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
+    },
+    requestConfig: {
+      headers: {
+        'x-goog-api-key': `${hookPromptFileUpload.key}`
       },
-      requestConfig: {
-        headers: {
-          'x-goog-api-key': `${hookPromptFileUpload.key}`
-        },
-        method: "DELETE"
-      }
+      method: "DELETE"
     }
-
-    await worker(config)
-    await processTextPipeline(tempFilePath, id)
   }
 
+  await worker(config)
+  await processTextPipeline(tempFilePath, id)
 }
+
