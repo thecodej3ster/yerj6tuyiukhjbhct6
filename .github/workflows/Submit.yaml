@@ -2,7 +2,7 @@ name: Process Submit PipeLine
 on:
   workflow_dispatch:
     inputs:
-      username:
+      campaignId:
         required: true
 jobs:
   edit:
