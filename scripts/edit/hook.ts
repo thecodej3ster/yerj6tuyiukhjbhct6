@@ -67,9 +67,14 @@ async function uploadFile(filePath: string) {
       method: "POST",
 
     },
-    resolverAction: async (args) => args.headers['x-goog-upload-url'],
+    resolverAction: async (args) => {
+      if (args.headers['x-goog-upload-url']) {
+        return args.headers['x-goog-upload-url']
+      } else {
+        return args.response
+      }
+    },
     direct: true
-
   }
 
   const { uploadUrl } = await worker(config)
@@ -148,7 +153,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
   } else {
     retries++
     if (retries === 3) {
-      return null
+      return chat
     }
 
     return await new Promise<{ content: string, key: string } | null>((resolve) => {
@@ -179,16 +184,18 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   const hookPromptFileUpload = await uploadFile(tempFilePath)
 
   if (!hookPromptFileUpload.file.uri) {
-    return
+    console.log(hookPromptFileUpload);
+    throw new Error(`Could Not Find Ai FileUpload Url`)
   }
 
 
   const onScreenTextResponse = await sendToAI({
     prompt: hookPrompt,
     fileUrl: hookPromptFileUpload.file.uri
-  })!
+  })
 
   if (!onScreenTextResponse) {
+    console.log(onScreenTextResponse);
     throw new Error("Could Not Generate Hook")
   }
 
@@ -199,6 +206,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   })
 
   if (!descriptionResponse) {
+    console.log(descriptionResponse);
     throw new Error("Could Not Generate Description")
   }
   const onScreenTextResult = onScreenTextResponse.content
