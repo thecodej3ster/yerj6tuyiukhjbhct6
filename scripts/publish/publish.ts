@@ -138,8 +138,8 @@ async function publish() {
         return
     }
     console.log(videoUrl);
-cleanUp(videoInfo.id)
-return
+    cleanUp(videoInfo.id)
+    return
     const publishQuery = `
         mutation ShareReelNow($input: CreatePostInput!) {
           createPost(input: $input) {
@@ -210,4 +210,46 @@ return
 
 }
 
-publish()
+import * as fs from 'fs';
+
+interface WorkflowDispatchEvent {
+    inputs?: {
+        environment?: string;
+        version?: string;
+        [key: string]: any; // Allows custom input fields
+    };
+    // Add other event properties if needed
+}
+
+function readWorkflowInputs() {
+    const eventPath = process.env.GITHUB_EVENT_PATH;
+
+    if (!eventPath) {
+        console.error("GITHUB_EVENT_PATH environment variable is not set.");
+        return;
+    }
+
+    try {
+        // Read and parse the event JSON file provided by GitHub Actions
+        const rawData = fs.readFileSync(eventPath, 'utf8');
+        const eventData: WorkflowDispatchEvent = JSON.parse(rawData);
+
+        // Extract your inputs
+        const inputs = eventData.inputs || {};
+
+        console.log("Received inputs:", inputs);
+
+        // Example: Accessing specific inputs
+        // const environment = inputs.environment || 'default-env';
+        // const version = inputs.version || 'v1.0.0';
+
+        console.log(inputs);
+
+        return inputs;
+    } catch (error) {
+        console.error("Failed to read or parse GitHub event payload:", error);
+    }
+}
+
+readWorkflowInputs();
+// publish()
