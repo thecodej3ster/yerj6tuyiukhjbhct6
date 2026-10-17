@@ -166,16 +166,16 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 export async function processHookPipeline(tempFilePath: string, id: string) {
   console.log('RUNNING HOOK PIPELINE');
 
-  const hookPromptFilePath = path.resolve(__dirname, "utils", "onScreenTextPrompt.txt")
+  const hookPromptFilePath = path.resolve("scripts/edit/prompts/onScreenTextPrompt.txt")
   const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
   const hookPrompt = hookPromptFile.toString()
 
-  const videoDescriptionPromptFilePath = path.resolve(__dirname, "utils", "videoDescriptionPrompt.txt")
+  const videoDescriptionPromptFilePath = path.resolve("scripts/edit/prompts/videoDescriptionPrompt.txt")
   const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
   const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
   const clip = await retrive({ table: "pip_videos", autoDelete: true, id: id })
-  const tempDir = path.resolve(__dirname, 'temp');
+  const tempDir = path.resolve("scripts", 'temp');
   await fsPromises.mkdir(tempDir, { recursive: true });
   const hookPromptFileUpload = await uploadFile(tempFilePath)
 
