@@ -139,4 +139,9 @@ const usernames = Object.keys(keys)
 export async function initSchedule() {
     const username = usernames[i]
     console.log(username);
+
+    i++
+    if (i < usernames.length) {
+        await initSchedule()
+    }
 }
