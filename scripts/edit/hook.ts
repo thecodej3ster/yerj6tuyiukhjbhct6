@@ -168,7 +168,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
     return await new Promise<{ content: string, key: string } | null>((resolve) => {
       setTimeout(async () => {
-        const data = await sendToAI({ prompt: prompt, fileUrl: fileUrl })
+        const data = await sendToAI({ prompt: prompt, fileUrl: fileUrl, key: key })
         resolve(data)
       }, 5000)
     })
@@ -201,7 +201,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
 
   const onScreenTextResponse = await sendToAI({
     prompt: hookPrompt,
-    key:hookPromptFileUpload.key,
+    key: hookPromptFileUpload.key,
     fileUrl: hookPromptFileUpload.file.uri
   })
 
