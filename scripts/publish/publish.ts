@@ -164,7 +164,6 @@ async function publish() {
         return
     }
 
-    return
     const video = await processCropPipeline()
 
     if (!video) {
@@ -199,6 +198,7 @@ async function publish() {
       `;
 
     const { username } = await manageSchedule(videoInfo.id)
+    return
     const keyStore = keys as Record<string, string>
     const key = keyStore[username]
 

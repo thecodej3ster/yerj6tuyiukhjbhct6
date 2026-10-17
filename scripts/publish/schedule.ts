@@ -136,9 +136,11 @@ export async function deleteSchedule(id: string) {
 
 let i = 0
 const usernames = Object.keys(keys)
+const initHour = 6
 export async function initSchedule() {
     const username = usernames[i]
-    console.log(username);
+
+    await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
 
     i++
     if (i < usernames.length) {
