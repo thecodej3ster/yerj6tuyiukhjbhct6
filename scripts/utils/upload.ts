@@ -15,8 +15,6 @@ const keepId = "-5113371237"
 
 export async function uploadVideo({ file, table, storageUpload, id }: { id: string, file?: File, table: string, storageUpload?: boolean }) {
 
-
-
   const videoId = id
 
   await db
@@ -60,7 +58,8 @@ export async function uploadVideo({ file, table, storageUpload, id }: { id: stri
           .insert([{ video_id: args.videoId, chunk_id: chunkId, position: args.index }])
 
         return JSON.stringify({ data: args.response, index: args.index })
-      }
+      },
+      direct: true
     }
 
     chunkUploadWorkers.push(worker(config))

@@ -67,7 +67,8 @@ async function uploadFile(filePath: string) {
       method: "POST",
 
     },
-    resolverAction: async (args) => args.headers['x-goog-upload-url']
+    resolverAction: async (args) => args.headers['x-goog-upload-url'],
+    direct: true
 
   }
 

@@ -124,7 +124,8 @@ export async function retrive(
     const config: WorkerConfig = {
       urls: {},
       resolverArgs: {},
-      requestConfig: { responseType: "arraybuffer" }
+      requestConfig: { responseType: "arraybuffer" },
+      direct: true
     }
 
     config.urls[id] = `https://api.telegram.org/file/bot${tkn}/${response.data}`

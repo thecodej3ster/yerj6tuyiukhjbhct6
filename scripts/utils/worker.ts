@@ -7,7 +7,7 @@ const workerLimit = 5
 
 
 
-export async function worker({ requestConfig, urls, resolverAction, resolverArgs }: WorkerConfig) {
+export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const result: Record<string, any> = {};
     const unFinishedWork = Object.keys(urls);
 
@@ -20,7 +20,7 @@ export async function worker({ requestConfig, urls, resolverAction, resolverArgs
 
 
     const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
-        if (resolverAction) {            
+        if (resolverAction) {
             if (resolverArgs) {
                 return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             } else {
@@ -39,7 +39,6 @@ export async function worker({ requestConfig, urls, resolverAction, resolverArgs
             method: requestConfig?.method?.toUpperCase() || "GET",
             responseEncoding: requestConfig?.responseEncoding || "UTF-8",
             responseType: requestConfig?.responseType || "text",
-            httpsAgent: new ProxyAgent({ keepAlive: true }),
             transformResponse: ([] as AxiosResponseTransformer[])
                 .concat(axios.defaults.transformResponse || [])
                 .concat([handleResolver]).filter(Boolean),
@@ -60,6 +59,9 @@ export async function worker({ requestConfig, urls, resolverAction, resolverArgs
             } as Record<string, string>
         };
 
+        if (!direct) {
+            selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
+        }
         try {
             const response = await axios(selectedRequestConfig);
             // console.log(response);

@@ -8,4 +8,5 @@ export type WorkerConfig = {
     requestConfig?: RequestConfig;
     resolverAction?: (args: Record<string, any>) => Promise<any>;
     resolverArgs?: Record<string, string>;
+    direct?: boolean
 };

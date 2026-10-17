@@ -6,7 +6,7 @@ import { pipeline } from 'stream/promises';
 
 export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
 
-  const stream = fs.createWriteStream(outputPath)  
+  const stream = fs.createWriteStream(outputPath)
 
   const config: WorkerConfig = {
     urls: {
@@ -17,7 +17,8 @@ export async function downloadVideo(targetUrl: string, outputPath: string,): Pro
     },
     resolverAction: async (args) => {
       await pipeline(args.response, stream)
-    }
+    },
+    direct: true
   }
 
   await worker(config)
