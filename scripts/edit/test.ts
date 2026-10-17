@@ -7,6 +7,8 @@ import { hash } from 'node:crypto'
 import { worker } from '../utils/worker'
 import { WorkerConfig } from '../utils/types'
 import path from 'path'
+import fs from 'fs'
+
 const r = async () => {
   // await emptyGeminiStorage()
   // await processCropPipeline()
@@ -16,9 +18,13 @@ const r = async () => {
 }
 
 (async () => {
-  const gg = path.resolve("fonts")
-  console.log(gg);
-  
+  const gg = path.resolve("scripts",'temp')
+
+ else {
+    console.log('NO');
+
+  }
+
 
   // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" } }
   // const { t } = await worker(config)
