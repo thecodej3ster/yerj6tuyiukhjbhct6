@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 import { retrive } from '../utils/retriveVideo';
 import { worker } from '../utils/worker';
 import { WorkerConfig } from '../utils/types';
-import { selectKey } from '../utils/helpers';
 import { processTextPipeline } from './addText';
 
 
@@ -17,6 +16,15 @@ interface Clip {
 
 
 const geminiKeys = JSON.parse(process.env.Ai_Key!)
+
+let lastUsed = -1
+function selectKey(list: { keys: string[] }) {
+  lastUsed++
+  if (lastUsed > list.keys.length - 1) {
+    lastUsed = 0
+  }
+  return list.keys[lastUsed]
+}
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
   const words = text.trim().replace('.', '').split(/\s+/)
@@ -73,7 +81,8 @@ async function uploadFile(filePath: string) {
       } else {
         return args.response
       }
-    }
+    },
+    direct: true
   }
 
   const { uploadUrl } = await worker(config)
