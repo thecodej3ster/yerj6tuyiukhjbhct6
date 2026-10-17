@@ -153,7 +153,9 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
   } else {
     retries++
     if (retries === 3) {
-      return chat
+      console.log(chat);
+      
+      return null
     }
 
     return await new Promise<{ content: string, key: string } | null>((resolve) => {
