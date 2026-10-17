@@ -3,10 +3,8 @@ import { worker } from './worker';
 import { WorkerConfig } from './types';
 import { GoogleGenAI } from '@google/genai';
 import { pipeline } from 'stream/promises';
-import path from 'path';
-export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
 
-  // const formatedPath = path.resolve('../scripts/temp', path.basename(outputPath))
+export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
 
   const stream = fs.createWriteStream(outputPath)  
 

@@ -18,12 +18,9 @@ const r = async () => {
 }
 
 (async () => {
-  const gg = path.resolve("scripts",'temp')
+  // const gg = path.resolve("scripts",'temp')
 
- else {
-    console.log('NO');
 
-  }
 
 
   // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" } }

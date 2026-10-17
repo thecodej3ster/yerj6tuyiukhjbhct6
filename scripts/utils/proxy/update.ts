@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import locations from './locations.json'
+import path from 'path'
 
 interface ProxyCreds {
     servers: { address: string }[],
@@ -58,8 +59,10 @@ const setProxyCreds = async () => {
 
     await updateInfo()
 
-    await fs.writeFile("./authLife.json", JSON.stringify(authLifeStore))
-    await fs.writeFile("./serverList.json", JSON.stringify(serverCreds))
+    const currentDir = path.resolve("scripts/utils/proxy")
+
+    await fs.writeFile(path.join(currentDir, "authLife.json"), JSON.stringify(authLifeStore))
+    await fs.writeFile(path.join(currentDir, "serverList.json"), JSON.stringify(serverCreds))
 }
-// { host: string, auth: string, expires: number }
+
 setProxyCreds()
