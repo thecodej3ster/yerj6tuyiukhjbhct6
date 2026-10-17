@@ -1,4 +1,4 @@
-name: Process Clipping PipeLine
+name: Process Monitor PipeLine
 on:
   workflow_dispatch:
 jobs:
