@@ -1,4 +1,5 @@
 import fs from 'fs/promises'
+import locations from './locations.json'
 
 interface ProxyCreds {
     servers: { address: string }[],
@@ -13,9 +14,6 @@ const setProxyCreds = async () => {
     const serverCreds: { servers: any[] } = { servers: [] }
 
     const getLocations = async () => {
-        const locationsData = await fs.readFile("./locations.json")
-        const locationsFile = locationsData.toString()
-        const locations = JSON.parse(locationsFile)
         const locationNames = Object.keys(locations)
         return locationNames
     }

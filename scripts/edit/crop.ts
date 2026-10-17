@@ -140,13 +140,7 @@ export async function processCropPipeline() {
 
   if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
-
-
   const tempDir = path.resolve("scripts", "temp");
-
-  try {
-    await fsPromises.mkdir(tempDir)
-  } catch (e) { }
 
   let tempVideoPath = "";
   const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
