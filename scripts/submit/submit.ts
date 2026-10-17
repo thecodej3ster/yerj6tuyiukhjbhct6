@@ -41,8 +41,9 @@ interface SubmissionQueueRecord {
     account_name: string
 }
 
-export async function submit(campaignId: string) {
-    console.log(campaignId);
+
+
+export async function submit(campaignId:string) {
 
     const token = await getAuth()
     const status = { suscess: false }
@@ -58,7 +59,7 @@ export async function submit(campaignId: string) {
     const payload = JSON.stringify({ url: post.url })
 
     let workerConfig: WorkerConfig = {
-        urls: { checkHandle: "https://monsterlab.io/api/social-media/lookup-handle" },
+        urls: { handleLookup: "https://monsterlab.io/api/social-media/lookup-handle" },
         requestConfig: {
             headers: {
                 "accept": "*/*",
@@ -79,14 +80,14 @@ export async function submit(campaignId: string) {
                 "sec-gpc": "1",
             },
             method: "POST",
+            responseType: "json",
             body: payload
         }
     }
 
-    const response = await worker(workerConfig)
+    const { handleLookup } = await worker(workerConfig)
     // console.log(response);
 
-    const handleLookup = JSON.parse(response.checkHandle)
     const handle = handleLookup.handle.replace("@", "")
     // console.log(handleLookup);
 
@@ -97,11 +98,6 @@ export async function submit(campaignId: string) {
         accountId: `instagram_${handle}`,
         source: "modal"
     }
-
-    console.log(submitPayload);
-
-    // const submitPayload = `{\"url\":\"${handleLookup.resolvedUrl}\",\"priority\":\"normal\",\"campaignId\":\"${campaignId}\",\"accountId\":\"instagram_${handle}\",\"source\":\"modal\"}`
-    // console.log(submitPayload);
 
     workerConfig = {
         urls: { submit: "https://monsterlab.io/api/social-media/monitor" },

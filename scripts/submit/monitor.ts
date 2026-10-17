@@ -2,6 +2,8 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { worker } from "../utils/worker"
 import { WorkerConfig, ResolverArgs } from "../utils/types";
 import { createClient } from "@supabase/supabase-js";
+import { submit } from "./submit";
+import fs from 'fs'
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
@@ -10,6 +12,11 @@ interface PostRecord {
     post_id: string
 }
 
+interface WorkflowDispatchEvent {
+    inputs: {
+        campaignId: string;
+    };
+}
 
 async function checkLatestPost({
     response: arg1,
@@ -79,9 +86,22 @@ export async function getRecentPost(): Promise<Record<string, boolean>> {
     console.log(recentPost);
 
     if (recentPost) {
-        recentPost.account_name = lastPost.username
-        recentPost.updated_at = new Date().toISOString()
-        await db.from("submission_queue").insert([recentPost])
+        // recentPost.account_name = lastPost.username
+        // recentPost.updated_at = new Date().toISOString()
+        // await db.from("submission_queue").insert([recentPost])
+        const eventPath = process.env.GITHUB_EVENT_PATH
+
+        if (!eventPath) {
+            throw new Error("GITHUB_EVENT_PATH environment variable is not set.");
+        }
+
+        const rawData = fs.readFileSync(eventPath, 'utf8');
+        const { inputs }: WorkflowDispatchEvent = JSON.parse(rawData);
+
+        const campaignId = inputs.campaignId
+
+        console.log(campaignId);
+        await submit(campaignId)
         return { sucess: true }
     }
     return status
