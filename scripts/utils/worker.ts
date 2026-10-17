@@ -19,9 +19,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
 
 
-    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
-        console.log(response);
-        
+    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {        
         if (resolverAction) {
             if (resolverArgs) {
                 return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })

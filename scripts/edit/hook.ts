@@ -201,6 +201,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
 
   const onScreenTextResponse = await sendToAI({
     prompt: hookPrompt,
+    key:hookPromptFileUpload.key,
     fileUrl: hookPromptFileUpload.file.uri
   })
 
