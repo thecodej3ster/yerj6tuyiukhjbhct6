@@ -41,8 +41,8 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
         ref: 'main',
         inputs: {
             username: username,
-            time: hours,
-            jobId: jobId
+            time: `${hours}`,
+            jobId: `${jobId}`
         }
     }
 

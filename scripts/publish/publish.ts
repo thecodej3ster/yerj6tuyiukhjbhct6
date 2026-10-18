@@ -130,39 +130,63 @@ interface WorkflowDispatchEvent {
     };
 }
 
-async function manageSchedule(video_id: string) {
+async function manageSchedule() {
     const postingHours = [6, 11, 17, 23]
     const eventPath = process.env.GITHUB_EVENT_PATH;
+
 
     if (!eventPath) {
         throw new Error("GITHUB_EVENT_PATH environment variable is not set.");
     }
 
+
     const rawData = fs.readFileSync(eventPath, 'utf8');
     const { inputs }: WorkflowDispatchEvent = JSON.parse(rawData);
 
-    await deleteSchedule(inputs.jobId)
+    if (inputs.jobId === "init") {
+        await initSchedule()
+        return {
+            username: null,
+            shouldPublish: false
+        }
+    }
+
+    const { data: job, error } = await db.from("jobs")
+        .select("*")
+        .eq("id", inputs.jobId)
+        .limit(1)
+        .single()
+
+    if (error) {
+        throw error
+    }
+
+    await deleteSchedule(job.job_id)
+
 
     const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
 
     await createSchedule({ hours: rotate(postingHours, inputs.time), username: inputs.username, minutes: selectedMinutes })
 
-    await db
-        .from("video_descriptions")
-        .delete()
-        .eq("video_id", video_id)
-
     return {
-        username: inputs.username
+        username: inputs.username,
+        shouldPublish: true
     }
 }
 
 
 async function publish() {
-    if (!Object.keys(jobStore.jobs).length) {
-        await initSchedule()
+    const { username, shouldPublish } = await manageSchedule()
+
+    if (!shouldPublish) {
         return
     }
+
+    // const { data: job } = await db.from("jobs")
+    //     .select("*")
+    //     .limit(1)
+    //     .maybeSingle()
+
 
     const video = await processCropPipeline()
 
@@ -197,7 +221,12 @@ async function publish() {
         }
       `;
 
-    const { username } = await manageSchedule(videoInfo.id)
+    // const { username } = await manageSchedule(videoInfo.id)
+    await db
+        .from("video_descriptions")
+        .delete()
+        .eq("video_id", video_id)
+
     return
     const keyStore = keys as Record<string, string>
     const key = keyStore[username]
