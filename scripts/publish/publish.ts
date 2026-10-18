@@ -151,6 +151,8 @@ async function manageSchedule() {
         }
     }
 
+    console.log(inputs.jobId);
+    
     const { data: job, error } = await db.from("jobs")
         .select("*")
         .eq("id", inputs.jobId)
