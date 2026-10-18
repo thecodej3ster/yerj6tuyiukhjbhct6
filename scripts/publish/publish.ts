@@ -131,7 +131,7 @@ interface WorkflowDispatchEvent {
 }
 
 async function manageSchedule() {
-    const postingHours = [6, 11, 17, 23]
+    const postingHours = [6, 11, 18, 23]
     const eventPath = process.env.GITHUB_EVENT_PATH;
 
 
