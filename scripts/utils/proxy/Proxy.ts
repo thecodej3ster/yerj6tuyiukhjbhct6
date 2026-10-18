@@ -1,14 +1,24 @@
 import tls from "node:tls";
 import { Agent as HttpsAgent } from "node:https";
-import serverList from './serverList.json';
+import { setProxyCreds } from "./update";
+import path from "path";
+import fs from 'fs'
 
 interface ConnectionOptions {
     host: string;
     port?: number;
 }
 
-let selectedServer: { host: string, auth: string }
 
+interface ServerCred {
+    host: string
+    auth: string
+}
+
+let selectedServer: ServerCred
+const serverListPath = path.resolve("scripts/utils/proxy/serverList.json")
+let serverListFile = fs.readFileSync(serverListPath, "utf-8")
+let serverList: { servers: ServerCred[] } = JSON.parse(serverListFile)
 
 
 
@@ -59,14 +69,20 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
     throw new Error("Proxy serverlist Exhausted.");
 }
 
+function buildConnectRequst({ authHeader, targetHost, targetPort }: { authHeader: string, targetHost: string, targetPort: number }) {
+    return `CONNECT ${targetHost}:${targetPort} HTTP/1.1\r\n` +
+        `Host: ${targetHost}:${targetPort}\r\n` +
+        `Proxy-Connection: Keep-Alive\r\n` +
+        authHeader +
+        `\r\n`;
+}
+
 /**
  * Custom HTTPS Agent subclass to properly override the createConnection method.
  * Built-in proxy authentication via hardcoded credentials.
  */
+let retried = false
 export class ProxyAgent extends HttpsAgent {
-    // Pre-computed Base64 auth header using your hardcoded credentials
-    private authHeader = "";
-
 
     // Overriding the class method instead of passing it as a constructor option
     override createConnection(options: any, callback?: (err: Error | null, socket?: any) => void): any {
@@ -74,39 +90,62 @@ export class ProxyAgent extends HttpsAgent {
 
         getProxySocket()
             .then((proxySocket) => {
-                this.authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
+                const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
                 const targetHost = connectionOpts.host;
                 const targetPort = connectionOpts.port || 443;
 
                 // Build the HTTP CONNECT request injection string
-                const connectRequest = `CONNECT ${targetHost}:${targetPort} HTTP/1.1\r\n` +
-                    `Host: ${targetHost}:${targetPort}\r\n` +
-                    `Proxy-Connection: Keep-Alive\r\n` +
-                    this.authHeader +
-                    `\r\n`;
+                const connectRequest = buildConnectRequst({ authHeader: authHeader, targetHost: targetHost, targetPort: targetPort })
 
                 proxySocket.write(connectRequest);
 
                 let connectResponse = "";
-                const onData = (chunk: Buffer) => {
+                const onData = async (chunk: Buffer) => {
                     connectResponse += chunk.toString("utf8");
+
                     if (connectResponse.includes("\r\n\r\n")) {
-                        proxySocket.off("data", onData);
-                        if (connectResponse.startsWith("HTTP/1.1 200") || connectResponse.startsWith("HTTP/1.0 200")) {
-                            const secureTargetSocket = tls.connect({
-                                socket: proxySocket,
-                                servername: targetHost
-                            });
+                        switch (true) {
+                            case connectResponse.startsWith("HTTP/1.1 200"):
+                            case connectResponse.startsWith("HTTP/1.0 200"):
+                                proxySocket.off("data", onData);
+                                const secureTargetSocket = tls.connect({
+                                    socket: proxySocket,
+                                    servername: targetHost
+                                });
 
-                            secureTargetSocket.on("secureConnect", () => {
-                                if (callback) callback(null, secureTargetSocket);
-                            });
-                            secureTargetSocket.on("error", (err) => {
-                                if (callback) callback(err);
-                            });
-                        } else {
+                                secureTargetSocket.on("secureConnect", () => {
+                                    if (callback) callback(null, secureTargetSocket);
+                                });
 
-                            if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
+                                secureTargetSocket.on("error", (err) => {
+                                    if (callback) callback(err);
+                                });
+                                break;
+
+                            case connectResponse.startsWith("HTTP/1.0 407") && !retried:
+                            case connectResponse.startsWith("HTTP/1.1 407") && !retried:
+                                await setProxyCreds()
+                                serverListFile = fs.readFileSync(serverListPath, "utf-8")
+                                serverList = JSON.parse(serverListFile)
+                                for (let i = 0; i < serverList.servers.length; i++) {
+                                    const server = serverList.servers[i];
+                                    if (server.host === selectedServer.host) {
+                                        selectedServer.auth = server.auth
+                                        const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
+                                        const connectRequest = buildConnectRequst({ authHeader: authHeader, targetHost: targetHost, targetPort: targetPort })
+                                        proxySocket.off("data", onData)
+                                        connectResponse = ""
+                                        proxySocket.on("data", onData)
+                                        proxySocket.write(connectRequest)
+                                        break
+                                    }
+                                }
+                                retried = true
+                                break;
+                            default:
+                                proxySocket.off("data", onData);
+                                if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
+
                         }
                     }
                 };

@@ -27,9 +27,12 @@ function selectKey(list: { keys: string[] }) {
 }
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
+  const emojis = ['🤯','😱','😮','👀']
+  const emoji = emojis[Math.floor(Math.random() * emojis.length)]
   const words = text.trim().replace('.', '').split(/\s+/)
   const resultLines: string[] = [];
   let line = ""
+
   words.map((word, i) => {
     const formatedWord = word + " "
 
@@ -37,13 +40,13 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
       resultLines.push(line)
       line = formatedWord
       if (i === words.length - 1) {
-        resultLines.push(line)
+        resultLines.push(line+" "+emoji)
       }
       return
     }
     if (i === words.length - 1) {
       line += formatedWord
-      resultLines.push(line)
+      resultLines.push(line+" "+emoji)
       return
     }
     line += formatedWord

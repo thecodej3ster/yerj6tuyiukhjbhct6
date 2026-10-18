@@ -8,6 +8,7 @@ import { worker } from '../utils/worker'
 import { WorkerConfig } from '../utils/types'
 import path from 'path'
 import fs from 'fs'
+import { log } from 'node:util'
 
 const r = async () => {
   // await emptyGeminiStorage()
@@ -18,14 +19,30 @@ const r = async () => {
 }
 
 (async () => {
+
+  const e = '🤯'
+  
+ const svg =  `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60" height="60" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" fill="none" />
+  <style>
+    text {
+      font-size: 60px;
+    }
+  </style>
+  <text x="20" y="60">${e}</text>
+</svg>`
+
+
+
   // const gg = path.resolve("scripts",'temp')
 
 
 
 
-  const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
-  const { t } = await worker(config)
-  console.log(t);
+  // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
+  // const { t } = await worker(config)
+  // console.log(t);
 
   // for (let i = 0; i < 5; i++) {
   //     await r()

@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import locations from './locations.json'
 import path from 'path'
+import axios from 'axios'
 
 interface ProxyCreds {
     servers: { address: string }[],
@@ -11,7 +12,7 @@ interface ProxyCreds {
 }
 
 
-const setProxyCreds = async () => {
+export async function setProxyCreds() {
     const serverCreds: { servers: any[] } = { servers: [] }
 
     const getLocations = async () => {
@@ -25,13 +26,13 @@ const setProxyCreds = async () => {
 
     let i = 0
     const updateInfo = async () => {
-        console.log("serverInfo");
+        // console.log("serverInfo");
         const tkn = "CAESKAoIdG91Y2h2cG4Q6NKI3QcY4r6VgggiEGYyOTQ3MzUwNjg2NmMzMjMaINPkTO4z7bYGbNBz8-cSeZ3VUpPR27q8BRhWC1_isoPx"
-        const serverData = await fetch(`https://api.pango-cloud.com/user/provide?access_token=${tkn}&type=proxy&location=${locationList[i]}`)
-        const serverInfo: ProxyCreds = await serverData.json()
+        const { data: serverInfo }: { data: ProxyCreds } = await axios.get(`https://api.pango-cloud.com/user/provide?access_token=${tkn}&type=proxy&location=${locationList[i]}`, { responseType: "json" })
+        // const serverInfo: ProxyCreds = 
         const authLife = { name: "", expires: 0 }
 
-        console.log(serverInfo);
+        // console.log(serverInfo);
         if (serverInfo.result === 'SERVER_UNAVAILABLE') {
             if (i < locationList.length) {
                 i++
@@ -64,5 +65,3 @@ const setProxyCreds = async () => {
     await fs.writeFile(path.join(currentDir, "authLife.json"), JSON.stringify(authLifeStore))
     await fs.writeFile(path.join(currentDir, "serverList.json"), JSON.stringify(serverCreds))
 }
-
-setProxyCreds()
