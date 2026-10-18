@@ -163,6 +163,8 @@ async function manageSchedule() {
         throw error
     }
 
+    console.log();
+    
     await deleteSchedule(job.job_id)
 
 

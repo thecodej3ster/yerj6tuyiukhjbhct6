@@ -123,14 +123,8 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
 
 export async function deleteSchedule(id: string) {
 
-    const { data } = await db.from("jobs")
-        .select("*")
-        .eq("id", id)
-        .limit(1)
-        .single()
-
     baseHeaders["x-api-method"] = "DeleteJob"
-    const payload = { jobId: data.job_id }
+    const payload = { jobId: id }
     const config: WorkerConfig = {
         urls: { deleteRequest: "https://api.cron-job.org/" },
         requestConfig: {
