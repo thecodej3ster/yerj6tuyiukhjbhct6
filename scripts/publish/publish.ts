@@ -160,10 +160,10 @@ async function manageSchedule() {
         .single()
 
     if (error) {
+        console.log(error);
         throw error
     }
 
-    console.log();
 
     await deleteSchedule(job.job_id)
 

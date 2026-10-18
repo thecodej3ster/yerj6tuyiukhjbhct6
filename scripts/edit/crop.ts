@@ -155,6 +155,7 @@ export async function processCropPipeline() {
 
       tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
       if (!clip || !clip.url) {
+        console.log(clip)
         return
       }
       await downloadVideo(clip.url, tempVideoPath);
