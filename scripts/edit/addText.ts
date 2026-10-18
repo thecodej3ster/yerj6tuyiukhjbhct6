@@ -70,7 +70,7 @@ export async function processTextPipeline(inputPath: string, id: string) {
 
   // Font paths configuration
   const fontPath = path.resolve("fonts", 'InterDisplay-ExtraBold.ttf');
-  const emojiFontPath = path.resolve("fonts", 'Twemoji.ttf'); // Ensure Twemoji.ttf exists here
+  const emojiFontPath = path.resolve("fonts", 'NotoColorEmoji.ttf'); // Ensure Twemoji.ttf exists here
 
   const resvg = new Resvg(svgContent, {
     fitTo: { mode: 'width', value: 1080 },
