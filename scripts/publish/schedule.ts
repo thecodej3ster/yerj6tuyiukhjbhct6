@@ -137,10 +137,15 @@ export async function deleteSchedule(id: string) {
     const { deleteRequest }: Record<string, any> = await worker(config)
 
 
-    await db
+    const { error } = await db
         .from("jobs")
         .delete()
-        .eq("id", id)
+        .eq("job_id", id)
+
+    console.log(error)
+    console.log(id);
+    
+
 }
 
 let i = 0

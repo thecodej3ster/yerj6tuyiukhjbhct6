@@ -152,7 +152,7 @@ async function manageSchedule() {
     }
 
     console.log(inputs.jobId);
-    
+
     const { data: job, error } = await db.from("jobs")
         .select("*")
         .eq("id", inputs.jobId)
@@ -164,13 +164,13 @@ async function manageSchedule() {
     }
 
     console.log();
-    
+
     await deleteSchedule(job.job_id)
 
 
     const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
 
-    await createSchedule({ hours: rotate(postingHours, inputs.time), username: inputs.username, minutes: selectedMinutes })
+    await createSchedule({ hours: rotate(postingHours, Number(inputs.time)), username: inputs.username, minutes: selectedMinutes })
 
     return {
         username: inputs.username,
