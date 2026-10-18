@@ -101,7 +101,7 @@ export async function getRecentPost(): Promise<Record<string, boolean>> {
         const campaignId = inputs.campaignId
 
         console.log(campaignId);
-        await submit(campaignId)
+        await submit({ campaignId: campaignId, url: recentPost.url })
         return { sucess: true }
     }
     return status

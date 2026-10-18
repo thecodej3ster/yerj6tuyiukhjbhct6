@@ -1,8 +1,9 @@
 import { worker } from "../utils/worker"
 import { WorkerConfig } from "../utils/types";
-import { PostgrestError, createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js";
+import { reportSubmit } from './report'
 
-const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
+// const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
 async function getAuth() {
     const workerConfig: WorkerConfig = {
@@ -43,20 +44,20 @@ interface SubmissionQueueRecord {
 
 
 
-export async function submit(campaignId:string) {
+export async function submit({ campaignId, url }: { campaignId: string, url: string }) {
 
     const token = await getAuth()
     const status = { suscess: false }
 
-    const { data: post, error }:
-        { data: SubmissionQueueRecord | null, error: PostgrestError | null } =
-        await db.from("submission_queue").select("*").order("updated_at", { ascending: true }).limit(1).single()
+    // const { data: post, error }:
+    //     { data: SubmissionQueueRecord | null, error: PostgrestError | null } =
+    //     await db.from("submission_queue").select("*").order("updated_at", { ascending: true }).limit(1).single()
 
-    if (!post) {
-        return status
-    }
+    // if (!post) {
+    //     return status
+    // }
 
-    const payload = JSON.stringify({ url: post.url })
+    const payload = JSON.stringify({ url: url })
 
     let workerConfig: WorkerConfig = {
         urls: { handleLookup: "https://monsterlab.io/api/social-media/lookup-handle" },
@@ -135,12 +136,15 @@ export async function submit(campaignId:string) {
         if (submission.success) {
             const reelCodeSearch = handleLookup.resolvedUrl.match(/(?<=p\/)[^\/]+/)
             if (reelCodeSearch) {
-                const insertUrl = `https://www.instagram.com/reel/${reelCodeSearch[0]}/embed/captioned/`
-                const { data: hh, error: ef } = await db.from("submitted_posts").insert([{
-                    account_name: handle,
-                    url: insertUrl
-                }]).select()
-                const { data: hk, error: op } = await db.from("submission_queue").delete().eq("url", post.url).select()
+                await reportSubmit({ username: handle })
+                // const insertUrl = `https://www.instagram.com/reel/${reelCodeSearch[0]}/embed/captioned/`
+
+                // const { data: hh, error: ef } = await db.from("submitted_posts").insert([{
+                //     account_name: handle,
+                //     url: insertUrl
+                // }]).select()
+                // const { data: hk, error: op } = await db.from("submission_queue").delete().eq("url", post.url).select()
+
                 status.suscess = true
             }
         }

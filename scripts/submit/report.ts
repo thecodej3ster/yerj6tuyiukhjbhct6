@@ -1,41 +1,39 @@
-import { createClient } from "@supabase/supabase-js";
 import { worker } from "../utils/worker"
 import { WorkerConfig } from "../utils/types";
 
-const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
+const tkn = "8781068686:AAG_xq7KsN6_Z15qZ_SS6NyEGjEaUMXsGxI"
 
-export async function getPostIfo() {
+export async function reportSubmit({ username }: { username: string }) {
 
-    type SubmissionRecord = {
-        url: string,
-        account_name: string
-    }
+    // type SubmissionRecord = {
+    //     url: string,
+    //     account_name: string
+    // }
 
     let status = { suscess: false }
 
     try {
-        const { data }: { data: SubmissionRecord | null } = await db
-            .from("submitted_posts")
-            .select("*")
-            .limit(1)
-            .single()
+        // const { data }: { data: SubmissionRecord | null } = await db
+        //     .from("submitted_posts")
+        //     .select("*")
+        //     .limit(1)
+        //     .single()
 
-        if (!data) {
-            return status
-        }
+        // if (!data) {
+        //     return status
+        // }
 
-        const submitReportBotToken = process.env.SRB_Token
-        const reportTemplate = `Post For ${data.account_name} Suscessfully Submitted 🎉🎉🎉`
+        // const submitReportBotToken = process.env.SRB_Token
+        const reportTemplate = `Post For ${username} Suscessfully Submitted 🎉🎉🎉`
 
         const payload = {
             text: reportTemplate,
-            chat_id: process.env.SRB_GROUP_ID
+            chat_id: '-5555063021'
         }
 
-        console.log(JSON.stringify(payload));
 
         const config: WorkerConfig = {
-            urls: { sendReport: `https://api.telegram.org/bot${submitReportBotToken}/sendMessage` },
+            urls: { sendReport: `https://api.telegram.org/bot${tkn}/sendMessage` },
             requestConfig: {
                 body: JSON.stringify(payload),
                 method: "POST",
@@ -48,10 +46,10 @@ export async function getPostIfo() {
         await worker(config)
 
 
-        await db
-            .from("submitted_posts")
-            .delete()
-            .eq("url", data.url)
+        // await db
+        //     .from("submitted_posts")
+        //     .delete()
+        //     .eq("url", data.url)
 
         status.suscess = true
     } catch (error) { }
