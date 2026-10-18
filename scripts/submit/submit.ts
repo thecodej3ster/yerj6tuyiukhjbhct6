@@ -88,6 +88,10 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
 
     const { handleLookup } = await worker(workerConfig)
     // console.log(response);
+    if (!handleLookup) {
+        console.log(handleLookup);
+        throw new Error('Could not Find Handle')
+    }
 
     const handle = handleLookup.handle.replace("@", "")
     // console.log(handleLookup);
