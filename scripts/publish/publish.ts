@@ -181,10 +181,16 @@ async function manageSchedule() {
 
 
 async function publish() {
-    const { username, shouldPublish, jobId} = await manageSchedule()
+    const { username, shouldPublish, jobId } = await manageSchedule()
 
     if (!shouldPublish) {
         return
+    }
+
+    if (!username || !jobId) {
+        console.log(`USERNAME IS ${username}`);
+        console.log(`JOBID IS ${jobId}`);
+        throw new Error('Expected Arg is Mising')
     }
 
     // const { data: job } = await db.from("jobs")
@@ -196,17 +202,21 @@ async function publish() {
     const video = await processCropPipeline()
 
     if (!video) {
-        return
+        console.log(video);
+        throw new Error(`Video Is Missing`);
     }
 
     const videoInfo = await getVideo(video.videoId)
     if (!videoInfo) {
-        return
+        console.log(videoInfo);
+        throw new Error(`VideoInfo Is Missing`);
     }
     const { videoUrl, description } = videoInfo
 
     if (!videoUrl || !description) {
-        return
+        console.log(`VideoUrl is : ${videoUrl}`);
+        console.log(`Description is : ${description}`);
+        throw new Error(`Either VideoUrl or Description Is Missing`);
     }
     console.log(videoUrl);
 
@@ -226,7 +236,52 @@ async function publish() {
         }
       `;
 
-    // const { username } = await manageSchedule(videoInfo.id)
+    // return
+    // const keyStore = keys as Record<string, string>
+    // const key = keyStore[username]
+
+    // const channelId = await getChannelId(key)
+
+    // const payload = {
+    //     input: {
+    //         text: description,
+    //         channelId: channelId,
+    //         schedulingType: "automatic",
+    //         mode: "shareNow",
+    //         metadata: {
+    //             instagram: {
+    //                 type: "reel",
+    //                 shouldShareToFeed: true
+    //             }
+    //         },
+    //         assets: [
+    //             {
+    //                 video: {
+    //                     url: videoUrl
+    //                 }
+    //             }
+    //         ]
+    //     }
+    // }
+
+    // const config: WorkerConfig = {
+    //     urls: {
+    //         postInfo: "https://api.buffer.com"
+    //     },
+    //     requestConfig: {
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "Authorization": `Bearer ${key}`,
+    //         },
+    //         body: JSON.stringify({ query: publishQuery, variables: payload }),
+    //         responseType: "json",
+    //         method: "POST"
+    //     }
+
+    // }
+
+    // const { postInfo } = await worker(config)
+    // console.log(postInfo);
 
     //shoulds be last
     await deleteSchedule(jobId)
@@ -234,53 +289,19 @@ async function publish() {
         .from("video_descriptions")
         .delete()
         .eq("video_id", video.videoId)
-
-    return
-    const keyStore = keys as Record<string, string>
-    const key = keyStore[username]
-
-    const channelId = await getChannelId(key)
-
-    const payload = {
-        input: {
-            text: description,
-            channelId: channelId,
-            schedulingType: "automatic",
-            mode: "shareNow",
-            metadata: {
-                instagram: {
-                    type: "reel",
-                    shouldShareToFeed: true
-                }
-            },
-            assets: [
-                {
-                    video: {
-                        url: videoUrl
-                    }
-                }
-            ]
-        }
-    }
-
-    const config: WorkerConfig = {
-        urls: {
-            postInfo: "https://api.buffer.com"
-        },
-        requestConfig: {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${key}`,
-            },
-            body: JSON.stringify({ query: publishQuery, variables: payload }),
-            responseType: "json",
-            method: "POST"
-        }
-
-    }
-
-    const { postInfo } = await worker(config)
-    console.log(postInfo);
 }
 
-publish()
+let retries = 0
+async function init() {
+
+    retries++
+    try {
+        await publish()
+    } catch (error) {
+        if (retries < 3) {
+            await publish()
+        }
+    }
+
+}
+init()
