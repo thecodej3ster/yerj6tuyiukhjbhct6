@@ -165,7 +165,7 @@ async function manageSchedule() {
     }
 
 
-    await deleteSchedule(job.job_id)
+    // await deleteSchedule(job.job_id)
 
 
     const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
@@ -174,13 +174,14 @@ async function manageSchedule() {
 
     return {
         username: inputs.username,
-        shouldPublish: true
+        shouldPublish: true,
+        jobId: job.job_id
     }
 }
 
 
 async function publish() {
-    const { username, shouldPublish } = await manageSchedule()
+    const { username, shouldPublish, jobId} = await manageSchedule()
 
     if (!shouldPublish) {
         return
@@ -226,10 +227,13 @@ async function publish() {
       `;
 
     // const { username } = await manageSchedule(videoInfo.id)
+
+    //shoulds be last
+    await deleteSchedule(jobId)
     await db
         .from("video_descriptions")
         .delete()
-        .eq("video_id", video_id)
+        .eq("video_id", video.videoId)
 
     return
     const keyStore = keys as Record<string, string>
