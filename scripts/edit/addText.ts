@@ -36,7 +36,7 @@ async function generateTitleSvg(hookJson: string): Promise<string> {
   <style>
     text {
       /* Inter Display handles letters, Twemoji handles color vector emojis */
-      font-family: "Inter Display", "Twemoji", -apple-system, sans-serif;
+      font-family: "Inter Display", "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
       font-size: 60px;
       font-weight: 300;
       fill: #000000;
@@ -76,7 +76,7 @@ export async function processTextPipeline(inputPath: string, id: string) {
     fitTo: { mode: 'width', value: 1080 },
     font: {
       fontFiles: [fontPath, emojiFontPath],
-      loadSystemFonts: false,
+      loadSystemFonts: true,
       defaultFontFamily: 'Inter Display',
     },
   });
