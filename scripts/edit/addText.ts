@@ -176,7 +176,7 @@ async function generateTitlePng(
   const textBuffer = Buffer.from(resvg.render().asPng());
 
   const overlays: import('sharp').OverlayOptions[] = [];
-  
+
   for (let index = 0; index < lines.length; index++) {
     const { text, emoji } = lines[index];
 
@@ -241,6 +241,7 @@ async function generateTitlePng(
     .toFile(outputPath);
 }
 
+let retries = 0
 export async function processTextPipeline(
   inputPath: string,
   id: string,
@@ -324,7 +325,21 @@ export async function processTextPipeline(
     });
 
     console.log('Video generated successfully at:', outputPath);
-  } finally {
+  }
+  catch (error) {
+    retries++
+    if (retries < 3) {
+      await new Promise<void>((resolve) => {
+        setTimeout(async () => {
+          await processTextPipeline(inputPath, id)
+          resolve()
+        }, 3000);
+      })
+    }
+    console.log(error);
+    throw new Error("COULD NOT SUCESSFULLY EXECUTE TEXT PIPELINE");
+  }
+  finally {
     await fs.unlink(tempPngPath).catch(() => { });
     await fs.unlink(inputPath).catch(() => { });
     await fs.unlink(outputPath).catch(() => { });

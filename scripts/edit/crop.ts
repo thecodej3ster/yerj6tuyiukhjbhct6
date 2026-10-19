@@ -135,6 +135,7 @@ async function uploadOutputFile(
 /**
  * Execution Pipeline: Download -> Extract Frame 1 -> OpenCV Detect -> FFmpeg Crop -> Upload
  */
+let retries = 0
 export async function processCropPipeline() {
   console.log('RUNNING CROP PIPELINE');
 
@@ -206,7 +207,21 @@ export async function processCropPipeline() {
     await processPipPipeline(tempOutputPath, videoId)
 
     return { videoId: videoId }
-  } finally {
+  }
+  catch (error) {
+    retries++
+    if (retries < 3) {
+      await new Promise<void>((resolve) => {
+        setTimeout(async () => {
+          await processCropPipeline()
+          resolve()
+        }, 3000);
+      })
+    }
+    console.log(error);
+    throw new Error("COULD NOT SUCESSFULLY EXECUTE CROP PIPELINE");
+  }
+  finally {
     // Clean up all temporary files from system temp folder
     await fsPromises.unlink(tempVideoPath).catch(() => { });
     await fsPromises.unlink(tempFramePath).catch(() => { });

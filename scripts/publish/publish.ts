@@ -178,9 +178,12 @@ async function manageSchedule() {
     }
 }
 
+let retries = 0
+let video: { videoId: string } | undefined
 
 async function publish() {
     const { username, shouldPublish, jobId } = await manageSchedule()
+
 
     if (!shouldPublish) {
         return
@@ -198,7 +201,9 @@ async function publish() {
     //     .maybeSingle()
 
 
-    const video = await processCropPipeline()
+    if (retries === 0) {
+        video = await processCropPipeline()
+    }
 
     if (!video) {
         console.log(video);
@@ -290,7 +295,6 @@ async function publish() {
         .eq("video_id", video.videoId)
 }
 
-let retries = 0
 async function init() {
 
     retries++

@@ -27,7 +27,7 @@ function selectKey(list: { keys: string[] }) {
 }
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
-  const emojis = ['🤯','😱','😮','👀']
+  const emojis = ['🤯', '😱', '😮', '👀']
   const emoji = emojis[Math.floor(Math.random() * emojis.length)]
   const words = text.trim().replace('.', '').split(/\s+/)
   const resultLines: string[] = [];
@@ -40,13 +40,13 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
       resultLines.push(line)
       line = formatedWord
       if (i === words.length - 1) {
-        resultLines.push(line+" "+emoji)
+        resultLines.push(line + " " + emoji)
       }
       return
     }
     if (i === words.length - 1) {
       line += formatedWord
-      resultLines.push(line+" "+emoji)
+      resultLines.push(line + " " + emoji)
       return
     }
     line += formatedWord
@@ -180,99 +180,114 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
   }
 }
 
-
+let hookRetry = 0
 export async function processHookPipeline(tempFilePath: string, id: string) {
-  console.log('RUNNING HOOK PIPELINE');
+  try {
+    console.log('RUNNING HOOK PIPELINE');
 
-  const hookPromptFilePath = path.resolve("scripts/edit/prompts/onScreenTextPrompt.txt")
-  const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
-  const hookPrompt = hookPromptFile.toString()
+    const hookPromptFilePath = path.resolve("scripts/edit/prompts/onScreenTextPrompt.txt")
+    const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
+    const hookPrompt = hookPromptFile.toString()
 
-  const videoDescriptionPromptFilePath = path.resolve("scripts/edit/prompts/videoDescriptionPrompt.txt")
-  const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
-  const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
+    const videoDescriptionPromptFilePath = path.resolve("scripts/edit/prompts/videoDescriptionPrompt.txt")
+    const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
+    const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
 
-  const clip = await retrive({ table: "pip_videos", autoDelete: true, id: id })
-  const tempDir = path.resolve("scripts", 'temp');
-  await fsPromises.mkdir(tempDir, { recursive: true });
-  const hookPromptFileUpload = await uploadFile(tempFilePath)
+    const clip = await retrive({ table: "pip_videos", autoDelete: true, id: id })
+    const tempDir = path.resolve("scripts", 'temp');
+    await fsPromises.mkdir(tempDir, { recursive: true });
+    const hookPromptFileUpload = await uploadFile(tempFilePath)
 
-  if (!hookPromptFileUpload.file.uri) {
-    console.log(hookPromptFileUpload);
-    throw new Error(`Could Not Find Ai FileUpload Url`)
-  }
-
-
-  const onScreenTextResponse = await sendToAI({
-    prompt: hookPrompt,
-    key: hookPromptFileUpload.key,
-    fileUrl: hookPromptFileUpload.file.uri
-  })
-
-  if (!onScreenTextResponse) {
-    console.log(onScreenTextResponse);
-    throw new Error("Could Not Generate Hook")
-  }
-
-  const descriptionResponse = await sendToAI({
-    prompt: videoDescriptionPrompt,
-    fileUrl: hookPromptFileUpload.file.uri,
-    key: onScreenTextResponse.key
-  })
-
-  if (!descriptionResponse) {
-    console.log(descriptionResponse);
-    throw new Error("Could Not Generate Description")
-  }
-  const onScreenTextResult = onScreenTextResponse.content
-  const hooks = onScreenTextResult.split("\n")
-
-  let hookFound = false
-  hooks.map(async hook => {
-    if (hookFound) {
-      return
+    if (!hookPromptFileUpload.file.uri) {
+      console.log(hookPromptFileUpload);
+      throw new Error(`Could Not Find Ai FileUpload Url`)
     }
-    if (hook && !hook.toLowerCase().includes("titles")) {
-      const formatedHook = wrapText(hook)
 
-      if (formatedHook.length && formatedHook.length < 5) {
-        const hookLines = { lines: formatedHook }
-        const { error } = await db.from("video_hooks")
-          .insert([{
-            video_id: id,
-            hook: JSON.stringify(hookLines)
-          }])
 
-        if (error) {
-          throw error
+    const onScreenTextResponse = await sendToAI({
+      prompt: hookPrompt,
+      key: hookPromptFileUpload.key,
+      fileUrl: hookPromptFileUpload.file.uri
+    })
+
+    if (!onScreenTextResponse) {
+      console.log(onScreenTextResponse);
+      throw new Error("Could Not Generate Hook")
+    }
+
+    const descriptionResponse = await sendToAI({
+      prompt: videoDescriptionPrompt,
+      fileUrl: hookPromptFileUpload.file.uri,
+      key: onScreenTextResponse.key
+    })
+
+    if (!descriptionResponse) {
+      console.log(descriptionResponse);
+      throw new Error("Could Not Generate Description")
+    }
+    const onScreenTextResult = onScreenTextResponse.content
+    const hooks = onScreenTextResult.split("\n")
+
+    let hookFound = false
+    hooks.map(async hook => {
+      if (hookFound) {
+        return
+      }
+      if (hook && !hook.toLowerCase().includes("titles")) {
+        const formatedHook = wrapText(hook)
+
+        if (formatedHook.length && formatedHook.length < 5) {
+          const hookLines = { lines: formatedHook }
+          const { error } = await db.from("video_hooks")
+            .insert([{
+              video_id: id,
+              hook: JSON.stringify(hookLines)
+            }])
+
+          if (error) {
+            throw error
+          }
+
+          hookFound = true
         }
+      }
+    })
 
-        hookFound = true
+    const { error } = await db.from("video_descriptions")
+      .insert([{ video_id: id, content: descriptionResponse.content }])
+
+    if (error) {
+      throw error
+    }
+
+
+    const config: WorkerConfig = {
+      urls: {
+        deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
+      },
+      requestConfig: {
+        headers: {
+          'x-goog-api-key': `${hookPromptFileUpload.key}`
+        },
+        method: "DELETE"
       }
     }
-  })
 
-  const { error } = await db.from("video_descriptions")
-    .insert([{ video_id: id, content: descriptionResponse.content }])
-
-  if (error) {
-    throw error
-  }
-
-
-  const config: WorkerConfig = {
-    urls: {
-      deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
-    },
-    requestConfig: {
-      headers: {
-        'x-goog-api-key': `${hookPromptFileUpload.key}`
-      },
-      method: "DELETE"
+    await worker(config)
+    await processTextPipeline(tempFilePath, id)
+  } catch (error) {
+    hookRetry++
+    if (hookRetry < 3) {
+      await new Promise<void>((resolve) => {
+        setTimeout(async () => {
+          await processHookPipeline(tempFilePath, id)
+          resolve()
+        }, 3000);
+      })
     }
+    console.log(error);
+    throw new Error("COULD NOT SUCESSFULLY EXECUTE HOOK PIPELINE");
   }
-
-  await worker(config)
-  await processTextPipeline(tempFilePath, id)
 }
+
 
