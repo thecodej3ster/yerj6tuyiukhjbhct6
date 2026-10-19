@@ -19,7 +19,9 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
-// Inlines full-color Twemoji SVG markup directly to bypass resvg's monochrome font limitation
+// In-memory cache so emojis are only fetched once per server lifecycle
+const emojiCache = new Map<string, string>();
+
 async function replaceEmojisWithInlineSvg(text: string): Promise<string> {
   let processedText = text;
   const emojiRegex = /\p{Extended_Pictographic}+/gu;
@@ -27,40 +29,36 @@ async function replaceEmojisWithInlineSvg(text: string): Promise<string> {
 
   if (!matches) return escapeXml(text);
 
-  const svgCache = new Map<string, string>();
-
   for (const emoji of matches) {
     const codePoint = twemoji.convert.toCodePoint(emoji);
     const cdnUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${codePoint}.svg`;
 
-    let svgData = svgCache.get(cdnUrl);
+    let svgData = emojiCache.get(cdnUrl);
+    
     if (!svgData) {
       try {
-        const response = await fetch(cdnUrl);
+        const response = await fetch(cdnUrl, { signal: AbortSignal.timeout(3000) }); // 3s timeout to prevent hanging
         if (response.ok) {
           let svgText = await response.text();
-          // Clean up and style the SVG snippet for inline rendering next to 60px text
-          svgText = svgText
-            .replace(/<\?xml[^>]*\?>/g, '')
-            .replace(/width="[^"]*"/, 'width="55"')
-            .replace(/height="[^"]*"/, 'height="55"')
-            .replace('<svg ', '<svg y="-8" style="display:inline; vertical-align:middle;" ');
-          
-          svgData = svgText;
-          svgCache.set(cdnUrl, svgData);
+          // Convert SVG text into a base64 Data URI so resvg parses it natively without external requests
+          const base64 = Buffer.from(svgText).toString('base64');
+          svgData = `data:image/svg+xml;base64,${base64}`;
+          emojiCache.set(cdnUrl, svgData);
         }
       } catch (e) {
-        console.warn(`Failed to fetch color emoji for ${emoji}:`, e);
+        console.warn(`[Pipeline] Warning: Could not fetch color emoji asset for ${emoji}. Falling back to text.`);
       }
     }
 
     if (svgData) {
-      processedText = processedText.replace(emoji, svgData);
+      // Replace emoji character with an SVG image data-uri tag styled inline
+      const imageTag = `<tspan dy="10"><image href="${svgData}" width="50" height="50" /></tspan>`;
+      processedText = processedText.replace(emoji, imageTag);
     }
   }
 
-  // Escape XML for the text parts, keeping the inline SVG code intact
-  return processedText;
+  // Escape XML for remaining text parts
+  return escapeXml(processedText);
 }
 
 async function generateTitleSvg(hookJson: string): Promise<string> {
@@ -68,9 +66,8 @@ async function generateTitleSvg(hookJson: string): Promise<string> {
 
   const processedLines = await Promise.all(
     hook.lines.map(async (line, index) => {
-      // Escape text first, then inject full-color inline SVG emojis
-      const safeText = escapeXml(line.toUpperCase());
-      const formattedLine = await replaceEmojisWithInlineSvg(safeText);
+      const upperLine = line.toUpperCase();
+      const formattedLine = await replaceEmojisWithInlineSvg(upperLine);
       const dy = index === 0 ? '0' : '1.05em';
       return `<tspan x="20" dy="${dy}">${formattedLine}</tspan>`;
     })
