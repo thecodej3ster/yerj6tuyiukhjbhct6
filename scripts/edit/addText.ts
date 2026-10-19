@@ -1,14 +1,38 @@
+
 import { Resvg } from '@resvg/resvg-js';
 import { execFile } from 'child_process';
 import ffmpegPath from 'ffmpeg-static';
 import fs, { readFile } from 'fs/promises';
 import path from 'path';
-import twemoji from 'twemoji';
 import { promisify } from 'util';
+import sharp from 'sharp';
+import fontkit from 'fontkit';
+
 import { retrive } from '../utils/retriveVideo';
 import { uploadVideo } from '../utils/upload';
 
 const execFileAsync = promisify(execFile);
+
+interface VideoHookRecord {
+  video_id: string;
+  url: string;
+  hook: string;
+}
+
+interface TextEmoji {
+  text: string;
+  emoji: string | null;
+}
+
+const WIDTH = 1080;
+const HEIGHT = 420;
+const FONT_SIZE = 60;
+const LETTER_SPACING = 2;
+const LINE_HEIGHT = 1.05;
+const TEXT_X = 20;
+const TEXT_Y = 140;
+const EMOJI_SIZE = 64;
+const EMOJI_GAP = 12;
 
 function escapeXml(text: string): string {
   return text
@@ -19,148 +43,290 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
-// In-memory cache so emojis are only fetched once per server lifecycle
-const emojiCache = new Map<string, string>();
+// Extract trailing emoji sequences from a line.
+function splitTextAndEmoji(line: string): TextEmoji {
+  const emojiRegex =
+    /((?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?)*)+)$/u;
 
-async function replaceEmojisWithInlineSvg(text: string): Promise<string> {
-  let processedText = text;
-  const emojiRegex = /\p{Extended_Pictographic}+/gu;
-  const matches = text.match(emojiRegex);
+  const match = line.match(emojiRegex);
 
-  if (!matches) return escapeXml(text);
-
-  for (const emoji of matches) {
-    const codePoint = twemoji.convert.toCodePoint(emoji);
-    const cdnUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${codePoint}.svg`;
-
-    let svgData = emojiCache.get(cdnUrl);
-    
-    if (!svgData) {
-      try {
-        const response = await fetch(cdnUrl, { signal: AbortSignal.timeout(3000) }); // 3s timeout to prevent hanging
-        if (response.ok) {
-          let svgText = await response.text();
-          // Convert SVG text into a base64 Data URI so resvg parses it natively without external requests
-          const base64 = Buffer.from(svgText).toString('base64');
-          svgData = `data:image/svg+xml;base64,${base64}`;
-          emojiCache.set(cdnUrl, svgData);
-        }
-      } catch (e) {
-        console.warn(`[Pipeline] Warning: Could not fetch color emoji asset for ${emoji}. Falling back to text.`);
-      }
-    }
-
-    if (svgData) {
-      // Replace emoji character with an SVG image data-uri tag styled inline
-      const imageTag = `<tspan dy="10"><image href="${svgData}" width="50" height="50" /></tspan>`;
-      processedText = processedText.replace(emoji, imageTag);
-    }
+  if (!match || match.index === undefined) {
+    return { text: line, emoji: null };
   }
 
-  // Escape XML for remaining text parts
-  return escapeXml(processedText);
+  return {
+    text: line.slice(0, match.index).trimEnd(),
+    emoji: match[1],
+  };
 }
 
-async function generateTitleSvg(hookJson: string): Promise<string> {
+// Convert an emoji into the Twemoji PNG filename.
+function getTwemojiCodepoints(emoji: string): string {
+  return Array.from(emoji)
+    .map((char) => char.codePointAt(0)!.toString(16))
+    .filter((code) => code !== 'fe0e')
+    .join('-');
+}
+
+// Download the full-color Twemoji PNG.
+async function fetchTwemoji(emoji: string): Promise<Buffer> {
+  const codepoints = getTwemojiCodepoints(emoji);
+
+  const url =
+    `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${codepoints}.png`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to download emoji "${emoji}": HTTP ${response.status}. URL: ${url}`,
+    );
+  }
+
+  return Buffer.from(await response.arrayBuffer());
+}
+
+// Measure text width using Fontkit.
+
+function measureTextWidth(text: string, fontPath: string): number {
+  if (!text) return 0;
+
+  const loadedFont = fontkit.openSync(fontPath);
+
+  // Handle FontCollection versus Font.
+  const font =
+    'unitsPerEm' in loadedFont
+      ? loadedFont
+      : loadedFont.fonts[0];
+
+  if (!font) {
+    throw new Error(`No usable font found at ${fontPath}`);
+  }
+
+  const scale = FONT_SIZE / font.unitsPerEm;
+  let advanceWidth = 0;
+
+  for (const char of text) {
+    const glyph = font.glyphForCodePoint(char.codePointAt(0)!);
+    advanceWidth += glyph.advanceWidth * scale;
+  }
+
+  const characterCount = Array.from(text).length;
+  const spacing =
+    Math.max(0, characterCount - 1) * LETTER_SPACING;
+
+  return advanceWidth + spacing;
+}
+
+
+async function generateTitlePng(
+  hookJson: string,
+  outputPath: string,
+): Promise<void> {
   const hook: { lines: string[] } = JSON.parse(hookJson);
 
-  const processedLines = await Promise.all(
-    hook.lines.map(async (line, index) => {
-      const upperLine = line.toUpperCase();
-      const formattedLine = await replaceEmojisWithInlineSvg(upperLine);
-      const dy = index === 0 ? '0' : '1.05em';
-      return `<tspan x="20" dy="${dy}">${formattedLine}</tspan>`;
-    })
+  const fontPath = path.resolve(
+    'fonts',
+    'InterDisplay-ExtraBold.ttf',
   );
 
-  const tspanLines = processedLines.join('');
+  await fs.access(fontPath);
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="1080" height="420" viewBox="0 0 1080 420" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <rect width="1080" height="420" fill="none" />
+  const lines = hook.lines.map((line) =>
+    splitTextAndEmoji(line),
+  );
+
+  // Render text only. Emojis will be added as colored PNGs.
+  const tspanLines = lines
+    .map(({ text }, index) => {
+      const safeText = escapeXml(text.toUpperCase());
+      const dy = index === 0 ? '0' : `${LINE_HEIGHT}em`;
+
+      return `<tspan x="${TEXT_X}" dy="${dy}">${safeText}</tspan>`;
+    })
+    .join('');
+
+  const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${WIDTH}" height="${HEIGHT}"
+     viewBox="0 0 ${WIDTH} ${HEIGHT}"
+     xmlns="http://www.w3.org/2000/svg">
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="none"/>
   <style>
     text {
       font-family: "Inter Display", sans-serif;
-      font-size: 60px;
+      font-size: ${FONT_SIZE}px;
       font-weight: 300;
       fill: #000000;
-      letter-spacing: 2px;
+      letter-spacing: ${LETTER_SPACING}px;
       text-anchor: start;
     }
   </style>
-  <text x="20" y="140">${tspanLines}</text>
+  <text x="${TEXT_X}" y="${TEXT_Y}">${tspanLines}</text>
 </svg>`;
+
+  const resvg = new Resvg(svgContent, {
+    fitTo: { mode: 'width', value: WIDTH },
+    font: {
+      fontFiles: [fontPath],
+      loadSystemFonts: true,
+      defaultFontFamily: 'Inter Display',
+    },
+  });
+
+  const textBuffer = Buffer.from(resvg.render().asPng());
+
+  const overlays: import('sharp').OverlayOptions[] = [];
+  
+  for (let index = 0; index < lines.length; index++) {
+    const { text, emoji } = lines[index];
+
+    if (!emoji) continue;
+
+    try {
+      const emojiBuffer = await fetchTwemoji(emoji);
+
+      const emojiPng = await sharp(emojiBuffer)
+        .resize(EMOJI_SIZE, EMOJI_SIZE, {
+          fit: 'contain',
+        })
+        .png()
+        .toBuffer();
+
+      const textWidth = measureTextWidth(
+        text.toUpperCase(),
+        fontPath,
+      );
+
+      const left = Math.round(
+        TEXT_X + textWidth + (text.length > 0 ? EMOJI_GAP : 0),
+      );
+
+      // Match the SVG's baseline and line spacing.
+      const baseline =
+        TEXT_Y + index * FONT_SIZE * LINE_HEIGHT;
+
+      const top = Math.round(
+        baseline - EMOJI_SIZE + 8,
+      );
+
+      if (
+        left < 0 ||
+        left + EMOJI_SIZE > WIDTH ||
+        top < 0 ||
+        top + EMOJI_SIZE > HEIGHT
+      ) {
+        console.warn(
+          `Emoji "${emoji}" falls outside the title canvas on line ${index + 1}.`,
+        );
+        continue;
+      }
+
+      overlays.push({
+        input: emojiPng,
+        left,
+        top,
+      });
+    } catch (error) {
+      console.error(
+        `Failed to render emoji "${emoji}" on line ${index + 1}:`,
+        error,
+      );
+    }
+  }
+
+  // Composite full-color emoji PNGs over the transparent text image.
+  await sharp(textBuffer)
+    .composite(overlays)
+    .png()
+    .toFile(outputPath);
 }
 
-interface VideoHookRecord {
-  video_id: string;
-  url: string;
-  hook: string;
-}
-
-export async function processTextPipeline(inputPath: string, id: string) {
+export async function processTextPipeline(
+  inputPath: string,
+  id: string,
+): Promise<void> {
   console.log('RUNNING TEXT PIPELINE');
 
-  const video = (await retrive({ table: 'video_hooks', autoDelete: true, id: id })) as VideoHookRecord;
-  const tempDir = path.resolve('scripts', 'temp');
-  const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`);
+  const video = (await retrive({
+    table: 'video_hooks',
+    autoDelete: true,
+    id,
+  })) as VideoHookRecord | null;
 
   if (!video) {
     throw new Error('VIDEO HOOK NOT FOUND');
   }
 
-  console.log('Rendering title PNG with Resvg...');
-  const svgContent = await generateTitleSvg(video.hook);
-  const fontPath = path.resolve('fonts', 'InterDisplay-ExtraBold.ttf');
+  const tempDir = path.resolve('scripts', 'temp');
 
-  const resvg = new Resvg(svgContent, {
-    fitTo: { mode: 'width', value: 1080 },
-    font: {
-      fontFiles: [fontPath],
-      loadSystemFonts: false,
-      defaultFontFamily: 'Inter Display',
-    },
-  });
+  await fs.mkdir(tempDir, { recursive: true });
 
-  const tempPngPath = path.resolve(tempDir, `temp_png_${Date.now()}.png`);
-  await fs.writeFile(tempPngPath, resvg.render().asPng());
+  const timestamp = Date.now();
 
-  console.log('Running FFmpeg 9:16 video processing...');
-  const filterGraph =
-    '[0:v]scale=1080:-1[scaled];[scaled]pad=1080:1920:(ow-iw)/2:(oh-ih)/2:white[canvas];[canvas][1:v]overlay=x=0:y=200[outv]';
+  const outputPath = path.resolve(
+    tempDir,
+    `temp_output_${timestamp}.mp4`,
+  );
 
-  const args = [
-    '-i',
-    inputPath,
-    '-i',
-    tempPngPath,
-    '-filter_complex',
-    filterGraph,
-    '-map',
-    '[outv]',
-    '-map',
-    '0:a?',
-    '-c:a',
-    'copy',
-    '-y',
-    outputPath,
-  ];
+  const tempPngPath = path.resolve(
+    tempDir,
+    `temp_png_${timestamp}.png`,
+  );
 
   try {
+    console.log('Rendering title PNG using Resvg, Fontkit, and Sharp...');
+
+    await generateTitlePng(video.hook, tempPngPath);
+
+    console.log('Running FFmpeg 9:16 video processing...');
+
+    const filterGraph =
+      '[0:v]scale=1080:-1[scaled];' +
+      '[scaled]pad=1080:1920:(ow-iw)/2:(oh-ih)/2:white[canvas];' +
+      '[canvas][1:v]overlay=x=0:y=200[outv]';
+
+    const args = [
+      '-i',
+      inputPath,
+      '-i',
+      tempPngPath,
+      '-filter_complex',
+      filterGraph,
+      '-map',
+      '[outv]',
+      '-map',
+      '0:a?',
+      '-c:a',
+      'copy',
+      '-y',
+      outputPath,
+    ];
+
     await execFileAsync(ffmpegPath!, args);
+
     const buffer = await readFile(outputPath);
     const fileName = path.basename(outputPath);
 
-    const file = new File([new Uint8Array(buffer)], fileName, {
-      type: 'application/octet-stream',
-      lastModified: Date.now(),
+    const file = new File(
+      [new Uint8Array(buffer)],
+      fileName,
+      {
+        type: 'application/octet-stream',
+        lastModified: Date.now(),
+      },
+    );
+
+    await uploadVideo({
+      table: 'editted_videos',
+      storageUpload: true,
+      file,
+      id,
     });
 
-    await uploadVideo({ table: 'editted_videos', storageUpload: true, file: file, id: id });
     console.log('Video generated successfully at:', outputPath);
   } finally {
-    await fs.unlink(tempPngPath).catch(() => {});
-    await fs.unlink(inputPath).catch(() => {});
-    await fs.unlink(outputPath).catch(() => {});
+    await fs.unlink(tempPngPath).catch(() => { });
+    await fs.unlink(inputPath).catch(() => { });
+    await fs.unlink(outputPath).catch(() => { });
   }
 }
