@@ -186,7 +186,10 @@ export async function processCropPipeline() {
 
     await extractVideoRatio(ffmpegPath)
     if (!ratio) {
-      return
+      console.log(ratio);
+
+      throw new Error("Ratio is Missing");
+
     }
     const { x, y, w, h } = ratio as BoundingBox
 

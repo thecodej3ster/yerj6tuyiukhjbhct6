@@ -297,10 +297,10 @@ async function publish() {
 
 async function init() {
 
-    retries++
     try {
         await publish()
     } catch (error) {
+        retries++
         if (retries < 3) {
             await publish()
         }
