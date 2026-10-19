@@ -3,6 +3,7 @@ import { execFile } from 'child_process';
 import ffmpegPath from 'ffmpeg-static';
 import fs, { readFile } from 'fs/promises';
 import path from 'path';
+import twemoji from 'twemoji';
 import { promisify } from 'util';
 import { retrive } from '../utils/retriveVideo';
 import { uploadVideo } from '../utils/upload';
@@ -18,38 +19,67 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
-// Helper function to cleanly split a line into text and a trailing emoji
-function splitTextAndEmoji(line: string) {
-  // Matches one or more emojis at the very end of the string
-  const emojiRegex = /(\p{Extended_Pictographic}+)$/u;
-  const match = line.match(emojiRegex);
+// Inlines full-color Twemoji SVG markup directly to bypass resvg's monochrome font limitation
+async function replaceEmojisWithInlineSvg(text: string): Promise<string> {
+  let processedText = text;
+  const emojiRegex = /\p{Extended_Pictographic}+/gu;
+  const matches = text.match(emojiRegex);
 
-  if (match) {
-    const textPart = line.replace(emojiRegex, '').trim();
-    const emojiPart = match[1];
-    return { text: textPart, emoji: emojiPart };
+  if (!matches) return escapeXml(text);
+
+  const svgCache = new Map<string, string>();
+
+  for (const emoji of matches) {
+    const codePoint = twemoji.convert.toCodePoint(emoji);
+    const cdnUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${codePoint}.svg`;
+
+    let svgData = svgCache.get(cdnUrl);
+    if (!svgData) {
+      try {
+        const response = await fetch(cdnUrl);
+        if (response.ok) {
+          let svgText = await response.text();
+          // Clean up and style the SVG snippet for inline rendering next to 60px text
+          svgText = svgText
+            .replace(/<\?xml[^>]*\?>/g, '')
+            .replace(/width="[^"]*"/, 'width="55"')
+            .replace(/height="[^"]*"/, 'height="55"')
+            .replace('<svg ', '<svg y="-8" style="display:inline; vertical-align:middle;" ');
+          
+          svgData = svgText;
+          svgCache.set(cdnUrl, svgData);
+        }
+      } catch (e) {
+        console.warn(`Failed to fetch color emoji for ${emoji}:`, e);
+      }
+    }
+
+    if (svgData) {
+      processedText = processedText.replace(emoji, svgData);
+    }
   }
-  return { text: line, emoji: null };
+
+  // Escape XML for the text parts, keeping the inline SVG code intact
+  return processedText;
 }
 
 async function generateTitleSvg(hookJson: string): Promise<string> {
   const hook: { lines: string[] } = JSON.parse(hookJson);
 
-  const tspanLines = hook.lines
-    .map((line, index) => {
-      const { text, emoji } = splitTextAndEmoji(line);
-      const safeText = escapeXml(text.toUpperCase());
+  const processedLines = await Promise.all(
+    hook.lines.map(async (line, index) => {
+      // Escape text first, then inject full-color inline SVG emojis
+      const safeText = escapeXml(line.toUpperCase());
+      const formattedLine = await replaceEmojisWithInlineSvg(safeText);
       const dy = index === 0 ? '0' : '1.05em';
-
-      // If an emoji is found, place it in a separate span targeting system emoji fonts
-      const emojiSpan = emoji ? ` <tspan class="emoji">${emoji}</tspan>` : '';
-
-      return `<tspan x="20" dy="${dy}">${safeText}${emojiSpan}</tspan>`;
+      return `<tspan x="20" dy="${dy}">${formattedLine}</tspan>`;
     })
-    .join('');
+  );
+
+  const tspanLines = processedLines.join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="1080" height="420" viewBox="0 0 1080 420" xmlns="http://www.w3.org/2000/svg">
+<svg width="1080" height="420" viewBox="0 0 1080 420" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <rect width="1080" height="420" fill="none" />
   <style>
     text {
@@ -59,10 +89,6 @@ async function generateTitleSvg(hookJson: string): Promise<string> {
       fill: #000000;
       letter-spacing: 2px;
       text-anchor: start;
-    }
-    .emoji {
-      /* Forces resvg to look up native system outline/vector emoji fallbacks */
-      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
     }
   </style>
   <text x="20" y="140">${tspanLines}</text>
@@ -94,7 +120,7 @@ export async function processTextPipeline(inputPath: string, id: string) {
     fitTo: { mode: 'width', value: 1080 },
     font: {
       fontFiles: [fontPath],
-      loadSystemFonts: true, // Crucial: Allows resvg to discover system-level font fallbacks for emojis
+      loadSystemFonts: false,
       defaultFontFamily: 'Inter Display',
     },
   });
