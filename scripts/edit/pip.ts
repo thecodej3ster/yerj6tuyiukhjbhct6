@@ -49,8 +49,8 @@ interface ProcessVideoOptions {
 export function createVerticalVideoFromRemote({
   inputPath,
   outputPath,
-  targetWidth = 1080,
-  targetHeight = 1920,
+  targetWidth = 1070,
+  targetHeight = 1910,
   backgroundColor = 'white',
 }: ProcessVideoOptions): Promise<string> {
   return new Promise(async (resolve, reject) => {
