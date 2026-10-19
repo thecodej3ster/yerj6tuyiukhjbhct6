@@ -5,7 +5,6 @@ import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
 import keys from "./keys.json"
 import { createSchedule, deleteSchedule } from "./schedule";
-import jobStore from './jobs.json'
 import { initSchedule } from "./schedule";
 import fs from 'fs'
 
@@ -125,7 +124,7 @@ function rotate(list: any[], currentElement: any) {
 interface WorkflowDispatchEvent {
     inputs: {
         username: string;
-        time: number;
+        time: string;
         jobId: string
     };
 }
@@ -169,8 +168,8 @@ async function manageSchedule() {
 
 
     const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
-
-    await createSchedule({ hours: rotate(postingHours, Number(inputs.time)), username: inputs.username, minutes: selectedMinutes })
+    const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
+    await createSchedule({ hours: selectedHours, username: inputs.username, minutes: selectedMinutes })
 
     return {
         username: inputs.username,
