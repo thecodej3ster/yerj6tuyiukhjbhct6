@@ -56,7 +56,7 @@ export function createVerticalVideoFromRemote({
   return new Promise(async (resolve, reject) => {
     const sideMargin = 20; // Space on each side in pixels
 
-    const filterString = `scale=${targetWidth - sideMargin * 2}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
+    const filterString = `scale=${targetWidth - sideMargin * 2}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+60:${backgroundColor}`;
     // const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
 
     // await downloadVideo(inputUrl, inputPath)
