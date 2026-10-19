@@ -49,12 +49,15 @@ interface ProcessVideoOptions {
 export function createVerticalVideoFromRemote({
   inputPath,
   outputPath,
-  targetWidth = 1070,
-  targetHeight = 1910,
+  targetWidth = 1080,
+  targetHeight = 1920,
   backgroundColor = 'white',
 }: ProcessVideoOptions): Promise<string> {
   return new Promise(async (resolve, reject) => {
-    const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
+    const sideMargin = 20; // Space on each side in pixels
+
+    const filterString = `scale=${targetWidth - sideMargin * 2}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
+    // const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
 
     // await downloadVideo(inputUrl, inputPath)
     ffmpeg()
