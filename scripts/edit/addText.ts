@@ -227,10 +227,8 @@ async function generateTitlePng(
         top,
       });
     } catch (error) {
-      console.error(
-        `Failed to render emoji "${emoji}" on line ${index + 1}:`,
-        error,
-      );
+      console.error(`Failed to render emoji "${emoji}" on line ${index + 1}:`, error);
+      throw error
     }
   }
 
@@ -247,67 +245,38 @@ export async function processTextPipeline(
   id: string,
 ): Promise<void> {
   console.log('RUNNING TEXT PIPELINE');
-
-  const video = (await retrive({
-    table: 'video_hooks',
-    autoDelete: true,
-    id,
-  })) as VideoHookRecord | null;
-
-  if (!video) {
-    throw new Error('VIDEO HOOK NOT FOUND');
-  }
-
   const tempDir = path.resolve('scripts', 'temp');
+  const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`);
+  const tempPngPath = path.resolve(tempDir, `temp_png_${Date.now()}.png`);
+  const filterGraph =
+    '[0:v]scale=1080:-1[scaled];' +
+    '[scaled]pad=1080:1920:(ow-iw)/2:(oh-ih)/2:white[canvas];' +
+    '[canvas][1:v]overlay=x=0:y=200[outv]';
 
-  await fs.mkdir(tempDir, { recursive: true });
-
-  const timestamp = Date.now();
-
-  const outputPath = path.resolve(
-    tempDir,
-    `temp_output_${timestamp}.mp4`,
-  );
-
-  const tempPngPath = path.resolve(
-    tempDir,
-    `temp_png_${timestamp}.png`,
-  );
+  const args = [
+    '-i',
+    inputPath,
+    '-i',
+    tempPngPath,
+    '-filter_complex',
+    filterGraph,
+    '-map',
+    '[outv]',
+    '-map',
+    '0:a?',
+    '-c:a',
+    'copy',
+    '-y',
+    outputPath,
+  ]
 
   try {
-    console.log('Rendering title PNG using Resvg, Fontkit, and Sharp...');
-
+    const video = await retrive({ table: 'video_hooks', autoDelete: true, id: id, }) as VideoHookRecord;
+    await fs.mkdir(tempDir, { recursive: true });
     await generateTitlePng(video.hook, tempPngPath);
-
-    console.log('Running FFmpeg 9:16 video processing...');
-
-    const filterGraph =
-      '[0:v]scale=1080:-1[scaled];' +
-      '[scaled]pad=1080:1920:(ow-iw)/2:(oh-ih)/2:white[canvas];' +
-      '[canvas][1:v]overlay=x=0:y=200[outv]';
-
-    const args = [
-      '-i',
-      inputPath,
-      '-i',
-      tempPngPath,
-      '-filter_complex',
-      filterGraph,
-      '-map',
-      '[outv]',
-      '-map',
-      '0:a?',
-      '-c:a',
-      'copy',
-      '-y',
-      outputPath,
-    ];
-
     await execFileAsync(ffmpegPath!, args);
-
     const buffer = await readFile(outputPath);
     const fileName = path.basename(outputPath);
-
     const file = new File(
       [new Uint8Array(buffer)],
       fileName,
@@ -316,7 +285,6 @@ export async function processTextPipeline(
         lastModified: Date.now(),
       },
     );
-
     await uploadVideo({
       table: 'editted_videos',
       storageUpload: true,

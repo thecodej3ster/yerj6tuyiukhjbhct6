@@ -41,8 +41,8 @@ export async function retrive(
         .select('*', { count: 'exact', head: true });
 
       if (countError || !count) {
-        console.error('Error:', countError || `NO ${table.toUpperCase()} FOUND`);
-        return null;
+        console.log('Error:', countError);
+        throw new Error(`NO ${table.toUpperCase()} FOUND`);
       }
 
       const randomIndex = getRandomIndex(count);
@@ -57,13 +57,11 @@ export async function retrive(
       error = videoInfoError
     }
 
-
-
     const videoInfo = video as { video_id: string } & Record<string, any>
 
     if (error || !videoInfo) {
-      console.error('Error:', error || "NO EDITTED VIDEO FOUND");
-      return null;
+      console.log(error);
+      throw new Error("NO EDITTED VIDEO FOUND")
     }
 
     return videoInfo;

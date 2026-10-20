@@ -139,94 +139,99 @@ let retries = 0
 export async function processCropPipeline() {
   console.log('RUNNING CROP PIPELINE');
 
-  if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
+  const handleCrop = async () => {
+    if (!ffmpegPath) throw new Error('FFmpeg binary is unavailable.');
 
-  const tempDir = path.resolve("scripts", "temp");
+    const tempDir = path.resolve("scripts", "temp");
 
-  let tempVideoPath = "";
-  const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
-  const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
-  const videoId = crypto.randomBytes(8).toString("hex")
-  let ratio: BoundingBox | null = null
+    let tempVideoPath = "";
+    const tempFramePath = path.resolve(tempDir, `temp_frame_${Date.now()}.jpg`);
+    const tempOutputPath = path.resolve(tempDir, `cropped_output_${Date.now()}.mp4`);
+    const videoId = crypto.randomBytes(8).toString("hex")
+    let ratio: BoundingBox | null = null
 
-  try {
+    try {
 
-    const extractVideoRatio = async (ffmpegPath: string) => {
-      const clip = await getVideo({ table: 'videos', isRandom: true })
+      const extractVideoRatio = async (ffmpegPath: string) => {
+        const clip = await getVideo({ table: 'videos', isRandom: true })
 
-      tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
-      if (!clip || !clip.url) {
-        console.log(clip)
-        return
+        tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
+        if (!clip || !clip.url) {
+          console.log(clip)
+          return
+        }
+        await downloadVideo(clip.url, tempVideoPath);
+
+        console.log('Extracting frame 1 with FFmpeg...');
+        await execFileAsync(ffmpegPath, [
+          '-i',
+          tempVideoPath,
+          '-vframes',
+          '1',
+          '-q:v',
+          '2',
+          '-y',
+          tempFramePath,
+        ]);
+
+        console.log('Running OpenCV crop detection...');
+        ratio = await detectCropBox(tempFramePath)
+
+        const maxHeight = 600 //470
+        const minHeight = 376
+        if (ratio.h > maxHeight || ratio.h < minHeight) {
+          await fsPromises.unlink(tempVideoPath)
+          await extractVideoRatio(ffmpegPath)
+        }
       }
-      await downloadVideo(clip.url, tempVideoPath);
 
-      console.log('Extracting frame 1 with FFmpeg...');
+      await extractVideoRatio(ffmpegPath)
+      if (!ratio) {
+        console.log(ratio);
+
+        throw new Error("Ratio is Missing");
+
+      }
+      const { x, y, w, h } = ratio as BoundingBox
+
+      console.log(`[OpenCV Result] Crop Box -> X:${x}, Y:${y}, W:${w}, H:${h}`);
+
+      console.log('Executing FFmpeg crop...');
       await execFileAsync(ffmpegPath, [
         '-i',
         tempVideoPath,
-        '-vframes',
-        '1',
-        '-q:v',
-        '2',
+        '-vf',
+        `crop=${w}:${h}:${x}:${y}`,
+        '-c:a',
+        'copy',
         '-y',
-        tempFramePath,
+        tempOutputPath,
       ]);
-
-      console.log('Running OpenCV crop detection...');
-      ratio = await detectCropBox(tempFramePath)
-
-      const maxHeight = 600 //470
-      const minHeight = 376
-      if (ratio.h > maxHeight || ratio.h < minHeight) {
-        await fsPromises.unlink(tempVideoPath)
-        await extractVideoRatio(ffmpegPath)
+      return { tempOutputPath: tempOutputPath, videoId: videoId }
+    }
+    catch (error) {
+      retries++
+      if (retries < 3) {
+        return await new Promise<any>((resolve) => {
+          setTimeout(async () => {
+            const result = await handleCrop()
+            resolve(result)
+          }, 3000);
+        })
       }
+      console.log(error);
+      throw new Error("COULD NOT SUCESSFULLY EXECUTE CROP PIPELINE");
     }
-
-    await extractVideoRatio(ffmpegPath)
-    if (!ratio) {
-      console.log(ratio);
-
-      throw new Error("Ratio is Missing");
-
+    finally {
+      // Clean up all temporary files from system temp folder
+      await fsPromises.unlink(tempVideoPath).catch(() => { });
+      await fsPromises.unlink(tempFramePath).catch(() => { });
     }
-    const { x, y, w, h } = ratio as BoundingBox
-
-    console.log(`[OpenCV Result] Crop Box -> X:${x}, Y:${y}, W:${w}, H:${h}`);
-
-    console.log('Executing FFmpeg crop...');
-    await execFileAsync(ffmpegPath, [
-      '-i',
-      tempVideoPath,
-      '-vf',
-      `crop=${w}:${h}:${x}:${y}`,
-      '-c:a',
-      'copy',
-      '-y',
-      tempOutputPath,
-    ]);
-
-    await processPipPipeline(tempOutputPath, videoId)
-
-    return { videoId: videoId }
   }
-  catch (error) {
-    retries++
-    if (retries < 3) {
-      await new Promise<void>((resolve) => {
-        setTimeout(async () => {
-          await processCropPipeline()
-          resolve()
-        }, 3000);
-      })
-    }
-    console.log(error);
-    throw new Error("COULD NOT SUCESSFULLY EXECUTE CROP PIPELINE");
-  }
-  finally {
-    // Clean up all temporary files from system temp folder
-    await fsPromises.unlink(tempVideoPath).catch(() => { });
-    await fsPromises.unlink(tempFramePath).catch(() => { });
-  }
+
+
+  const { tempOutputPath, videoId } = await handleCrop()
+  await processPipPipeline(tempOutputPath, videoId)
+
+  return { videoId: videoId }
 }

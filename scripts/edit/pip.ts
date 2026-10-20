@@ -90,33 +90,38 @@ export function createVerticalVideoFromRemote({
 
 let retries = 0
 export async function processPipPipeline(inputPath: string, video_id: string) {
-  const tempDir = path.resolve("scripts", "temp")
-  const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
+  const handlePip = async () => {
+    const tempDir = path.resolve("scripts", "temp")
+    const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
 
-  try {
-    await createVerticalVideoFromRemote({
-      inputPath: inputPath,
-      outputPath: outputPath,
-      backgroundColor: 'white',
-    })
-
-    await uploadVideo({ table: 'pip_videos', id: video_id })
-    await processHookPipeline(outputPath, video_id)
-
-  } catch (error) {
-    retries++
-    if (retries < 3) {
-      await new Promise<void>((resolve) => {
-        setTimeout(async () => {
-          await processPipPipeline(inputPath, video_id)
-          resolve()
-        }, 3000);
+    try {
+      await createVerticalVideoFromRemote({
+        inputPath: inputPath,
+        outputPath: outputPath,
+        backgroundColor: 'white',
       })
+
+      await uploadVideo({ table: 'pip_videos', id: video_id })
+
+      return outputPath
+    } catch (error) {
+      retries++
+      if (retries < 3) {
+        return await new Promise<any>((resolve) => {
+          setTimeout(async () => {
+            const result = await handlePip()
+            resolve(result)
+          }, 3000);
+        })
+      }
+      console.log(error);
+      throw new Error("COULD NOT SUCESSFULLY EXECUTE PIP PIPELINE");
     }
-    console.log(error);
-    throw new Error("COULD NOT SUCESSFULLY EXECUTE PIP PIPELINE");
+    finally {
+      await fsPromises.unlink(inputPath)
+    }
   }
-  finally {
-    await fsPromises.unlink(inputPath)
-  }
+
+  const outputPath = await handlePip()
+  await processHookPipeline(outputPath, video_id)
 }

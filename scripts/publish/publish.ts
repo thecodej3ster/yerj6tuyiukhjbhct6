@@ -10,6 +10,7 @@ import fs from 'fs'
 
 const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
+let getChannelIdRetries = 0
 async function getChannelId(key: string) {
     type OrganizationInfo = {
         data: {
@@ -37,7 +38,6 @@ async function getChannelId(key: string) {
         }
     }
 
-    console.log(key);
     const organizationsQuery = `
     query GetAccountAndChannels {
       account {
@@ -47,28 +47,7 @@ async function getChannelId(key: string) {
         }
       }
     }
-  `;
-
-
-    let config: WorkerConfig = {
-        urls: {
-            organizations: "https://api.buffer.com"
-        },
-        requestConfig: {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${key.trim()}`,
-            },
-            method: "POST",
-            body: JSON.stringify({ query: organizationsQuery }),
-            responseType: "json"
-        }
-    }
-
-    const { organizations } = await worker(config) as { organizations: OrganizationInfo }
-
-    console.log(organizations);
-
+  `
     const channelsQuery = `
         query GetChannels($organizationId: OrganizationId!) {
           channels(input: { organizationId: $organizationId }) {
@@ -80,39 +59,82 @@ async function getChannelId(key: string) {
         }
       `
 
-    config.urls = { channelInfo: "https://api.buffer.com" }
-    if (config.requestConfig) {
-        config.requestConfig.body = JSON.stringify({
-            query: channelsQuery,
-            variables: { organizationId: organizations.data.account.organizations[0].id }
+
+    try {
+        let config: WorkerConfig = {
+            urls: {
+                organizations: "https://api.buffer.com"
+            },
+            requestConfig: {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${key.trim()}`,
+                },
+                method: "POST",
+                body: JSON.stringify({ query: organizationsQuery }),
+                responseType: "json"
+            }
+        }
+
+        const { organizations } = await worker(config) as { organizations: OrganizationInfo }
+
+        config.urls = { channelInfo: "https://api.buffer.com" }
+        if (config.requestConfig) {
+            config.requestConfig.body = JSON.stringify({
+                query: channelsQuery,
+                variables: { organizationId: organizations.data.account.organizations[0].id }
+            })
+        }
+
+        const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
+
+        return channelInfo.data.channels[0].id
+    } catch (error) {
+        getChannelIdRetries++
+        if (getChannelIdRetries === 3) {
+            throw error
+        }
+
+        return await new Promise<any>((resolve) => {
+            setTimeout(async () => {
+                const result = await getChannelId(key)
+                resolve(result)
+            }, 3000);
         })
     }
-
-    const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
-
-    console.log(channelInfo);
-
-    return channelInfo.data.channels[0].id
 }
 
-
+let getVideoRetries = 0
 async function getVideo(id: string) {
-    const video = await retrive({ table: "editted_videos", autoDelete: true, download: true })
+    try {
+        const video = await retrive({ table: "editted_videos", autoDelete: true, download: true })
 
-    const { data: videoDescription, error } = await db
-        .from("video_descriptions")
-        .select("*")
-        .eq("video_id", id)
-        .limit(1)
-        .single()
+        const { data: videoDescription, error } = await db
+            .from("video_descriptions")
+            .select("*")
+            .eq("video_id", id)
+            .limit(1)
+            .single()
 
-    if (error) {
-        throw error
+        if (error) {
+            throw error
+        }
+
+        return { videoUrl: video.url, description: videoDescription.content, id: video.video_id }
+    } catch (error) {
+        getVideoRetries++
+        if (getVideoRetries === 3) {
+            throw error
+        }
+
+        return await new Promise<any>((resolve) => {
+            setTimeout(async () => {
+                const result = await getVideo(id)
+                resolve(result)
+            }, 3000);
+        })
     }
-
-    return { videoUrl: video.url, description: videoDescription.content, id: video.video_id }
 }
-
 
 function rotate(list: any[], currentElement: any) {
     const currentIndex = list.indexOf(currentElement)
@@ -163,12 +185,9 @@ async function manageSchedule() {
         throw error
     }
 
-
-    // await deleteSchedule(job.job_id)
-
-
     const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
     const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
+
     await createSchedule({ hours: selectedHours, username: inputs.username, minutes: selectedMinutes })
 
     return {
@@ -178,12 +197,9 @@ async function manageSchedule() {
     }
 }
 
-let retries = 0
-let video: { videoId: string } | undefined
 
 async function publish() {
     const { username, shouldPublish, jobId } = await manageSchedule()
-
 
     if (!shouldPublish) {
         return
@@ -195,33 +211,10 @@ async function publish() {
         throw new Error('Expected Arg is Mising')
     }
 
-    // const { data: job } = await db.from("jobs")
-    //     .select("*")
-    //     .limit(1)
-    //     .maybeSingle()
+    let { videoId } = await processCropPipeline()
 
+    const { videoUrl, description } = await getVideo(videoId)
 
-    if (retries === 0) {
-        video = await processCropPipeline()
-    }
-
-    if (!video) {
-        console.log(video);
-        throw new Error(`Video Is Missing`);
-    }
-
-    const videoInfo = await getVideo(video.videoId)
-    if (!videoInfo) {
-        console.log(videoInfo);
-        throw new Error(`VideoInfo Is Missing`);
-    }
-    const { videoUrl, description } = videoInfo
-
-    if (!videoUrl || !description) {
-        console.log(`VideoUrl is : ${videoUrl}`);
-        console.log(`Description is : ${description}`);
-        throw new Error(`Either VideoUrl or Description Is Missing`);
-    }
     console.log(videoUrl);
 
     const publishQuery = `
@@ -289,22 +282,11 @@ async function publish() {
 
     //shoulds be last
     await deleteSchedule(jobId)
+
     await db
         .from("video_descriptions")
         .delete()
-        .eq("video_id", video.videoId)
+        .eq("video_id", videoId)
 }
 
-async function init() {
-
-    try {
-        await publish()
-    } catch (error) {
-        retries++
-        if (retries < 3) {
-            await publish()
-        }
-    }
-
-}
-init()
+publish()
