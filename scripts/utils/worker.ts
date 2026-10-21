@@ -68,7 +68,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             result[key] = await response.data
         } catch (error) {
             failedWorks.push(key)
-            result[key] = `Error: ${(error as Error).message}\n${workerResponse.data}`;
+            result[key] = `Error: ${(error as Error).message}\n${workerResponse}`;
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
