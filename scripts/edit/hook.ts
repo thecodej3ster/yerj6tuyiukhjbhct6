@@ -106,7 +106,8 @@ async function uploadFile(filePath: string) {
           'X-Goog-Upload-Command': 'upload, finalize',
         },
         body: fileStream,
-        responseType: "json"
+        responseType: "json",
+        method:"POST"
       }
     }
 
