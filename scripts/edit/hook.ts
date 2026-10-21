@@ -87,14 +87,13 @@ async function uploadFile(filePath: string) {
         } else {
           return args.response
         }
-      },
-      direct: true
+      }
     }
 
     const { uploadUrl } = await worker(intiUploadConfig)
 
     console.log(uploadUrl);
-    
+
     const fileStream = await fsPromises.readFile(filePath)
 
     const uploadConfig: WorkerConfig = {
@@ -109,8 +108,9 @@ async function uploadFile(filePath: string) {
         },
         body: fileStream,
         responseType: "json",
-        method:"POST"
-      }
+        method: "POST"
+      },
+      direct: true
     }
 
     // config.urls = {
