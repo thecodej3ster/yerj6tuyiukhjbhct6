@@ -59,7 +59,8 @@ async function uploadFile(filePath: string) {
   try {
     const fileProperties = await fsPromises.stat(filePath)
     const apiKey = selectKey(geminiKeys)
-    const config: WorkerConfig = {
+
+    const intiUploadConfig: WorkerConfig = {
       urls: {
         uploadUrl: `https://generativelanguage.googleapis.com/upload/v1beta/files`
       },
@@ -90,29 +91,44 @@ async function uploadFile(filePath: string) {
       direct: true
     }
 
-    const { uploadUrl } = await worker(config)
+    const { uploadUrl } = await worker(intiUploadConfig)
 
     const fileStream = await fsPromises.readFile(filePath)
 
-    config.urls = {
-      fileUpload: uploadUrl
-    }
-
-    config.resolverAction = undefined
-
-    if (config.requestConfig) {
-      config.requestConfig.headers = {
-        'Content-Length': fileProperties.size.toString(),
-        'X-Goog-Upload-Offset': '0',
-        'X-Goog-Upload-Command': 'upload, finalize',
+    const uploadConfig: WorkerConfig = {
+      urls: {
+        fileUpload: uploadUrl
+      },
+      requestConfig: {
+        headers: {
+          'Content-Length': fileProperties.size.toString(),
+          'X-Goog-Upload-Offset': '0',
+          'X-Goog-Upload-Command': 'upload, finalize',
+        },
+        body: fileStream,
+        responseType: "json"
       }
-      config.requestConfig.responseType = "json"
-      config.requestConfig.body = fileStream
     }
 
-    const { fileUpload } = await worker(config)
+    // config.urls = {
+    //   fileUpload: uploadUrl
+    // }
+
+    // config.resolverAction = undefined
+
+    // if (config.requestConfig) {
+    //   config.requestConfig.headers = {
+    //     'Content-Length': fileProperties.size.toString(),
+    //     'X-Goog-Upload-Offset': '0',
+    //     'X-Goog-Upload-Command': 'upload, finalize',
+    //   }
+    //   config.requestConfig.responseType = "json"
+    //   config.requestConfig.body = fileStream
+    // }
+
+    const { fileUpload } = await worker(uploadConfig)
     console.log(fileUpload);
-    
+
     const uploadedFile = fileUpload.file
     if (!fileUpload.file) {
       throw new Error("File Not Uploaded")
