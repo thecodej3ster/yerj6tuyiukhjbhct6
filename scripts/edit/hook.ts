@@ -112,6 +112,9 @@ async function uploadFile(filePath: string) {
 
     const { fileUpload } = await worker(config)
     const uploadedFile = fileUpload.file
+    if (!fileUpload.file) {
+      throw new Error("File Not Uploaded")
+    }
     return { key: apiKey, file: uploadedFile }
   } catch (error) {
     fileUploadRetries++
