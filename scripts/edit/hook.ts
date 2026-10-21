@@ -93,6 +93,8 @@ async function uploadFile(filePath: string) {
 
     const { uploadUrl } = await worker(intiUploadConfig)
 
+    console.log(uploadUrl);
+    
     const fileStream = await fsPromises.readFile(filePath)
 
     const uploadConfig: WorkerConfig = {
