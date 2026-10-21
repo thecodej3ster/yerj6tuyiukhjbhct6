@@ -111,6 +111,8 @@ async function uploadFile(filePath: string) {
     }
 
     const { fileUpload } = await worker(config)
+    console.log(fileUpload);
+    
     const uploadedFile = fileUpload.file
     if (!fileUpload.file) {
       throw new Error("File Not Uploaded")
