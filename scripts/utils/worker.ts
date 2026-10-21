@@ -5,7 +5,7 @@ import { WorkerConfig } from "./types";
 
 const workerLimit = 5
 
-
+let workerResponse: AxiosResponse<any, any, {}, any>
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const result: Record<string, any> = {};
@@ -19,7 +19,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
 
 
-    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {        
+    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
+        workerResponse = response
         if (resolverAction) {
             if (resolverArgs) {
                 return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
@@ -63,12 +64,11 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
         try {
-            const response = await axios(selectedRequestConfig);
-            // console.log(response);
+            let response = await axios(selectedRequestConfig);
             result[key] = await response.data
         } catch (error) {
             failedWorks.push(key)
-            result[key] = `Error: ${(error as Error).message}`;
+            result[key] = `Error: ${(error as Error).message}\n${workerResponse.data}`;
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
