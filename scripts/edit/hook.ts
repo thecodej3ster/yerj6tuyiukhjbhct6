@@ -17,6 +17,9 @@ interface Clip {
 
 const geminiKeys = JSON.parse(process.env.Ai_Key!)
 
+console.log(geminiKeys);
+
+
 let lastUsed = -1
 function selectKey(list: { keys: string[] }) {
   lastUsed++
@@ -60,6 +63,8 @@ async function uploadFile(filePath: string) {
     const fileProperties = await fsPromises.stat(filePath)
     const apiKey = selectKey(geminiKeys)
 
+    console.log(apiKey);
+    
     const intiUploadConfig: WorkerConfig = {
       urls: {
         uploadUrl: `https://generativelanguage.googleapis.com/upload/v1beta/files`
