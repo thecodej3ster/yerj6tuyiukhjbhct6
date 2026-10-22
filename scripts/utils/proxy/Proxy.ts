@@ -91,7 +91,7 @@ export class ProxyAgent extends HttpsAgent {
         let connectRetry = 0
         const hanleRequest = async () => {
             const proxySocket = await getProxySocket()
-            proxySocket.setTimeout(120000)
+            proxySocket.setTimeout(60000)
 
             proxySocket.on("timeout", async () => {
                 proxySocket.destroy();
