@@ -292,6 +292,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
               }])
 
             if (error) {
+              console.log(error);
               throw error
             }
             hookFound = true
