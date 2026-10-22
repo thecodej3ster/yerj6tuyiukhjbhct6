@@ -46,10 +46,10 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
                 const socket = tls.connect({ host: server.host, port: 443, servername: server.host });
 
                 // const socket = tls.connect({ host: server, port: 443, servername: server });
-                socket.setTimeout(30000);
+                socket.setTimeout(3000);
 
                 socket.on("secureConnect", () => {
-                    socket.setTimeout(0);
+                    // socket.setTimeout(0);
                     resolve(socket);
                 });
                 socket.on("timeout", () => {

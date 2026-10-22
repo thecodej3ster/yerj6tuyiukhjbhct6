@@ -40,9 +40,9 @@ const r = async () => {
 
 
 
-  // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
-  // const { t } = await worker(config)
-  // console.log(t);
+  const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
+  const { t } = await worker(config)
+  console.log(t);
 
   // for (let i = 0; i < 5; i++) {
   //     await r()
