@@ -276,10 +276,10 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       const onScreenTextResult = onScreenTextResponse.content
       const hooks = onScreenTextResult.split("\n")
 
-      hooks.map(async hook => {
-        if (hookFound) {
-          return
-        }
+      let i = 0
+      const formatHook = async () => {
+        const hook = hooks[i]
+
         if (hook && !hook.toLowerCase().includes("titles")) {
           const formatedHook = wrapText(hook)
 
@@ -298,7 +298,14 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
             hookFound = true
           }
         }
-      })
+
+        i++
+        if (i < hooks.length && !hookFound) {
+          await formatHook()
+        }
+      }
+
+      await formatHook()
 
       if (hookFound === false) {
         console.log(onScreenTextResponse);
