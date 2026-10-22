@@ -18,16 +18,7 @@ interface ServerCred {
 
 let selectedServer: ServerCred
 
-const { data: lists, error } = await db.from('serverlists')
-    .select("*")
-    .eq("id", 'tv-xxx')
-    .limit(1)
-    .single<{ data: string }>()
 
-if (error) {
-    throw error
-}
-const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
 
 let lastUsed = -1
 export function selectKey(list: { keys: string[] }) {
@@ -44,6 +35,18 @@ export function selectKey(list: { keys: string[] }) {
  */
 async function getProxySocket(): Promise<tls.TLSSocket> {
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
+
+    const { data: lists, error } = await db.from('serverlists')
+        .select("*")
+        .eq("id", 'tv-xxx')
+        .limit(1)
+        .single<{ data: string }>()
+
+    if (error) {
+        throw error
+    }
+    const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
+
     const shuffledServerList = [...serverList.servers].sort(() => Math.random() - 0.5);
 
     for (const server of shuffledServerList) {
