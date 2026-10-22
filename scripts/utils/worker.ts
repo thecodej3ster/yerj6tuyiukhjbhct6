@@ -37,6 +37,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
             data: requestConfig?.body || null,
+            timeout:30000,
             method: requestConfig?.method?.toUpperCase() || "GET",
             responseEncoding: requestConfig?.responseEncoding || "UTF-8",
             responseType: requestConfig?.responseType || "text",
