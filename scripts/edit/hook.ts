@@ -15,19 +15,19 @@ interface Clip {
 }
 
 
-const geminiKeys = JSON.parse(process.env.Ai_Key!)
+// const geminiKeys = JSON.parse(process.env.Ai_Key!)
 
-console.log(geminiKeys);
+// console.log(geminiKeys);
 
 
-let lastUsed = -1
-function selectKey(list: { keys: string[] }) {
-  lastUsed++
-  if (lastUsed > list.keys.length - 1) {
-    lastUsed = 0
-  }
-  return list.keys[lastUsed]
-}
+// let lastUsed = -1
+// function selectKey(list: { keys: string[] }) {
+//   lastUsed++
+//   if (lastUsed > list.keys.length - 1) {
+//     lastUsed = 0
+//   }
+//   return list.keys[lastUsed]
+// }
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
   const emojis = ['🤯', '😱', '😮', '👀']
@@ -61,10 +61,9 @@ let fileUploadRetries = 0
 async function uploadFile(filePath: string) {
   try {
     const fileProperties = await fsPromises.stat(filePath)
-    const apiKey = selectKey(geminiKeys)
-
+    const apiKey = process.env.Ai_Key
     console.log(apiKey);
-    
+
     const intiUploadConfig: WorkerConfig = {
       urls: {
         uploadUrl: `https://generativelanguage.googleapis.com/upload/v1beta/files`
@@ -162,7 +161,8 @@ async function uploadFile(filePath: string) {
 let aiRetries = 0
 async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: string, key?: string }): Promise<{ content: string, key: string }> {
   const geminiAPi = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent`
-  const selectedKey = key || selectKey(geminiKeys)
+  const selectedKey = key || process.env.Ai_Key!
+
 
   const config: WorkerConfig = {
     urls: {
