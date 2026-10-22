@@ -38,7 +38,7 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
     const api = process.env.GITHUB_API_URL
     const repo = process.env.GITHUB_REPOSITORY
 
-    console.log(process.env.G_Key);
+    console.log(JSON.stringify(process.env));
     
     const url = `${api}/repos/${repo}/actions/workflows/Clip.yaml/dispatches`;
     const jobId = crypto.randomBytes(8).toString("hex")
