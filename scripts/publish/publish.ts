@@ -107,7 +107,7 @@ async function getChannelId(key: string) {
 let getVideoRetries = 0
 async function getVideo(id: string) {
     try {
-        const video = await retrive({ table: "editted_videos", autoDelete: true, download: true })
+        const video = await retrive({ table: "editted_videos", autoDelete: true, download: true, id: id })
 
         const { data: videoDescription, error } = await db
             .from("video_descriptions")
@@ -293,13 +293,18 @@ async function publish() {
         }
 
         if (video) {
-            await db
+            const { error } = await db
                 .from("video_descriptions")
                 .delete()
                 .eq("video_id", video.videoId)
+
+            console.log(error);
         }
 
     }
 }
 
 publish()
+    .then(() => {
+        console.log('CLIPPING PIPELINE SUCESSFULLY EXECUTED');
+    })
