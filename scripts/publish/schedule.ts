@@ -34,9 +34,13 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
 
     const postID = `Post_${Date.now()}`
     const token = process.env.G_key!
-    console.log(process.env);
+    // const owner = process.env.GITHUB_REPOSITORY_OWNER!
+    const api = process.env.GITHUB_API_URL!
+    const repo = process.env.GITHUB_REPOSITORY!
+
+    console.log(process.env.G_Key);
     
-    const url = `https://api.github.com/repos/thecodej3ster/yerj6tuyiukhjbhct6/actions/workflows/Clip.yaml/dispatches`;
+    const url = `${api}/repos/${repo}/actions/workflows/Clip.yaml/dispatches`;
     const jobId = crypto.randomBytes(8).toString("hex")
 
     const payload = {
