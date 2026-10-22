@@ -38,13 +38,6 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
     // const owner = process.env.GITHUB_REPOSITORY_OWNER!
     const api = process.env.GITHUB_API_URL
     const repo = process.env.GITHUB_REPOSITORY
-
-    console.log(process.env.G_Key);
-    console.log(process.env.Ai_Key);
-    console.log(token);
-    
-    
-    
     const url = `${api}/repos/${repo}/actions/workflows/Clip.yaml/dispatches`;
     const jobId = crypto.randomBytes(8).toString("hex")
 
