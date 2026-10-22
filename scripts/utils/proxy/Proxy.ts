@@ -1,9 +1,8 @@
 import tls from "node:tls";
 import { Agent as HttpsAgent } from "node:https";
 import { setProxyCreds } from "./update";
-import fs from 'fs'
 import { createClient } from '@supabase/supabase-js'
-const db = createClient(process.env.SB_Url!, process.env.SB_KEY!)
+const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 
 interface ConnectionOptions {
@@ -132,7 +131,7 @@ export class ProxyAgent extends HttpsAgent {
                         case connectResponse.startsWith("HTTP/1.0 407") && !retried:
                         case connectResponse.startsWith("HTTP/1.1 407") && !retried:
                             await setProxyCreds()
-                            
+
                             const { data: lists, error } = await db.from('serverlists')
                                 .select("*")
                                 .eq("id", 'tv-xxx')

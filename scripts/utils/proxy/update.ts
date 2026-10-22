@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import axios from 'axios'
 import { createClient } from '@supabase/supabase-js'
-const db = createClient(process.env.SB_Url!, process.env.SB_KEY!)
+const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 interface ProxyCreds {
     servers: { address: string }[],
