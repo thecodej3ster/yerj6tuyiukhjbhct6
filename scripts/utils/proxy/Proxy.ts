@@ -88,28 +88,8 @@ export class ProxyAgent extends HttpsAgent {
     override createConnection(options: any, callback?: (err: Error | null, socket?: any) => void): any {
         const connectionOpts = options as ConnectionOptions;
         let connectResponse = "";
-        let connectRetry = 0
         const hanleRequest = async () => {
             const proxySocket = await getProxySocket()
-            // proxySocket.removeAllListeners('timeout');
-            // proxySocket.setTimeout(30000)
-
-            // proxySocket.on("timeout", async () => {
-            //     console.log('TIMEOUT...');
-            //     proxySocket.setTimeout(0)
-            //     proxySocket.destroy();
-            //     connectResponse = ""
-            //     try {
-            //         connectRetry++
-            //         await hanleRequest()
-            //     } catch (error) {
-            //         if (connectRetry === 3) {
-            //             throw new Error('Connection Timed Out')
-            //         }
-            //         await hanleRequest()
-            //     }
-            // })
-
             const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
             const targetHost = connectionOpts.host;
             const targetPort = connectionOpts.port || 443;

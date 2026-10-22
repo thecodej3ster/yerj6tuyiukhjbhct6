@@ -30,7 +30,8 @@ interface Clip {
 // }
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
-  const emojis = ['🤯', '😱', '😮', '👀']
+  
+  const emojis = ['🤯', '😳', '😱', '👀']
   const emoji = emojis[Math.floor(Math.random() * emojis.length)]
   const words = text.trim().replace('.', '').split(/\s+/)
   const resultLines: string[] = [];
