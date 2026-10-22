@@ -199,6 +199,8 @@ async function manageSchedule() {
 
 
 async function publish() {
+        console.log(process.env);
+
     const { username, shouldPublish, jobId } = await manageSchedule()
 
     if (!shouldPublish) {
