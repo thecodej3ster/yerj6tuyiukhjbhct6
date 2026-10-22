@@ -33,10 +33,10 @@ const storeObj = jobStore as { jobs: Record<string, number> }
 export async function createSchedule({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
 
     const postID = `Post_${Date.now()}`
-    const token = process.env.G_key!
+    const token = process.env.G_key
     // const owner = process.env.GITHUB_REPOSITORY_OWNER!
-    const api = process.env.GITHUB_API_URL!
-    const repo = process.env.GITHUB_REPOSITORY!
+    const api = process.env.GITHUB_API_URL
+    const repo = process.env.GITHUB_REPOSITORY
 
     console.log(process.env.G_Key);
     
