@@ -168,7 +168,8 @@ async function manageSchedule() {
         await initSchedule()
         return {
             username: null,
-            shouldPublish: false
+            shouldPublish: false,
+            jobId: 0
         }
     }
 
@@ -178,7 +179,7 @@ async function manageSchedule() {
         .select("*")
         .eq("id", inputs.jobId)
         .limit(1)
-        .single()
+        .single<{ job_id: number }>()
 
     if (error) {
         console.log(error);
@@ -199,27 +200,31 @@ async function manageSchedule() {
 
 
 async function publish() {
-        // console.log(process.env);
+    // console.log(process.env);
+    let schedule
+    let video
+    try {
+        schedule = await manageSchedule()
+        const { username, shouldPublish, jobId } = schedule
 
-    const { username, shouldPublish, jobId } = await manageSchedule()
+        if (!shouldPublish) {
+            return
+        }
 
-    if (!shouldPublish) {
-        return
-    }
+        if (!username || !jobId) {
+            console.log(`USERNAME IS ${username}`);
+            console.log(`JOBID IS ${jobId}`);
+            throw new Error('Expected Arg is Mising')
+        }
 
-    if (!username || !jobId) {
-        console.log(`USERNAME IS ${username}`);
-        console.log(`JOBID IS ${jobId}`);
-        throw new Error('Expected Arg is Mising')
-    }
+        video = await processCropPipeline()
+        const { videoId } = video
 
-    let { videoId } = await processCropPipeline()
+        const { videoUrl, description } = await getVideo(videoId)
 
-    const { videoUrl, description } = await getVideo(videoId)
+        console.log(videoUrl);
 
-    console.log(videoUrl);
-
-    const publishQuery = `
+        const publishQuery = `
         mutation ShareReelNow($input: CreatePostInput!) {
           createPost(input: $input) {
             ... on PostActionSuccess {
@@ -235,60 +240,66 @@ async function publish() {
         }
       `;
 
-    // return
-    // const keyStore = keys as Record<string, string>
-    // const key = keyStore[username]
+        // return
+        // const keyStore = keys as Record<string, string>
+        // const key = keyStore[username]
 
-    // const channelId = await getChannelId(key)
+        // const channelId = await getChannelId(key)
 
-    // const payload = {
-    //     input: {
-    //         text: description,
-    //         channelId: channelId,
-    //         schedulingType: "automatic",
-    //         mode: "shareNow",
-    //         metadata: {
-    //             instagram: {
-    //                 type: "reel",
-    //                 shouldShareToFeed: true
-    //             }
-    //         },
-    //         assets: [
-    //             {
-    //                 video: {
-    //                     url: videoUrl
-    //                 }
-    //             }
-    //         ]
-    //     }
-    // }
+        // const payload = {
+        //     input: {
+        //         text: description,
+        //         channelId: channelId,
+        //         schedulingType: "automatic",
+        //         mode: "shareNow",
+        //         metadata: {
+        //             instagram: {
+        //                 type: "reel",
+        //                 shouldShareToFeed: true
+        //             }
+        //         },
+        //         assets: [
+        //             {
+        //                 video: {
+        //                     url: videoUrl
+        //                 }
+        //             }
+        //         ]
+        //     }
+        // }
 
-    // const config: WorkerConfig = {
-    //     urls: {
-    //         postInfo: "https://api.buffer.com"
-    //     },
-    //     requestConfig: {
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //             "Authorization": `Bearer ${key}`,
-    //         },
-    //         body: JSON.stringify({ query: publishQuery, variables: payload }),
-    //         responseType: "json",
-    //         method: "POST"
-    //     }
+        // const config: WorkerConfig = {
+        //     urls: {
+        //         postInfo: "https://api.buffer.com"
+        //     },
+        //     requestConfig: {
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "Authorization": `Bearer ${key}`,
+        //         },
+        //         body: JSON.stringify({ query: publishQuery, variables: payload }),
+        //         responseType: "json",
+        //         method: "POST"
+        //     }
 
-    // }
+        // }
 
-    // const { postInfo } = await worker(config)
-    // console.log(postInfo);
+        // const { postInfo } = await worker(config)
+        // console.log(postInfo);
+    } finally {
+        //shoulds be last
+        if (schedule) {
+            await deleteSchedule(`${schedule.jobId}`)
+        }
 
-    //shoulds be last
-    await deleteSchedule(jobId)
+        if (video) {
+            await db
+                .from("video_descriptions")
+                .delete()
+                .eq("video_id", video.videoId)
+        }
 
-    await db
-        .from("video_descriptions")
-        .delete()
-        .eq("video_id", videoId)
+    }
 }
 
 publish()
