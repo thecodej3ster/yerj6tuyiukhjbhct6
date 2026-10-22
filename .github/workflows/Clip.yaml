@@ -15,7 +15,7 @@ jobs:
       SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
       SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
       Keep_key: 8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk
-      G_Key: ${{secrets.workflow}}
+      G_Key: ${{secrets.Auth}}
       Ai_Key: ${{secrets.Ai_Key}}
       Keep_Id: -5113371237
 
