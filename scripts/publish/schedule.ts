@@ -33,7 +33,7 @@ const storeObj = jobStore as { jobs: Record<string, number> }
 export async function createSchedule({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
 
     const postID = `Post_${Date.now()}`
-    const token = "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"
+    const token = process.env.G_key!
     const url = `https://api.github.com/repos/thecodej3ster/yerj6tuyiukhjbhct6/actions/workflows/Clip.yaml/dispatches`;
     const jobId = crypto.randomBytes(8).toString("hex")
 
