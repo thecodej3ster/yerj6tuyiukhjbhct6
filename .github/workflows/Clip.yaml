@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: KEYS
     env:
-      SB_Url: ${{secrets.SB_Url}}
-      SB_Key: ${{secrets.SB_Key}}
-      Keep_key: ${{secrets.Keep_key}}
+      SB_Url: ${{secrets.SB_URL}}
+      SB_Key: ${{secrets.SB_KEY}}
+      Keep_key: ${{secrets.KEEP_KEY}}
       G_Key: ${{secrets.G_KEY}}
-      Ai_Key: ${{secrets.Ai_Key}}
+      Ai_Key: ${{secrets.AI_KEY}}
       Keep_Id: -5113371237
 
     steps:
