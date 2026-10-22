@@ -46,7 +46,7 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
                 const socket = tls.connect({ host: server.host, port: 443, servername: server.host });
 
                 // const socket = tls.connect({ host: server, port: 443, servername: server });
-                socket.setTimeout(6000);
+                socket.setTimeout(60000);
 
                 socket.on("secureConnect", () => {
                     socket.setTimeout(0);
@@ -91,7 +91,6 @@ export class ProxyAgent extends HttpsAgent {
         let connectRetry = 0
         const hanleRequest = async () => {
             const proxySocket = await getProxySocket()
-            proxySocket.setTimeout(60000)
 
             proxySocket.on("timeout", async () => {
                 console.log('TIMEOUT...');
