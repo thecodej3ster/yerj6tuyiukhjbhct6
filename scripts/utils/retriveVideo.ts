@@ -4,7 +4,7 @@ import crypto from "node:crypto"
 import { WorkerConfig } from './types';
 import FormData from 'form-data';
 
-const db = createClient(process.env.SB_URL!, process.env.SB_Key!)
+const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const tkn = process.env.Keep_key
 const keepId = process.env.Keep_Id
 
