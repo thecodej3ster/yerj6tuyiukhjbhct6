@@ -61,7 +61,7 @@ let fileUploadRetries = 0
 async function uploadFile(filePath: string) {
   try {
     const fileProperties = await fsPromises.stat(filePath)
-    const apiKey = process.env.Ai_Key
+    const apiKey = process.env.Ai_Key!
     console.log(apiKey);
 
     const intiUploadConfig: WorkerConfig = {
