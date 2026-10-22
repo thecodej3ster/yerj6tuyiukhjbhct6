@@ -16,7 +16,7 @@ jobs:
       SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
       Keep_key: 8874078883:AAG0WVQr1GdJxjjaw_7KsbtrEz9CTgYb3kk
       G_Key: ${{secrets.workflow}}
-      Ai_Key: '{"keys":["AQ.Ab8RN6JBLXkIdNG5UNEUZzFjD9ywYZ6bvOLxRqJoDZPaexS8zQ","AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ","AQ.Ab8RN6JqYnGOApdqW1U4Jv-oZE07d0HvHd6qqFvBm6cH1oSSCQ","AQ.Ab8RN6IXQmX7D_6KtqDsT2vw2M4yZ_3DaO9U-IR9pBMAU3E5ag","AQ.Ab8RN6JY2R5mnOCYIUaspfbRtY235up0jtuLNtsdCVnL6pw_Wg"]}'
+      Ai_Key: ${{secrets.Ai_Key}}
       Keep_Id: -5113371237
 
     steps:
