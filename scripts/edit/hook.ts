@@ -96,8 +96,6 @@ async function uploadFile(filePath: string) {
 
     const { uploadUrl } = await worker(intiUploadConfig)
 
-    console.log(uploadUrl);
-
     const fileStream = await fsPromises.readFile(filePath)
 
     const uploadConfig: WorkerConfig = {
@@ -117,24 +115,7 @@ async function uploadFile(filePath: string) {
       direct: true
     }
 
-    // config.urls = {
-    //   fileUpload: uploadUrl
-    // }
-
-    // config.resolverAction = undefined
-
-    // if (config.requestConfig) {
-    //   config.requestConfig.headers = {
-    //     'Content-Length': fileProperties.size.toString(),
-    //     'X-Goog-Upload-Offset': '0',
-    //     'X-Goog-Upload-Command': 'upload, finalize',
-    //   }
-    //   config.requestConfig.responseType = "json"
-    //   config.requestConfig.body = fileStream
-    // }
-
     const { fileUpload } = await worker(uploadConfig)
-    console.log(fileUpload);
 
     const uploadedFile = fileUpload.file
     if (!fileUpload.file) {
