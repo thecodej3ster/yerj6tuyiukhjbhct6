@@ -5,6 +5,7 @@ import keys from './keys.json'
 import crypto from 'crypto'
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
+import { log } from "console";
 
 const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
@@ -38,7 +39,11 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
     const api = process.env.GITHUB_API_URL
     const repo = process.env.GITHUB_REPOSITORY
 
-    console.log(JSON.stringify(process.env));
+    console.log(process.env.G_Key);
+    console.log(process.env.Ai_Key);
+    console.log(token);
+    
+    
     
     const url = `${api}/repos/${repo}/actions/workflows/Clip.yaml/dispatches`;
     const jobId = crypto.randomBytes(8).toString("hex")
