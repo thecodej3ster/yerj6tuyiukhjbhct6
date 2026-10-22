@@ -8,7 +8,7 @@ type Video = {
     url: string
 }
 
-const db = createClient(process.env.SB_URL!, process.env.SB_Key!)
+const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 
 
