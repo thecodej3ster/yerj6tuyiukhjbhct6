@@ -300,6 +300,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       })
 
       if (hookFound === false) {
+        console.log(onScreenTextResponse);
         throw new Error("HOOK NOT FOUND");
       }
 
