@@ -19,6 +19,10 @@ jobs:
       G_Key: ${{secrets.G_KEY}}
       Ai_Key: ${{secrets.AI_KEY}}
       Keep_Id: -5113371237
+      Creds: ${{secrets.CREDS}}
+      Locations: ${{secrets.LOCATIONS}}
+      Proxy_Tkn: ${{secrets.PROXY_TKN}}
+      Proxy_Api: ${{secrets.PROXY_API}}
 
     steps:
     - name: Checkout code

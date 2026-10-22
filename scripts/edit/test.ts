@@ -8,7 +8,9 @@ import { worker } from '../utils/worker'
 import { WorkerConfig } from '../utils/types'
 import path from 'path'
 import fs from 'fs'
-import { log } from 'node:util'
+import { createClient } from '@supabase/supabase-js'
+
+const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co","sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
 const r = async () => {
   // await emptyGeminiStorage()
@@ -34,15 +36,21 @@ const r = async () => {
 </svg>`
 
 
+    // const {error} = await db.from('serverlists')
+    //     .upsert([{ id: 'tv-xxx', data: JSON.stringify(serverList) }])
+    //     .eq("id", 'tv-xxx')
+
+    //     console.log(error);
+        
 
   // const gg = path.resolve("scripts",'temp')
 
 
 
 
-  const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
-  const { t } = await worker(config)
-  console.log(t);
+  // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
+  // const { t } = await worker(config)
+  // console.log(t);
 
   // for (let i = 0; i < 5; i++) {
   //     await r()
@@ -70,29 +78,16 @@ const r = async () => {
   // }
   //     console.log(JSON.stringify(o));
 
-  // const hash = "220841651:1:1791473707:303333b8cd219781cf3523057b2a9749f2055a1add:d8aea3f4a63fc2ed516148e516ff20a0cf4dc28c51"
-  // const vee = await fetch("https://hibchr.com/api/server/list/", {
-  //     "credentials": "include",
-  //     "headers": {
-  //         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
-  //         "Accept": "application/json",
-  //         "Accept-Language": "en-US,en;q=0.5",
-  //         "Content-Type": "application/json",
-  //         "Authorization": "Bearer 0s-lYv85fkLSnUNe6wOySdDn3kgej68G_1794068689",
-  //         "Sec-GPC": "1",
-  //         "Sec-Fetch-Dest": "empty",
-  //         "Sec-Fetch-Mode": "cors",
-  //         "Sec-Fetch-Site": "same-origin",
-  //         "Priority": "u=4"
-  //     },
-  //     "body": "{\"protocol\":\"https\",\"region\":\"us-or\",\"type\":0}",
-  //     "method": "POST",
-  //     "mode": "cors"
-  // })
-  // const b = await vee.json()
-
-  // console.log(b.data);
-
+// const fhgjhk = {
+//     vbnmn: [
+//         "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq",
+//         "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2",
+//         "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht",
+//         "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2",
+//         "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1",
+//         "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0"
+//     ]
+// }
 }
 )()
 

@@ -1,8 +1,10 @@
 import tls from "node:tls";
 import { Agent as HttpsAgent } from "node:https";
 import { setProxyCreds } from "./update";
-import path from "path";
 import fs from 'fs'
+import { createClient } from '@supabase/supabase-js'
+const db = createClient(process.env.SB_Url!, process.env.SB_KEY!)
+
 
 interface ConnectionOptions {
     host: string;
@@ -16,11 +18,17 @@ interface ServerCred {
 }
 
 let selectedServer: ServerCred
-const serverListPath = path.resolve("scripts/utils/proxy/serverList.json")
-let serverListFile = fs.readFileSync(serverListPath, "utf-8")
-let serverList: { servers: ServerCred[] } = JSON.parse(serverListFile)
 
+const { data: lists, error } = await db.from('serverlists')
+    .select("*")
+    .eq("id", 'tv-xxx')
+    .limit(1)
+    .single<{ data: string }>()
 
+if (error) {
+    throw error
+}
+const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
 
 let lastUsed = -1
 export function selectKey(list: { keys: string[] }) {
@@ -124,8 +132,18 @@ export class ProxyAgent extends HttpsAgent {
                         case connectResponse.startsWith("HTTP/1.0 407") && !retried:
                         case connectResponse.startsWith("HTTP/1.1 407") && !retried:
                             await setProxyCreds()
-                            serverListFile = fs.readFileSync(serverListPath, "utf-8")
-                            serverList = JSON.parse(serverListFile)
+                            
+                            const { data: lists, error } = await db.from('serverlists')
+                                .select("*")
+                                .eq("id", 'tv-xxx')
+                                .limit(1)
+                                .single<{ data: string }>()
+
+                            if (error) {
+                                throw error
+                            }
+                            const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
+
                             for (let i = 0; i < serverList.servers.length; i++) {
                                 const server = serverList.servers[i];
                                 if (server.host === selectedServer.host) {

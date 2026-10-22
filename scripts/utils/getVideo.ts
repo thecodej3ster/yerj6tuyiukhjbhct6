@@ -8,10 +8,8 @@ type Video = {
     url: string
 }
 
-// const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
-// const tkn = process.env.Keep_key
+const db = createClient(process.env.SB_URL!, process.env.SB_Key!)
 
-const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
 
 
@@ -111,4 +109,3 @@ export async function getVideo(
     
     return { url: cleanUrl(videoUrl) ,code:selectedVideo.code}
 }
-// getVideo({ table: "videos", isRandom: true })

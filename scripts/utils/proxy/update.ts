@@ -1,7 +1,8 @@
 import fs from 'fs/promises'
-import locations from './locations.json'
 import path from 'path'
 import axios from 'axios'
+import { createClient } from '@supabase/supabase-js'
+const db = createClient(process.env.SB_Url!, process.env.SB_KEY!)
 
 interface ProxyCreds {
     servers: { address: string }[],
@@ -16,23 +17,18 @@ export async function setProxyCreds() {
     const serverCreds: { servers: any[] } = { servers: [] }
 
     const getLocations = async () => {
-        const locationNames = Object.keys(locations)
+        const locationNames = JSON.parse(process.env.Locations!).locations
         return locationNames
     }
-
-    const authLifeStore: { items: any[] } = { items: [] }
 
     const locationList = await getLocations()
 
     let i = 0
     const updateInfo = async () => {
-        // console.log("serverInfo");
-        const tkn = "CAESKAoIdG91Y2h2cG4Q6NKI3QcY4r6VgggiEGYyOTQ3MzUwNjg2NmMzMjMaINPkTO4z7bYGbNBz8-cSeZ3VUpPR27q8BRhWC1_isoPx"
-        const { data: serverInfo }: { data: ProxyCreds } = await axios.get(`https://api.pango-cloud.com/user/provide?access_token=${tkn}&type=proxy&location=${locationList[i]}`, { responseType: "json" })
-        // const serverInfo: ProxyCreds = 
-        const authLife = { name: "", expires: 0 }
+        const tkn = process.env.Proxy_Tkn
+        const api = process.env.Proxy_Api
+        const { data: serverInfo }: { data: ProxyCreds } = await axios.get(`https://${api}/user/provide?access_token=${tkn}&type=proxy&location=${locationList[i]}`, { responseType: "json" })
 
-        // console.log(serverInfo);
         if (serverInfo.result === 'SERVER_UNAVAILABLE') {
             if (i < locationList.length) {
                 i++
@@ -47,10 +43,7 @@ export async function setProxyCreds() {
             const cred = { host: "", auth: "" }
             cred.host = server.address
             cred.auth = Buffer.from(`${serverInfo.username.trim()}:${serverInfo.password.trim()}`).toString("base64")
-            authLife.name = locationList[i]
-            authLife.expires = serverInfo.expire_time
             serverCreds.servers.push(cred)
-            authLifeStore.items.push(authLife)
         })
         i++
         if (i !== locationList.length) {
@@ -62,6 +55,8 @@ export async function setProxyCreds() {
 
     const currentDir = path.resolve("scripts/utils/proxy")
 
-    await fs.writeFile(path.join(currentDir, "authLife.json"), JSON.stringify(authLifeStore))
-    await fs.writeFile(path.join(currentDir, "serverList.json"), JSON.stringify(serverCreds))
+    await db.from('serverlists')
+        .upsert([{ id: 'tv-xxx', data: JSON.stringify(serverCreds) }])
+        .eq("id", 'tv-xxx')
+
 }

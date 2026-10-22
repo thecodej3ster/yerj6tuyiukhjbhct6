@@ -1,13 +1,10 @@
 import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
-import jobStore from './jobs.json'
-import keys from './keys.json'
 import crypto from 'crypto'
-import path from "path";
 import { createClient } from "@supabase/supabase-js";
-import { log } from "console";
 
-const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
+const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+const keys = JSON.parse(process.env.Creds!)
 
 const baseHeaders = {
     "accept": "application/json, text/plain, */*",
@@ -29,7 +26,6 @@ const baseHeaders = {
     "Referer": "https://console.cron-job.org/"
 }
 
-const storeObj = jobStore as { jobs: Record<string, number> }
 
 export async function createSchedule({ hours, minutes, username }: { hours: number, minutes: number, username: string }) {
 
