@@ -9,7 +9,9 @@ import { downloadVideo } from '../utils/helpers';
 import { getVideo } from '../utils/getVideo';
 import { processPipPipeline } from './pip';
 import crypto from "crypto"
+import { createClient } from '@supabase/supabase-js';
 
+const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const execFileAsync = promisify(execFile);
 
 interface BoundingBox {
@@ -158,7 +160,8 @@ export async function processCropPipeline() {
         tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
         if (!clip || !clip.url) {
           console.log(clip)
-          return
+          throw new Error("Video Url Not Found");
+
         }
         await downloadVideo(clip.url, tempVideoPath);
 
@@ -181,6 +184,13 @@ export async function processCropPipeline() {
         const minHeight = 376
         if (ratio.h > maxHeight || ratio.h < minHeight) {
           await fsPromises.unlink(tempVideoPath)
+          const { error } = await db.from('videos')
+            .delete()
+            .eq('code', clip.code)
+
+          if (error) {
+            console.log(error);
+          }
           await extractVideoRatio(ffmpegPath)
         }
       }

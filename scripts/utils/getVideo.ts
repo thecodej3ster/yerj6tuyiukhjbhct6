@@ -109,6 +109,6 @@ export async function getVideo(
         }
     }
     
-    return { url: cleanUrl(videoUrl) }
+    return { url: cleanUrl(videoUrl) ,code:selectedVideo.code}
 }
 // getVideo({ table: "videos", isRandom: true })
