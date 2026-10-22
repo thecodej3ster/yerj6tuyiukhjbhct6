@@ -146,9 +146,7 @@ export async function deleteSchedule(id: string) {
         .delete()
         .eq("job_id", id)
 
-    console.log(error)
-    console.log(id);
-    
+    console.log(error)    
 
 }
 

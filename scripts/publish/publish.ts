@@ -167,7 +167,7 @@ async function manageSchedule() {
     if (inputs.jobId === "init") {
         await initSchedule()
         return {
-            username: null,
+            username: "",
             shouldPublish: false,
             jobId: 0
         }
