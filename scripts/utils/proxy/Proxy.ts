@@ -94,6 +94,8 @@ export class ProxyAgent extends HttpsAgent {
             proxySocket.setTimeout(60000)
 
             proxySocket.on("timeout", async () => {
+                console.log('TIMEOUT...');
+
                 proxySocket.destroy();
                 connectResponse = ""
                 try {
@@ -101,7 +103,7 @@ export class ProxyAgent extends HttpsAgent {
                     await hanleRequest()
                 } catch (error) {
                     if (connectRetry === 3) {
-                        throw new Error("Timeout")
+                        throw new Error('Connection Timed Out')
                     }
                     await hanleRequest()
                 }

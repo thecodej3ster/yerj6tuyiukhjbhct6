@@ -102,6 +102,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         await Promise.all(initialWorkers)
         const newWork: Record<string, string> = {}
         if (failedWorks.length && !isRetry) {
+            console.log('RETRYING ...');
+            
             failedWorks.map(key => {
                 newWork[key] = works[key]
             })
