@@ -95,7 +95,7 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
                     minutes
                 ],
                 expiresAt: 0,
-                timezone: "Africa/Casablanca"
+                timezone: "Africa/Lagos"
             },
             folderId: 0
         }
@@ -148,7 +148,7 @@ export async function deleteSchedule(id: string) {
 
 let i = 0
 const usernames = Object.keys(keys)
-const initHour = 18
+const initHour = 23
 export async function initSchedule() {
     const username = usernames[i]
 
