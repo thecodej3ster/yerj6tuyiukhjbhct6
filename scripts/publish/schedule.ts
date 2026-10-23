@@ -148,7 +148,7 @@ export async function deleteSchedule(id: string) {
 
 let i = 0
 const usernames = Object.keys(keys)
-const initHour = 6
+const initHour = 18
 export async function initSchedule() {
     const username = usernames[i]
 
