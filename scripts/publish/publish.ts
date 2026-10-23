@@ -240,54 +240,51 @@ async function publish() {
         }
       `;
 
-        // return
-        // const keyStore = keys as Record<string, string>
-        // const key = keyStore[username]
+        const keyStore = keys as Record<string, string>
+        const key = keyStore[username]
 
-        // const channelId = await getChannelId(key)
+        const channelId = await getChannelId(key)
 
-        // const payload = {
-        //     input: {
-        //         text: description,
-        //         channelId: channelId,
-        //         schedulingType: "automatic",
-        //         mode: "shareNow",
-        //         metadata: {
-        //             instagram: {
-        //                 type: "reel",
-        //                 shouldShareToFeed: true
-        //             }
-        //         },
-        //         assets: [
-        //             {
-        //                 video: {
-        //                     url: videoUrl
-        //                 }
-        //             }
-        //         ]
-        //     }
-        // }
+        const payload = {
+            input: {
+                text: description,
+                channelId: channelId,
+                schedulingType: "automatic",
+                mode: "shareNow",
+                metadata: {
+                    instagram: {
+                        type: "reel",
+                        shouldShareToFeed: true
+                    }
+                },
+                assets: [
+                    {
+                        video: {
+                            url: videoUrl
+                        }
+                    }
+                ]
+            }
+        }
 
-        // const config: WorkerConfig = {
-        //     urls: {
-        //         postInfo: "https://api.buffer.com"
-        //     },
-        //     requestConfig: {
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "Authorization": `Bearer ${key}`,
-        //         },
-        //         body: JSON.stringify({ query: publishQuery, variables: payload }),
-        //         responseType: "json",
-        //         method: "POST"
-        //     }
+        const config: WorkerConfig = {
+            urls: {
+                postInfo: "https://api.buffer.com"
+            },
+            requestConfig: {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${key}`,
+                },
+                body: JSON.stringify({ query: publishQuery, variables: payload }),
+                responseType: "json",
+                method: "POST"
+            }
 
-        // }
+        }
 
-        // const { postInfo } = await worker(config)
-        // console.log(postInfo);
+        const { postInfo } = await worker(config)
     } finally {
-        //shoulds be last
         if (schedule) {
             await deleteSchedule(`${schedule.jobId}`)
         }
