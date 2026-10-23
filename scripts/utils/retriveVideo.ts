@@ -183,7 +183,8 @@ export async function retrive(
       method: "POST",
       responseType: "document",
       headers: { ...form.getHeaders() }
-    }
+    },
+    direct:true
   }
 
   const fileUploadResponse = await worker(config)
