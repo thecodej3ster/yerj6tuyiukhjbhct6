@@ -7,7 +7,7 @@ async function extractVideoIDs({ response }: ResolverArgs) {
     const videoIdSearchMatches = data.match(/[^-'"]{11}(?=","accessibilityText"[:])/mg)
 
     if (!videoIdSearchMatches) {
-        throw new Error("No Video Id Found");        
+        throw new Error("No Video Id Found");
     }
 
     const videoIds = videoIdSearchMatches
@@ -17,6 +17,7 @@ async function extractVideoIDs({ response }: ResolverArgs) {
 
 async function track() {
     const username = "BelmarDivision"
+    const lastSubmittedPost = "QpYHnKwLJFE"
 
     const config: WorkerConfig = {
         urls: {
@@ -25,10 +26,13 @@ async function track() {
         resolverAction: extractVideoIDs
     }
 
-    const videoIds = await worker(config)
+    const { videoIds } = await worker(config) as { videoIds: string[] }
 
-    console.log(videoIds);
-    
+    const endIndex = videoIds.indexOf(lastSubmittedPost)
+    const unSubmittedPosts = videoIds.slice(0, endIndex)
+
+    console.log(unSubmittedPosts);
+
 }
 
 track()
