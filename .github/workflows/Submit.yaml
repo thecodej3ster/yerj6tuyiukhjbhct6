@@ -25,4 +25,4 @@ jobs:
       run: npm ci
 
     - name: Process Submit PipeLine
-      run: npx tsx ./scripts/submit/monitor.ts
+      run: npx tsx ./scripts/submit/monitor/youtube.ts

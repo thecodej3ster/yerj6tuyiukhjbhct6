@@ -10,7 +10,7 @@ async function extractVideoIDs({ response }: ResolverArgs) {
         throw new Error("No Video Id Found");        
     }
 
-    const videoIds = videoIdSearchMatches[0]
+    const videoIds = videoIdSearchMatches
 
     return videoIds
 }

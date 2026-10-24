@@ -38,4 +38,4 @@ jobs:
       run: npm ci
 
     - name: Process Clipping PipeLine
-      run: npx tsx ./scripts/submit/monitor/youtube.ts
+      run: npx tsx ./scripts/publish/publish.ts
