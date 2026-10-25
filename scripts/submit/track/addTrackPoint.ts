@@ -103,7 +103,9 @@ async function add(urls: string[]) {
         ytWorkerUrls[id] = url
     })
 
-    if (ytUrls) {
+    console.log(ytUrls);
+    
+    if (ytUrls.length) {
         const ytConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
         const ytPostIdResponses = await worker(ytConfig)
         trackPoints.concat(Object.values(ytPostIdResponses))
