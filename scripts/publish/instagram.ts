@@ -7,8 +7,16 @@ import { WorkerConfig } from "../utils/types"
 let getChannelIdRetries = 0
 async function getChannelId() {
     const keys = JSON.parse(process.env.Creds!)
+    const n:Record<string,string> = {}
 
-    console.log(JSON.stringify(keys));
+
+    for (const key in keys) {
+        n[key] = keys[key]        
+        
+    }
+    console.log(n);
+    // console.log(`${JSON.stringify(keys)}`);
+    
     
     console.log(keys['verdictmedia_1']);
 
