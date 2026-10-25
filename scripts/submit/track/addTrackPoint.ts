@@ -120,4 +120,5 @@ async function add(urls: string[]) {
 
 }
 
-add(["https://www.youtube.com/shorts/8JZhpUPjia8", "https://www.youtube.com/shorts/8JZhpUPjia8", "https://www.youtube.com/shorts/8JZhpUPjia8", "https://www.youtube.com/shorts/8JZhpUPjia8", "https://www.youtube.com/shorts/8JZhpUPjia8", "https://www.youtube.com/shorts/8JZhpUPjia8",])
+const urls = ['https://www.instagram.com/p/De4o-PeEWPt/', "https://www.youtube.com/shorts/8JZhpUPjia8"]
+add(urls)
