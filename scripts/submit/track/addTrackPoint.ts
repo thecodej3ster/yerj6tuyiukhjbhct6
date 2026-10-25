@@ -10,7 +10,7 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 async function makePayload({ response: arg1, platform }: ResolverArgs & { platform?: string }) {
     const response = arg1 as string
-    console.log(response)
+    // console.log(response)
     
     const payloads: (PostRecord & { updated_at: string })[] = []
 
@@ -107,11 +107,13 @@ async function add(urls: string[]) {
     if (ytUrls.length) {
         const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
         const ytPostIdResponses = await worker(ytConfig)
+        console.log(ytPostIdResponses);
+        
         trackPoints.concat(Object.values(ytPostIdResponses))
     }
 
 
-    console.log(trackPoints)
+    // console.log(trackPoints)
     // const { error } = await db
     //     .from('track_points')
     //     .upsert(trackPoints, { onConflict: 'username' })
