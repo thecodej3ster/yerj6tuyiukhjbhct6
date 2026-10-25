@@ -35,12 +35,6 @@ async function getAuth() {
 
 }
 
-interface SubmissionQueueRecord {
-    url: string,
-    account_name: string
-}
-
-
 
 export async function submit({ campaignId, url }: { campaignId: string, url: string }) {
 

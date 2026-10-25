@@ -19,13 +19,6 @@ async function getVideoId({ response: arg1, lastSubmittedPost: arg2 }: ResolverA
         if (recentPosts.length) {
             recentPosts.reverse()
             postId = recentPosts[0]
-            // const clipCodePattern = new RegExp(`(?<=${postId}\",\"code\":\")[^\"]+`)
-            // const clipCodeSearch = response.match(clipCodePattern)
-
-            // if (clipCodeSearch) {
-            //     const videoId = clipCodeSearch[0]
-            //     return { postToSubmit: videoId, postId: recentPosts[0] }
-            // }
         }
     }
     const clipCodePattern = new RegExp(`(?<=${postId}\",\"code\":\")[^\"]+`)
@@ -47,11 +40,6 @@ async function track(lastSubmittedPost: PostRecord) {
     }
 
     const { post } = await worker(workerConfig) as { post: { postId: string, postToSubmit: string | null } }
-
-    if (post === null) {
-        return
-    }
-
     const { postId, postToSubmit } = post
 
     await db
