@@ -8,7 +8,6 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 async function track() {
     const { data: lastSubmittedPost, error } = await db.from("track_points")
         .select("*")
-        .eq("platform", "instagram")
         .order("updated_at", { ascending: true })
         .limit(1)
         .single<PostRecord>()
