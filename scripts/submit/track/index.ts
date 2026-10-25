@@ -14,6 +14,8 @@ async function track() {
         .single<PostRecord>()
 
 
+        console.log(`${lastSubmittedPost?.username} ${lastSubmittedPost?.platform}`);
+        
     if (error) {
         throw error
     }
