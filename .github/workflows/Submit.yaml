@@ -5,11 +5,12 @@ on:
       campaignId:
         required: true
 jobs:
-  edit:
+  SUBMIT:
+    environment: KEYS
     runs-on: ubuntu-latest
     env:
-      SB_Url: https://emosvfihxxpaqtmlniwe.supabase.co
-      SB_Key: sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9
+      SB_Url: ${{secrets.SB_URL}}
+      SB_Key: ${{secrets.SB_KEY}}
 
     steps:
     - name: Checkout code
@@ -25,4 +26,4 @@ jobs:
       run: npm ci
 
     - name: Process Submit PipeLine
-      run: npx tsx ./scripts/submit/monitor/youtube.ts
+      run: npx tsx ./scripts/submit/monitor/addTrackPoint.ts

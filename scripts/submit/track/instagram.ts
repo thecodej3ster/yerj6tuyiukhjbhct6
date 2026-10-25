@@ -1,0 +1,62 @@
+import { createClient } from "@supabase/supabase-js";
+import { worker } from "../../utils/worker"
+import { WorkerConfig, ResolverArgs } from "../../utils/types";
+import { submit } from "..";
+import { getCampaignId } from "./helpers";
+import { PostRecord } from "./types";
+
+async function getVideoId({ response: arg1, lastSubmittedPost: arg2 }: ResolverArgs & { lastSubmittedPost?: string }) {
+    const response = arg1 as string
+    const lastSubmittedPost = arg2 as string
+
+    const pattern = new RegExp(/(?<=\"pk\":\")\d+(?=\",\"code":\")/g)
+    const recentPostSearchMatch = response.match(pattern)
+    
+
+    if (recentPostSearchMatch) {
+        const recentPosts: string[] = recentPostSearchMatch.filter(num => BigInt(num) > BigInt(lastSubmittedPost))
+
+        if (recentPosts.length) {
+            recentPosts.reverse()
+            const clipCodePattern = new RegExp(`(?<=${recentPosts[0]}\",\"code\":\")[^\"]+`)
+            const clipCodeSearch = response.match(clipCodePattern)
+
+            if (clipCodeSearch) {
+                const videoId = clipCodeSearch[0]
+                return { postToSubmit: videoId, postId: recentPosts[0] }
+            }
+        }
+    }
+    return null
+}
+
+
+async function track(lastSubmittedPost: PostRecord) {
+    const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+
+    const workerConfig: WorkerConfig = {
+        urls: { post: `https://www.instagram.com/${lastSubmittedPost.username}` },
+        resolverArgs: { lastSubmittedPost: lastSubmittedPost.post_id },
+        resolverAction: getVideoId
+    }
+
+    const { post } = await worker(workerConfig) as { post: { postId: string, postToSubmit: string | null } }
+    const { postId, postToSubmit } = post
+
+    await db
+        .from('track_points')
+        .upsert(
+            {
+                post_id: postId,
+                updated_at: new Date().toISOString()
+            },
+            { onConflict: 'username' }
+        )
+
+    if (postToSubmit) {
+        const videoUrl = `https://www.instagram.com/p/${postToSubmit}/`
+        await submit({ campaignId: getCampaignId(), url: videoUrl })
+    }
+}
+
+export default track

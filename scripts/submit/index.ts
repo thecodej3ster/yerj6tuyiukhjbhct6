@@ -1,9 +1,7 @@
 import { worker } from "../utils/worker"
 import { WorkerConfig } from "../utils/types";
-// import { createClient } from "@supabase/supabase-js";
-import { reportSubmit } from './report'
+import { reportSubmit } from './report/report'
 
-// const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 
 async function getAuth() {
     const workerConfig: WorkerConfig = {
@@ -49,14 +47,6 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
     const token = await getAuth()
     const status = { suscess: false }
 
-    // const { data: post, error }:
-    //     { data: SubmissionQueueRecord | null, error: PostgrestError | null } =
-    //     await db.from("submission_queue").select("*").order("updated_at", { ascending: true }).limit(1).single()
-
-    // if (!post) {
-    //     return status
-    // }
-
     const payload = JSON.stringify({ url: url })
 
     let workerConfig: WorkerConfig = {
@@ -86,21 +76,22 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
         }
     }
 
-    const { handleLookup } = await worker(workerConfig)
-    // console.log(response);
+    const { handleLookup } = await worker(workerConfig) as { handleLookup: { handle: string, platform: string, resolvedUrl: string } | undefined }
+
     if (!handleLookup) {
         console.log(handleLookup);
         throw new Error('Could not Find Handle')
     }
 
-    const handle = handleLookup.handle.replace("@", "")
-    // console.log(handleLookup);
+    const { handle, platform, resolvedUrl } = handleLookup
 
+
+    const cleanHandle = handle.replace("@", "")
     const submitPayload = {
-        url: handleLookup.resolvedUrl,
+        url: resolvedUrl,
         priority: "normal",
         campaignId: campaignId,
-        accountId: `instagram_${handle}`,
+        accountId: `${platform}_${cleanHandle}`,
         source: "modal"
     }
 
@@ -130,26 +121,16 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
         }
     }
 
-    const workerResponse = await worker(workerConfig)
-
+    const { submit } = await worker(workerConfig)
 
     try {
-        const submission = JSON.parse(workerResponse.submit)
+        const submission = JSON.parse(submit)
         console.log(submission);
 
         if (submission.success) {
-            const reelCodeSearch = handleLookup.resolvedUrl.match(/(?<=p\/)[^\/]+/)
+            const reelCodeSearch = resolvedUrl.match(/(?<=p\/)[^\/]+/)
             if (reelCodeSearch) {
-                await reportSubmit({ username: handle })
-                // const insertUrl = `https://www.instagram.com/reel/${reelCodeSearch[0]}/embed/captioned/`
-
-                // const { data: hh, error: ef } = await db.from("submitted_posts").insert([{
-                //     account_name: handle,
-                //     url: insertUrl
-                // }]).select()
-                // const { data: hk, error: op } = await db.from("submission_queue").delete().eq("url", post.url).select()
-
-                status.suscess = true
+                await reportSubmit({ username: cleanHandle })
             }
         }
 
