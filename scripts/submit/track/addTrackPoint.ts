@@ -105,15 +105,14 @@ async function add(urls: string[]) {
 
 
     if (ytUrls.length) {
-        const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
+        const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "youtube" } }
         const ytPostIdResponses = await worker(ytConfig)
-        console.log(ytPostIdResponses);
-        
+        // console.log(ytPostIdResponses);
         trackPoints.concat(Object.values(ytPostIdResponses))
     }
 
 
-    // console.log(trackPoints)
+    console.log(trackPoints)
     // const { error } = await db
     //     .from('track_points')
     //     .upsert(trackPoints, { onConflict: 'username' })
