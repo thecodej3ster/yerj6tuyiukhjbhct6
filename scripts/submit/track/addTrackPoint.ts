@@ -11,7 +11,7 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 async function makePayload({ response: arg1, platform }: ResolverArgs & { platform?: string }) {
     const response = arg1 as string
     // console.log(response)
-    
+
     const payloads: (PostRecord & { updated_at: string })[] = []
 
     switch (platform) {
@@ -59,6 +59,7 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
                 updated_at: new Date().toISOString()
             }
             payloads.push(ytPayload)
+            console.log('CASE DONE');
 
             break;
     }
@@ -107,7 +108,7 @@ async function add(urls: string[]) {
     if (ytUrls.length) {
         const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "youtube" } }
         const ytPostIdResponses = await worker(ytConfig)
-        // console.log(ytPostIdResponses);
+        console.log(ytPostIdResponses);
         trackPoints.concat(Object.values(ytPostIdResponses))
     }
 
