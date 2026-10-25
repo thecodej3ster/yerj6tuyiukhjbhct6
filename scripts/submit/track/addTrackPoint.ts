@@ -104,13 +104,13 @@ async function add(urls: string[]) {
 
 
     console.log(trackPoints)
-    // const { error } = await db
-    //     .from('track_points')
-    //     .upsert(trackPoints, { onConflict: 'username' })
+    const { error } = await db
+        .from('track_points')
+        .upsert(trackPoints, { onConflict: 'username' })
 
-    // if (error) {
-    //     throw error
-    // }
+    if (error) {
+        throw error
+    }
 
 }
 
