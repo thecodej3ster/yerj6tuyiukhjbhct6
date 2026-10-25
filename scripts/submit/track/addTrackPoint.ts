@@ -70,7 +70,7 @@ async function add(urls: string[]) {
     const ytWorkerUrls: Record<string, string> = {}
     const igUrls: string[] = []
     const ytUrls: string[] = []
-    const trackPoints: string[] = []
+    let trackPoints: string[] = []
 
     urls.map(url => {
         switch (true) {
@@ -93,7 +93,7 @@ async function add(urls: string[]) {
     if (igUrls.length) {
         const igConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
         const igPostIdResponses = await worker(igConfig)
-        trackPoints.concat(Object.values(igPostIdResponses))
+        trackPoints = trackPoints.concat(Object.values(igPostIdResponses))
     }
 
     ytUrls.map(url => {
@@ -105,8 +105,7 @@ async function add(urls: string[]) {
     if (ytUrls.length) {
         const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "youtube" } }
         const ytPostIdResponses = await worker(ytConfig)
-        console.log(ytPostIdResponses);
-        trackPoints.concat(Object.values(ytPostIdResponses))
+        trackPoints = trackPoints.concat(Object.values(ytPostIdResponses))
     }
 
 
