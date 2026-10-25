@@ -6,7 +6,8 @@ import { WorkerConfig } from "../utils/types"
 
 let getChannelIdRetries = 0
 async function getChannelId(key: string) {
-    console.log(process.env.Creds!);
+    const keys = process.env.Creds!
+    console.log(keys);
 
     return
     type OrganizationInfo = {
