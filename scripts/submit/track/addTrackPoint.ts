@@ -10,9 +10,6 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 async function makePayload({ response: arg1, platform }: ResolverArgs & { platform?: string }) {
     const response = arg1 as string
-    console.log(response)
-
-    // const payloads: (PostRecord & { updated_at: string })[] = {}
 
     switch (platform) {
         case "instagram":
@@ -34,7 +31,6 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
                 updated_at: new Date().toISOString()
             }
 
-            // payloads.push(igPayload)
             return igPayload
 
         case "youtube":
@@ -58,7 +54,6 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
                 platform: "youtube",
                 updated_at: new Date().toISOString()
             }
-            // payloads.push(ytPayload)
             return ytPayload
     }
 
@@ -101,7 +96,6 @@ async function add(urls: string[]) {
         ytWorkerUrls[id] = url
     })
 
-
     if (ytUrls.length) {
         const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "youtube" } }
         const ytPostIdResponses = await worker(ytConfig)
@@ -120,5 +114,12 @@ async function add(urls: string[]) {
 
 }
 
-const urls = ['https://www.instagram.com/p/De4o-PeEWPt', "https://www.youtube.com/shorts/8JZhpUPjia8"]
+const urls = [
+    'https://www.instagram.com/p/De4o-PeEWPt', 
+    "https://www.instagram.com/p/De4rAm2sMgM",
+    'https://www.instagram.com/p/De4oe_jj3Kj',
+    'https://www.instagram.com/p/De4oXtznTrY',
+    'https://www.instagram.com/p/De4otBSDWY5',
+    'https://www.youtube.com/shorts/o1-viPkWKpA'
+]
 add(urls)
