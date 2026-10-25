@@ -39,7 +39,12 @@ async function track(lastSubmittedPost: PostRecord) {
         resolverArgs: { lastSubmittedPost: lastSubmittedPost.post_id }
     }
 
-    const { postToSubmit } = await worker(config) as { postToSubmit: string }
+    const { postToSubmit } = await worker(config) as { postToSubmit: string|null }
+
+    if (postToSubmit === null) {
+        return
+    }
+
     const videoUrl = `https://www.youtube.com/watch?v=${postToSubmit}`
 
     await db
@@ -49,7 +54,7 @@ async function track(lastSubmittedPost: PostRecord) {
                 post_id: postToSubmit,
                 updated_at: new Date().toISOString()
             },
-            { onConflict: 'username' }
+            { onConflict: 'username,platform' }
         )
 
     if (postToSubmit) {

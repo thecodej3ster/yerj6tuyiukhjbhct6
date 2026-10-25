@@ -41,6 +41,11 @@ async function track(lastSubmittedPost: PostRecord) {
     }
 
     const { post } = await worker(workerConfig) as { post: { postId: string, postToSubmit: string | null } }
+
+    if (post === null) {
+        return
+    }
+
     const { postId, postToSubmit } = post
 
     await db
@@ -50,7 +55,7 @@ async function track(lastSubmittedPost: PostRecord) {
                 post_id: postId,
                 updated_at: new Date().toISOString()
             },
-            { onConflict: 'username' }
+            { onConflict: 'username,platform' }
         )
 
     if (postToSubmit) {
