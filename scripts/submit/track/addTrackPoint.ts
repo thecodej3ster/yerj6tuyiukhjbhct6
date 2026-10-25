@@ -59,8 +59,6 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
                 updated_at: new Date().toISOString()
             }
             payloads.push(ytPayload)
-            console.log('CASE DONE');
-
             break;
     }
 
