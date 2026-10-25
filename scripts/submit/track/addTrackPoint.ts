@@ -12,7 +12,7 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
     const response = arg1 as string
     // console.log(response)
 
-    const payloads: (PostRecord & { updated_at: string })[] = []
+    // const payloads: (PostRecord & { updated_at: string })[] = {}
 
     switch (platform) {
         case "instagram":
@@ -34,8 +34,8 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
                 updated_at: new Date().toISOString()
             }
 
-            payloads.push(igPayload)
-            break;
+            // payloads.push(igPayload)
+            return igPayload
 
         case "youtube":
             const ytUserNameSearch = response.match(/(?<=Go\sto\schannel\s@)[^\"]+?"(?=,\"rendererContext\":{\"commandCont)/m)
@@ -58,11 +58,10 @@ async function makePayload({ response: arg1, platform }: ResolverArgs & { platfo
                 platform: "youtube",
                 updated_at: new Date().toISOString()
             }
-            payloads.push(ytPayload)
-            break;
+            // payloads.push(ytPayload)
+            return ytPayload
     }
 
-    return payloads
 }
 
 
