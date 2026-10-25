@@ -70,6 +70,7 @@ async function add(urls: string[]) {
     const ytWorkerUrls: Record<string, string> = {}
     const igUrls: string[] = []
     const ytUrls: string[] = []
+    const trackPoints: string[] = []
 
     urls.map(url => {
         switch (true) {
@@ -89,18 +90,23 @@ async function add(urls: string[]) {
     })
 
 
-
-    const igConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
-    const igPostIdResponses = await worker(igConfig)
+    if (igUrls.length) {
+        const igConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
+        const igPostIdResponses = await worker(igConfig)
+        trackPoints.concat(Object.values(igPostIdResponses))
+    }
 
     ytUrls.map(url => {
         const id = crypto.randomBytes(8).toString("hex")
         ytWorkerUrls[id] = url
     })
 
-    const ytConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
-    const ytPostIdResponses = await worker(ytConfig)
-    const trackPoints = Object.values(igPostIdResponses).concat(Object.values(ytPostIdResponses))
+    if (ytUrls) {
+        const ytConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
+        const ytPostIdResponses = await worker(ytConfig)
+        trackPoints.concat(Object.values(ytPostIdResponses))
+    }
+
 
     console.log(trackPoints)
     // const { error } = await db
