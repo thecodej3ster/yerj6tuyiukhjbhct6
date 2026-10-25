@@ -106,7 +106,7 @@ async function add(urls: string[]) {
     console.log(trackPoints)
     const { error } = await db
         .from('track_points')
-        .upsert(trackPoints, { onConflict: 'username' })
+        .upsert(trackPoints, { onConflict: 'username,platform' })
 
     if (error) {
         console.log(error);
