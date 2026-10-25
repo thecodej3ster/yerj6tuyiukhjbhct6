@@ -109,6 +109,7 @@ async function add(urls: string[]) {
         .upsert(trackPoints, { onConflict: 'username' })
 
     if (error) {
+        console.log(error);
         throw error
     }
 
