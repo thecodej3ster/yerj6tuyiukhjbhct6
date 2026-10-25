@@ -11,6 +11,10 @@ jobs:
     env:
       SB_Url: ${{secrets.SB_URL}}
       SB_Key: ${{secrets.SB_KEY}}
+      Creds: ${{secrets.CREDS}}
+      Locations: ${{secrets.LOCATIONS}}
+      Proxy_Tkn: ${{secrets.PROXY_TKN}}
+      Proxy_Api: ${{secrets.PROXY_API}}
 
     steps:
     - name: Checkout code
