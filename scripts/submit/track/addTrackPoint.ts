@@ -72,6 +72,8 @@ async function add(urls: string[]) {
     const ytUrls: string[] = []
     const trackPoints: string[] = []
 
+    console.log(urls);
+    
     urls.map(url => {
         switch (true) {
             case url.includes("youtube"):
