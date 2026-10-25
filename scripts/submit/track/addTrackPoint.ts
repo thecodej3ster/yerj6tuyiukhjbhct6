@@ -10,7 +10,7 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 async function makePayload({ response: arg1, platform }: ResolverArgs & { platform?: string }) {
     const response = arg1 as string
-    // console.log(response)
+    console.log(response)
 
     // const payloads: (PostRecord & { updated_at: string })[] = {}
 
