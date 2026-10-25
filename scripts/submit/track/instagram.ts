@@ -11,23 +11,29 @@ async function getVideoId({ response: arg1, lastSubmittedPost: arg2 }: ResolverA
 
     const pattern = new RegExp(/(?<=\"pk\":\")\d+(?=\",\"code":\")/g)
     const recentPostSearchMatch = response.match(pattern)
-    
+    let postId = lastSubmittedPost
 
     if (recentPostSearchMatch) {
         const recentPosts: string[] = recentPostSearchMatch.filter(num => BigInt(num) > BigInt(lastSubmittedPost))
 
         if (recentPosts.length) {
             recentPosts.reverse()
-            const clipCodePattern = new RegExp(`(?<=${recentPosts[0]}\",\"code\":\")[^\"]+`)
-            const clipCodeSearch = response.match(clipCodePattern)
+            postId = recentPosts[0]
+            // const clipCodePattern = new RegExp(`(?<=${postId}\",\"code\":\")[^\"]+`)
+            // const clipCodeSearch = response.match(clipCodePattern)
 
-            if (clipCodeSearch) {
-                const videoId = clipCodeSearch[0]
-                return { postToSubmit: videoId, postId: recentPosts[0] }
-            }
+            // if (clipCodeSearch) {
+            //     const videoId = clipCodeSearch[0]
+            //     return { postToSubmit: videoId, postId: recentPosts[0] }
+            // }
         }
     }
-    return null
+    const clipCodePattern = new RegExp(`(?<=${postId}\",\"code\":\")[^\"]+`)
+    const clipCodeSearch = response.match(clipCodePattern)
+    if (!clipCodeSearch) {
+        throw new Error("Clip Code Not Found");
+    }
+    return { postToSubmit: lastSubmittedPost, postId: clipCodeSearch[0] }
 }
 
 

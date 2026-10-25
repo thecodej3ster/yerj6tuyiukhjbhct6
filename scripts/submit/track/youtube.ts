@@ -14,7 +14,6 @@ async function extractVideoID({ response: arg1, lastSubmittedPost }: ResolverArg
         throw new Error("No Video Id Found");
     }
 
-    videoIdSearchMatches
 
     const endIndex = videoIdSearchMatches.indexOf(lastSubmittedPost!)
     const unSubmittedPosts = videoIdSearchMatches.slice(0, endIndex)
@@ -24,7 +23,7 @@ async function extractVideoID({ response: arg1, lastSubmittedPost }: ResolverArg
         return postToSubmit
     }
 
-    return null
+    return lastSubmittedPost
 }
 
 async function track(lastSubmittedPost: PostRecord) {
@@ -40,10 +39,6 @@ async function track(lastSubmittedPost: PostRecord) {
     }
 
     const { postToSubmit } = await worker(config) as { postToSubmit: string|null }
-
-    if (postToSubmit === null) {
-        return
-    }
 
     const videoUrl = `https://www.youtube.com/watch?v=${postToSubmit}`
 
