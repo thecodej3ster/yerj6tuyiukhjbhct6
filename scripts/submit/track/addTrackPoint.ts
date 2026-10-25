@@ -72,8 +72,6 @@ async function add(urls: string[]) {
     const ytUrls: string[] = []
     const trackPoints: string[] = []
 
-    console.log(urls);
-    
     urls.map(url => {
         switch (true) {
             case url.includes("youtube"):
@@ -103,10 +101,9 @@ async function add(urls: string[]) {
         ytWorkerUrls[id] = url
     })
 
-    console.log(ytUrls);
-    
+
     if (ytUrls.length) {
-        const ytConfig: WorkerConfig = { urls: igWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
+        const ytConfig: WorkerConfig = { urls: ytWorkerUrls, resolverAction: makePayload, resolverArgs: { platform: "instagram" } }
         const ytPostIdResponses = await worker(ytConfig)
         trackPoints.concat(Object.values(ytPostIdResponses))
     }
