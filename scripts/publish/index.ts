@@ -94,7 +94,8 @@ async function init() {
         videoId = video.videoId
 
         const { videoUrl, description, hook } = await getVideo(videoId)
-        const payload = { url: videoUrl, key: key, description: description, title: hook.content }
+        const title = hook.lines.join(' ')
+        const payload = { url: videoUrl, key: key, description: description, title: title }
 
         switch (true) {
             case username.includes("instagram"):
