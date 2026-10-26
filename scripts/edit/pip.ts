@@ -1,12 +1,10 @@
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-import { retrive } from '../utils/retriveVideo';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from "path"
-import fsPromises, { readFile } from 'fs/promises';
+import fsPromises from 'fs/promises';
 import { uploadVideo } from '../utils/upload';
-import { downloadVideo } from '../utils/helpers';
 import { processHookPipeline } from './hook';
 
 if (ffmpegPath) {
@@ -54,12 +52,10 @@ export function createVerticalVideoFromRemote({
   backgroundColor = 'white',
 }: ProcessVideoOptions): Promise<string> {
   return new Promise(async (resolve, reject) => {
-    const sideMargin = 20; // Space on each side in pixels
+    const sideMargin = 20;
 
     const filterString = `scale=${targetWidth - sideMargin * 2}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+60:${backgroundColor}`;
-    // const filterString = `scale=${targetWidth}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+100:${backgroundColor}`;
 
-    // await downloadVideo(inputUrl, inputPath)
     ffmpeg()
       .input(inputPath)
       .videoFilters(filterString)

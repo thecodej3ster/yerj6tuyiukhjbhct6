@@ -271,7 +271,7 @@ export async function processTextPipeline(
   ]
 
   try {
-    const video = await retrive({ table: 'video_hooks', autoDelete: true, id: id, }) as VideoHookRecord;
+    const video = await retrive({ table: 'video_hooks', id: id, }) as VideoHookRecord;
     await fs.mkdir(tempDir, { recursive: true });
     await generateTitlePng(video.hook, tempPngPath);
     await execFileAsync(ffmpegPath!, args);

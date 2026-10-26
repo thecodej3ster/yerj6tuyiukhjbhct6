@@ -14,21 +14,6 @@ interface Clip {
   video_id: string
 }
 
-
-// const geminiKeys = JSON.parse(process.env.Ai_Key!)
-
-// console.log(geminiKeys);
-
-
-// let lastUsed = -1
-// function selectKey(list: { keys: string[] }) {
-//   lastUsed++
-//   if (lastUsed > list.keys.length - 1) {
-//     lastUsed = 0
-//   }
-//   return list.keys[lastUsed]
-// }
-
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
   
   const emojis = ['🤯', '😳', '😱', '👀']

@@ -1,36 +1,51 @@
 
-import fs from 'fs'
-import { EventPayload } from "./utils/types"
 import { getChannelId } from './utils/getChannelId'
+import { publish } from './utils/publish'
 
 
+const publishQuery = `
+mutation ShareReelNow($input: CreatePostInput!) {
+  createPost(input: $input) {
+    ... on PostActionSuccess {
+      post {
+        id
+        status
+      }
+    }
+    ... on MutationError {
+      message
+    }
+  }
+}
+`
 
-async function publish(url: string) {
+async function initPublish({ url, key, description }: { url: string, description: string, key: string }) {
 
-    // const username = '_pulsepointmedia_youtube'
-    const eventPath = process.env.GITHUB_EVENT_PATH!
-    const { inputs }: { inputs: EventPayload } = JSON.parse(fs.readFileSync(eventPath, "utf8"))
-    const { username, jobId, time } = inputs
-    const keys = JSON.parse(process.env.Creds!)
-    const key = keys[username]
-    let channelId = ""
+    const channelId = await getChannelId({ key: key, platform: "instagram" })
 
-    switch (true) {
-        case username.includes("instagram"):
-            channelId = await getChannelId({ key: key, platform: "instagram" })
-            break;
-
-        case username.includes("youtube"):
-            channelId = await getChannelId({ key: key, platform: "youtube" })
-            break;
+    const variables = {
+        input: {
+            text: description,
+            channelId: channelId,
+            schedulingType: "automatic",
+            mode: "shareNow",
+            metadata: {
+                instagram: {
+                    type: "reel",
+                    shouldShareToFeed: true
+                }
+            },
+            assets: [
+                {
+                    video: {
+                        url: url
+                    }
+                }
+            ]
+        }
     }
 
-
-    // console.log(inputsJson);
-    console.log(username);
-    console.log(channelId);
-
-
+    await publish({ payload: { query: publishQuery, variables: variables }, key: key })
 }
 
-publish("")
+export default initPublish

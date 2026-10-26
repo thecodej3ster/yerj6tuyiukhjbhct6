@@ -81,10 +81,7 @@ async function getChannelId({ key, platform }: { key: string, platform: "instagr
         const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
 
         const channel = channelInfo.data.channels.filter(info => info.service === platform)
-
-
-        console.log(channelInfo.data);
-        console.log(channelInfo.data.channels);
+        
         return channel[0].id
     } catch (error) {
         getChannelIdRetries++

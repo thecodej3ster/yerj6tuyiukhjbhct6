@@ -73,7 +73,7 @@ async function manageSchedule() {
     const { inputs }: WorkflowDispatchEvent = JSON.parse(rawData);
 
     if (inputs.jobId === "init") {
-        await initSchedule()
+        
         return {
             username: "",
             shouldPublish: false,
@@ -132,66 +132,66 @@ async function publish() {
 
         console.log(videoUrl);
 
-        const publishQuery = `
-        mutation ShareReelNow($input: CreatePostInput!) {
-          createPost(input: $input) {
-            ... on PostActionSuccess {
-              post {
-                id
-                status
-              }
-            }
-            ... on MutationError {
-              message
-            }
-          }
-        }
-      `;
+    //     const publishQuery = `
+    //     mutation ShareReelNow($input: CreatePostInput!) {
+    //       createPost(input: $input) {
+    //         ... on PostActionSuccess {
+    //           post {
+    //             id
+    //             status
+    //           }
+    //         }
+    //         ... on MutationError {
+    //           message
+    //         }
+    //       }
+    //     }
+    //   `;
 
         const keyStore = keys as Record<string, string>
         const key = keyStore[username]
 
         const channelId = await getChannelId(key)
 
-        const payload = {
-            input: {
-                text: description,
-                channelId: channelId,
-                schedulingType: "automatic",
-                mode: "shareNow",
-                metadata: {
-                    instagram: {
-                        type: "reel",
-                        shouldShareToFeed: true
-                    }
-                },
-                assets: [
-                    {
-                        video: {
-                            url: videoUrl
-                        }
-                    }
-                ]
-            }
-        }
+        // const payload = {
+        //     input: {
+        //         text: description,
+        //         channelId: channelId,
+        //         schedulingType: "automatic",
+        //         mode: "shareNow",
+        //         metadata: {
+        //             instagram: {
+        //                 type: "reel",
+        //                 shouldShareToFeed: true
+        //             }
+        //         },
+        //         assets: [
+        //             {
+        //                 video: {
+        //                     url: videoUrl
+        //                 }
+        //             }
+        //         ]
+        //     }
+        // }
 
-        const config: WorkerConfig = {
-            urls: {
-                postInfo: "https://api.buffer.com"
-            },
-            requestConfig: {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${key}`,
-                },
-                body: JSON.stringify({ query: publishQuery, variables: payload }),
-                responseType: "json",
-                method: "POST"
-            }
+        // const config: WorkerConfig = {
+        //     urls: {
+        //         postInfo: "https://api.buffer.com"
+        //     },
+        //     requestConfig: {
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "Authorization": `Bearer ${key}`,
+        //         },
+        //         body: JSON.stringify({ query: publishQuery, variables: payload }),
+        //         responseType: "json",
+        //         method: "POST"
+        //     }
 
-        }
+        // }
 
-        const { postInfo } = await worker(config)
+        // const { postInfo } = await worker(config)
     } finally {
         if (schedule) {
             await deleteSchedule(`${schedule.jobId}`)
