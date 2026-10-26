@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { worker } from "../../utils/worker"
 import { WorkerConfig, ResolverArgs } from "../../utils/types";
-import { submit } from "..";
+import { submit } from "../index";
 import { getCampaignId } from "./helpers";
 import { PostRecord } from "./types";
 
@@ -26,7 +26,7 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
     if (!clipCodeSearch) {
         throw new Error("Clip Code Not Found");
     }
-    return { postToSubmit: lastSubmittedPost, code: clipCodeSearch[0] }
+    return { postToSubmit: postId, code: clipCodeSearch[0] }
 }
 
 
@@ -60,7 +60,7 @@ async function track(lastSubmittedPost: PostRecord) {
     }
 
     console.log(code);
-    
+
     if (postToSubmit !== lastSubmittedPost.post_id) {
         const videoUrl = `https://www.instagram.com/p/${code}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
