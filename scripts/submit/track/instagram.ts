@@ -42,7 +42,7 @@ async function track(lastSubmittedPost: PostRecord) {
     const { post } = await worker(workerConfig) as { post: { postId: string, postToSubmit: string | null } }
     const { postId, postToSubmit } = post
 
-    await db
+    const { error } = await db
         .from('track_points')
         .upsert(
             {
@@ -51,6 +51,11 @@ async function track(lastSubmittedPost: PostRecord) {
             },
             { onConflict: 'username,platform' }
         )
+
+    if (error) {
+        console.log(error)
+        throw error
+    }
 
     if (postToSubmit !== lastSubmittedPost.post_id) {
         const videoUrl = `https://www.instagram.com/p/${postToSubmit}/`
