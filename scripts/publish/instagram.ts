@@ -13,11 +13,11 @@ async function publish(url: string) {
     const { username, jobId, time }: EventPayload = JSON.parse(inputsJson)
     const keys = JSON.parse(process.env.Creds!)
     const key = keys[username]
-    const channelId = await getChannelId(key)
+    // const channelId = await getChannelId(key)
 
     console.log(inputsJson);
     console.log(username);
-    console.log(channelId);
+    // console.log(channelId);
     
     
 }
