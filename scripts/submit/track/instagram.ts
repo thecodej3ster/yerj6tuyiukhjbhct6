@@ -26,7 +26,7 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
     if (!clipCodeSearch) {
         throw new Error("Clip Code Not Found");
     }
-    return { postToSubmit: lastSubmittedPost, postId: clipCodeSearch[0] }
+    return { postToSubmit: lastSubmittedPost, code: clipCodeSearch[0] }
 }
 
 
@@ -39,14 +39,16 @@ async function track(lastSubmittedPost: PostRecord) {
         resolverAction: getPostId
     }
 
-    const { post } = await worker(workerConfig) as { post: { postId: string, postToSubmit: string | null } }
-    const { postId, postToSubmit } = post
+    const { post } = await worker(workerConfig) as { post: { code: string, postToSubmit: string } }
+    const { code, postToSubmit } = post
 
     const { error } = await db
         .from('track_points')
         .upsert(
             {
-                post_id: postId,
+                username: lastSubmittedPost.username,
+                platform: lastSubmittedPost.platform,
+                post_id: postToSubmit,
                 updated_at: new Date().toISOString()
             },
             { onConflict: 'username,platform' }
@@ -57,8 +59,10 @@ async function track(lastSubmittedPost: PostRecord) {
         throw error
     }
 
+    console.log(code);
+    
     if (postToSubmit !== lastSubmittedPost.post_id) {
-        const videoUrl = `https://www.instagram.com/p/${postToSubmit}/`
+        const videoUrl = `https://www.instagram.com/p/${code}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
     }
 }

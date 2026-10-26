@@ -4,6 +4,7 @@ import { submit } from '..'
 import { createClient } from "@supabase/supabase-js";
 import { PostRecord } from './types';
 import { getCampaignId } from './helpers';
+import { platform } from 'os';
 
 
 async function extractVideoID({ response: arg1, lastSubmittedPost }: ResolverArgs & { lastSubmittedPost?: string }) {
@@ -46,6 +47,8 @@ async function track(lastSubmittedPost: PostRecord) {
         .from('track_points')
         .upsert(
             {
+                username:lastSubmittedPost.username,
+                platform:lastSubmittedPost.platform,
                 post_id: postToSubmit,
                 updated_at: new Date().toISOString()
             },
