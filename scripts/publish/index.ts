@@ -94,11 +94,11 @@ async function init() {
         videoId = video.videoId
 
         const { videoUrl, description, hook } = await getVideo(videoId)
-        console.log(JSON.parse(hook.hook));
+        console.log();
         console.log(hook.hook["lines"]);
 
-        const title = JSON.parse(hook.hook.lines).join(' ')
-        const payload = { url: videoUrl, key: key, description: description, title: title }
+        const title = JSON.parse(hook.hook)
+        const payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
         console.log(title);
 
         switch (true) {
