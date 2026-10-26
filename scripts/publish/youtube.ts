@@ -25,6 +25,7 @@ async function initPublish({ url, key, description, title }: { url: string, desc
     input: {
       channelId: channelId,
       text: description,
+      schedulingType: "automatic",
       mode: "shareNow",
       metadata: {
         youtube: {
