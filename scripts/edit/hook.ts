@@ -14,8 +14,15 @@ interface Clip {
   video_id: string
 }
 
+function rotate(list: any[], currentElement: any) {
+  const currentIndex = list.indexOf(currentElement)
+  let nextIndex = currentIndex === list.length - 1 ? 0 : currentIndex + 1
+  const nextElement = list[nextIndex]
+  return nextElement
+}
+
 function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
-  
+
   const emojis = ['🤯', '😳', '😱', '👀']
   const emoji = emojis[Math.floor(Math.random() * emojis.length)]
   const words = text.trim().replace('.', '').split(/\s+/)
@@ -44,11 +51,12 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
 }
 
 let fileUploadRetries = 0
+const aiKeys = JSON.parse(process.env.Ai_Key!).keys
+let apiKey = ""
 async function uploadFile(filePath: string) {
   try {
     const fileProperties = await fsPromises.stat(filePath)
-    const apiKey = process.env.Ai_Key!
-    console.log(apiKey);
+    apiKey = aiKeys[0]
 
     const intiUploadConfig: WorkerConfig = {
       urls: {
@@ -117,6 +125,7 @@ async function uploadFile(filePath: string) {
 
     return await new Promise<any>((resolve) => {
       setTimeout(async () => {
+        apiKey = rotate(aiKeys, apiKey)
         const data = await uploadFile(filePath)
         resolve(data)
       }, 5000)
@@ -128,7 +137,9 @@ async function uploadFile(filePath: string) {
 let aiRetries = 0
 async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: string, key?: string }): Promise<{ content: string, key: string }> {
   const geminiAPi = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent`
-  const selectedKey = key || process.env.Ai_Key!
+  if (key) {
+    apiKey = key
+  }
 
 
   const config: WorkerConfig = {
@@ -137,7 +148,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
     },
     requestConfig: {
       headers: {
-        'x-goog-api-key': `${selectedKey}`,
+        'x-goog-api-key': `${apiKey}`,
         "Content-Type": "application/json"
       },
       method: "POST",
@@ -174,7 +185,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
     chat.candidates[0].content.parts[0].text
   ) {
     const response: string = chat.candidates[0].content.parts[0].text
-    return { content: response, key: selectedKey }
+    return { content: response, key: apiKey }
   } else {
     aiRetries++
     if (aiRetries === 3) {
@@ -184,7 +195,10 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
     return await new Promise<{ content: string, key: string }>((resolve) => {
       setTimeout(async () => {
-        const data = await sendToAI({ prompt: prompt, fileUrl: fileUrl, key: key })
+        if (!key) {
+          apiKey = rotate(aiKeys, apiKey)
+        }
+        const data = await sendToAI({ prompt: prompt, fileUrl: fileUrl, key: apiKey })
         resolve(data)
       }, 5000)
     })
