@@ -20,7 +20,7 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 let getVideoRetries = 0
 async function getVideo(id: string) {
     console.log('GETTING VIDEO');
-    
+
     try {
         const video = await retrive({ table: "editted_videos", autoDelete: true, download: true, id: id }) as { url: string; video_id: string; }
 
@@ -46,7 +46,7 @@ async function getVideo(id: string) {
 
         if (hookError) {
             console.log("HOOK ERROR");
-            
+
             console.log(hookError);
             throw error
         }
@@ -110,18 +110,24 @@ async function init() {
 
         await createSchedule({ hours: selectedHours, username: inputs.username, minutes: selectedMinutes })
     } finally {
-        const { data, error } = await db.from("jobs")
-            .select("*")
-            .eq("id", jobId)
-            .limit(1)
-            .single<{ job_id: number }>()
 
-        if (error) {
-            console.log(error);
-            throw error
+        let apiJobId = 0
+
+        if (jobId !== 'init') {
+            const { data, error } = await db.from("jobs")
+                .select("*")
+                .eq("id", jobId)
+                .limit(1)
+                .single<{ job_id: number }>()
+
+            if (error) {
+                console.log(error);
+                throw error
+            }
+
+            apiJobId = data.job_id
         }
 
-        const apiJobId = data.job_id
 
         if (time !== 'init') {
             await deleteSchedule(`${apiJobId}`)
