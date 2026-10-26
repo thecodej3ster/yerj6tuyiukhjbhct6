@@ -19,6 +19,8 @@ async function publish({ payload, key }: { payload: { query: string, variables: 
     }
 
     const { postInfo } = await worker(config)
+    console.log(postInfo);
+    
 }
 
 export { publish }

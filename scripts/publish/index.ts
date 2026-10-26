@@ -105,10 +105,14 @@ async function init() {
                 break;
         }
 
-        const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
-        const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
+        if (time !== 'init') {
+            const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
+            const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
 
-        await createSchedule({ hours: selectedHours, username: inputs.username, minutes: selectedMinutes })
+            await createSchedule({ hours: selectedHours, username: inputs.username, minutes: selectedMinutes })
+        }
+
+
     } finally {
 
         let apiJobId = 0
