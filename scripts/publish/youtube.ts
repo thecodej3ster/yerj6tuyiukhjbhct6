@@ -29,7 +29,8 @@ async function initPublish({ url, key, description, title }: { url: string, desc
       mode: "shareNow",
       metadata: {
         youtube: {
-          title: title
+          title: title,
+          category: "Entertainment",
         }
       },
       assets: [
@@ -40,8 +41,8 @@ async function initPublish({ url, key, description, title }: { url: string, desc
         }
       ]
     }
-  }
-  
+  };
+
   await publish({ payload: { query: publishQuery, variables: variables }, key: key })
 }
 
