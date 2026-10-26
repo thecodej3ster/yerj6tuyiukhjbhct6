@@ -15,7 +15,7 @@ async function publish(url: string) {
     const key = keys[username]
     const channelId = await getChannelId(key)
 
-    console.log(key);
+    console.log(inputsJson);
     console.log(username);
     console.log(channelId);
     
