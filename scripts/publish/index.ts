@@ -19,6 +19,8 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 let getVideoRetries = 0
 async function getVideo(id: string) {
+    console.log('GETTING VIDEO');
+    
     try {
         const video = await retrive({ table: "editted_videos", autoDelete: true, download: true, id: id }) as { url: string; video_id: string; }
 
@@ -30,6 +32,7 @@ async function getVideo(id: string) {
             .single()
 
         if (error) {
+            console.log('DESCRIPTION ERROR');
             console.log(error);
             throw error
         }
