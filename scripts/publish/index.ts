@@ -94,7 +94,7 @@ async function init() {
         videoId = video.videoId
 
         const { videoUrl, description, hook } = await getVideo(videoId)
-        const title = JSON.parse(hook).lines.join(' ')
+        const title = JSON.parse(hook.hook).lines.join(' ')
         const payload = { url: videoUrl, key: key, description: description, title: title }
 
         switch (true) {
