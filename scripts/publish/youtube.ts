@@ -24,19 +24,20 @@ async function initPublish({ url, key, description, title }: { url: string, desc
   const variables = {
     input: {
       channelId: channelId,
-      text: description,
+      text: description, // 📝 YouTube Video Description
       schedulingType: "automatic",
       mode: "shareNow",
       metadata: {
         youtube: {
-          title: title,
-          category: "Entertainment",
+          title: title,        // 📌 YouTube Video Title
+          categoryId: "25",   // 📰 News & Politics
+          madeForKids: false  // 🔞 Not Made for Kids
         }
       },
       assets: [
         {
           video: {
-            url: url
+            url: url // Direct MP4 URL
           }
         }
       ]
