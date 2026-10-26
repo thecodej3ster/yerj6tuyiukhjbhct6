@@ -52,7 +52,7 @@ async function track(lastSubmittedPost: PostRecord) {
             { onConflict: 'username,platform' }
         )
 
-    if (postToSubmit) {
+    if (postToSubmit !== lastSubmittedPost.post_id) {
         await submit({ campaignId: getCampaignId(), url: videoUrl })
     }
 }

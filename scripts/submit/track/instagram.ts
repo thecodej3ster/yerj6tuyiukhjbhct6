@@ -5,7 +5,7 @@ import { submit } from "..";
 import { getCampaignId } from "./helpers";
 import { PostRecord } from "./types";
 
-async function getVideoId({ response: arg1, lastSubmittedPost: arg2 }: ResolverArgs & { lastSubmittedPost?: string }) {
+async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverArgs & { lastSubmittedPost?: string }) {
     const response = arg1 as string
     const lastSubmittedPost = arg2 as string
 
@@ -36,7 +36,7 @@ async function track(lastSubmittedPost: PostRecord) {
     const workerConfig: WorkerConfig = {
         urls: { post: `https://www.instagram.com/${lastSubmittedPost.username}` },
         resolverArgs: { lastSubmittedPost: lastSubmittedPost.post_id },
-        resolverAction: getVideoId
+        resolverAction: getPostId
     }
 
     const { post } = await worker(workerConfig) as { post: { postId: string, postToSubmit: string | null } }
@@ -52,7 +52,7 @@ async function track(lastSubmittedPost: PostRecord) {
             { onConflict: 'username,platform' }
         )
 
-    if (postToSubmit) {
+    if (postToSubmit !== lastSubmittedPost.post_id) {
         const videoUrl = `https://www.instagram.com/p/${postToSubmit}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
     }
