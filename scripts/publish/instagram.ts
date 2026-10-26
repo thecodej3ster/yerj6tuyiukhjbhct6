@@ -13,7 +13,18 @@ async function publish(url: string) {
     const { username, jobId, time } = inputs
     const keys = JSON.parse(process.env.Creds!)
     const key = keys[username]
-    const channelId = await getChannelId(key)
+    let channelId = ""
+
+    switch (true) {
+        case username.includes("instagram"):
+            channelId = await getChannelId({ key: key, platform: "instagram" })
+            break;
+
+        case username.includes("youtube"):
+            channelId = await getChannelId({ key: key, platform: "youtube" })
+            break;
+    }
+
 
     // console.log(inputsJson);
     console.log(username);

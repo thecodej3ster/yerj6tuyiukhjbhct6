@@ -2,7 +2,7 @@ import { worker } from "../../utils/worker"
 import { WorkerConfig } from "../../utils/types"
 
 let getChannelIdRetries = 0
-async function getChannelId(key: string) {
+async function getChannelId({ key, platform }: { key: string, platform: "instagram" | "youtube" }) {
 
     type OrganizationInfo = {
         data: {
@@ -21,7 +21,7 @@ async function getChannelId(key: string) {
         id: string,
         name: string,
         displayName: string,
-        service: string
+        service: "instagram" | "youtube"
     }
 
     type ChannelInfo = {
@@ -79,9 +79,13 @@ async function getChannelId(key: string) {
         }
 
         const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
+
+        const channel = channelInfo.data.channels.filter(info => info.service === platform)
+
+
         console.log(channelInfo.data);
         console.log(channelInfo.data.channels);
-        return channelInfo.data.channels[0].id
+        return channel[0].id
     } catch (error) {
         getChannelIdRetries++
         if (getChannelIdRetries === 3) {
@@ -90,7 +94,7 @@ async function getChannelId(key: string) {
 
         return await new Promise<any>((resolve) => {
             setTimeout(async () => {
-                const result = await getChannelId(key)
+                const result = await getChannelId({ key: key, platform: platform })
                 resolve(result)
             }, 3000);
         })
