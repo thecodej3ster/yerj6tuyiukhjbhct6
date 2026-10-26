@@ -42,6 +42,8 @@ async function getVideo(id: string) {
             .single()
 
         if (hookError) {
+            console.log("HOOK ERROR");
+            
             console.log(hookError);
             throw error
         }
