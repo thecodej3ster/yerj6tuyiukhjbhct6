@@ -373,4 +373,4 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
 
 (async () => {
   await processCropPipeline()
-})
+})()
