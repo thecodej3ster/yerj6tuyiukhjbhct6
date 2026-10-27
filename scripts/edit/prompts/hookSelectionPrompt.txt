@@ -38,6 +38,7 @@ No additional text.
 No second choice.
 
 Your entire response must contain exactly one title on a single line.
+This is a strict API output contract. Any text outside the title line is an error. Prioritize matching the reference style over generic title-writing conventions. Return only the title.
 
 INPUT TITLES:
 {{TITLES}}
