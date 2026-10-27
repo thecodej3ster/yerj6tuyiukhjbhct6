@@ -179,6 +179,8 @@ async function generateTitlePng(
 
   for (let index = 0; index < lines.length; index++) {
     const { text, emoji } = lines[index];
+    console.log(lines[index]);
+    
 
     if (!emoji) continue;
 
