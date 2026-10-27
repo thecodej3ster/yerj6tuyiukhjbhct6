@@ -1,5 +1,6 @@
 import { worker } from "../../utils/worker"
 import { WorkerConfig } from "../../utils/types"
+import { getDispatchPayload } from "./getDIspatchPayload"
 
 let getChannelIdRetries = 0
 async function getChannelId({ key, platform }: { key: string, platform: "instagram" | "youtube" }) {
@@ -50,7 +51,7 @@ async function getChannelId({ key, platform }: { key: string, platform: "instagr
           }
         }
       `
-
+    const { username } = getDispatchPayload()
 
     try {
         let config: WorkerConfig = {
@@ -79,9 +80,9 @@ async function getChannelId({ key, platform }: { key: string, platform: "instagr
         }
 
         const { channelInfo } = await worker(config) as { channelInfo: ChannelInfo }
-
+//  && username === info.name
         const channel = channelInfo.data.channels.filter(info => info.service === platform)
-        
+
         return channel[0].id
     } catch (error) {
         getChannelIdRetries++
