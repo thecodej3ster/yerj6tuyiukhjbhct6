@@ -269,7 +269,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
         filePath: tempFilePath
       })
 
-      const onScreenTextSearch = onScreenTextSelectResponse.content.match(/^.+?\s[^\w.\s]{2}$/m)
+      const onScreenTextSearch = onScreenTextSelectResponse.content.match(/^.+?\s[^\w.\s]{2,}$/m)
 
       if (!onScreenTextSearch) {
         throw new Error("OnScreenText Does Not Match");
