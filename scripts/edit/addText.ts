@@ -253,7 +253,7 @@ export async function processTextPipeline(
   const filterGraph =
     '[0:v]scale=1080:-1[scaled];' +
     '[scaled]pad=1080:1920:(ow-iw)/2:(oh-ih)/2:white[canvas];' +
-    '[canvas][1:v]overlay=x=0:y=200[outv]';
+    '[canvas][1:v]overlay=x=0:y=150[outv]';
 
   const args = [
     '-i',
