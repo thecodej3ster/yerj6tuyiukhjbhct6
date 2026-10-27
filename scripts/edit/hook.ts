@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { retrive } from '../utils/retriveVideo';
 import { worker } from '../utils/worker';
 import { WorkerConfig } from '../utils/types';
-import { processTextPipeline } from './addText';
+// import { processTextPipeline } from './addText';
+import { processCropPipeline } from './crop'
 
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
@@ -53,6 +54,7 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
 let fileUploadRetries = 0
 const aiKeys = JSON.parse(process.env.Ai_Key!).keys
 let apiKey = ""
+
 async function uploadFile(filePath: string) {
   try {
     const fileProperties = await fsPromises.stat(filePath)
@@ -109,7 +111,7 @@ async function uploadFile(filePath: string) {
       direct: true
     }
 
-    const { fileUpload } = await worker(uploadConfig)
+    const { fileUpload } = await worker(uploadConfig) as { fileUpload: { file: { uri: string, name: string } } }
 
     const uploadedFile = fileUpload.file
     if (!fileUpload.file) {
@@ -123,7 +125,7 @@ async function uploadFile(filePath: string) {
       throw error
     }
 
-    return await new Promise<any>((resolve) => {
+    return await new Promise<{ key: string, file: { uri: string, name: string } }>((resolve) => {
       setTimeout(async () => {
         apiKey = rotate(aiKeys, apiKey)
         const data = await uploadFile(filePath)
@@ -135,10 +137,12 @@ async function uploadFile(filePath: string) {
 }
 
 let aiRetries = 0
-async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: string, key?: string }): Promise<{ content: string, key: string }> {
+async function sendToAI({ prompt, filePath }: { prompt: string, filePath?: string }): Promise<{ content: string }> {
   const geminiAPi = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent`
-  if (key) {
-    apiKey = key
+  let fileUpload = { key: "", file: { uri: "", name: "" } }
+
+  if (filePath) {
+    fileUpload = await uploadFile(filePath)
   }
 
 
@@ -160,7 +164,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
               { text: prompt },
               {
                 fileData: {
-                  fileUri: fileUrl,
+                  fileUri: fileUpload.file.uri,
                   mimeType: "video/mp4",
                 },
               },
@@ -174,6 +178,19 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
 
   const { chat } = await worker(config)
 
+  const fileDeleteConfig: WorkerConfig = {
+    urls: {
+      deleteFile: `https://generativelanguage.googleapis.com/v1beta/${fileUpload.file.name}`
+    },
+    requestConfig: {
+      headers: {
+        'x-goog-api-key': `${apiKey}`
+      },
+      method: "DELETE"
+    }
+  }
+
+  await worker(fileDeleteConfig)
 
   if (
     chat.candidates &&
@@ -185,7 +202,7 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
     chat.candidates[0].content.parts[0].text
   ) {
     const response: string = chat.candidates[0].content.parts[0].text
-    return { content: response, key: apiKey }
+    return { content: response }
   } else {
     aiRetries++
     if (aiRetries === 3) {
@@ -193,12 +210,10 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
       throw new Error("Ai Chat Failed");
     }
 
-    return await new Promise<{ content: string, key: string }>((resolve) => {
+    return await new Promise<{ content: string }>((resolve) => {
       setTimeout(async () => {
-        if (!key) {
-          apiKey = rotate(aiKeys, apiKey)
-        }
-        const data = await sendToAI({ prompt: prompt, fileUrl: fileUrl, key: apiKey })
+        apiKey = rotate(aiKeys, apiKey)
+        const data = await sendToAI({ prompt: prompt, filePath: filePath })
         resolve(data)
       }, 5000)
     })
@@ -206,12 +221,13 @@ async function sendToAI({ prompt, fileUrl, key }: { prompt: string, fileUrl: str
   }
 }
 
-let hookRetry = 0
+// let hookRetry = 0
 export async function processHookPipeline(tempFilePath: string, id: string) {
   console.log('RUNNING HOOK PIPELINE');
-  const hookPromptFileUpload = await uploadFile(tempFilePath)
+  // const hookPromptFileUpload = await uploadFile(tempFilePath)
 
   const hookPromptFilePath = path.resolve("scripts/edit/prompts/onScreenTextPrompt.txt")
+  const hookSelectionPromptFilePath = path.resolve("scripts/edit/prompts/hookSelectionPrompt.txt")
   const videoDescriptionPromptFilePath = path.resolve("scripts/edit/prompts/videoDescriptionPrompt.txt")
   const tempDir = path.resolve("scripts", 'temp');
 
@@ -222,9 +238,11 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       const hookPrompt = hookPromptFile.toString()
       const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
       const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
+      const hookSelectionPromptFile = await fsPromises.readFile(hookSelectionPromptFilePath)
+      const hookSelectionPrompt = hookSelectionPromptFile.toString()
       await retrive({ table: "pip_videos", autoDelete: true, id: id })
       await fsPromises.mkdir(tempDir, { recursive: true });
-      return { hookPrompt: hookPrompt, videoDescriptionPrompt: videoDescriptionPrompt }
+      return { hookPrompt: hookPrompt, videoDescriptionPrompt: videoDescriptionPrompt, hookSelectionPrompt: hookSelectionPrompt }
     } catch (error) {
       getResourcesRetries++
       if (getResourcesRetries === 3) {
@@ -240,60 +258,84 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
     }
   }
 
-  const { hookPrompt, videoDescriptionPrompt } = await getResources()
+  const { hookPrompt, videoDescriptionPrompt, hookSelectionPrompt } = await getResources()
 
 
   let onScreenTextRetries = 0
   const getOnscreenText = async function name() {
-    let hookFound = false
+    // let hookFound = false
 
     try {
       const onScreenTextResponse = await sendToAI({
         prompt: hookPrompt,
-        key: hookPromptFileUpload.key,
-        fileUrl: hookPromptFileUpload.file.uri
+        filePath: tempFilePath
       })
 
-      const onScreenTextResult = onScreenTextResponse.content
-      const hooks = onScreenTextResult.split("\n")
+      const onScreenTextSelectResponse = await sendToAI({
+        prompt: hookSelectionPrompt.replace('{{TITLES}}', onScreenTextResponse.content),
+        filePath: tempFilePath
+      })
 
-      let i = 0
-      const formatHook = async () => {
-        const hook = hooks[i]
+      const onScreenTextSearch = onScreenTextSelectResponse.content.match(/^.+?\s[^\w.\s]{2}$/m)
 
-        if (hook && !hook.toLowerCase().includes("titles")) {
-          const formatedHook = wrapText(hook)
-
-          if (formatedHook.length && formatedHook.length < 5) {
-            const hookLines = { lines: formatedHook }
-            const { error } = await db.from("video_hooks")
-              .insert([{
-                video_id: id,
-                hook: JSON.stringify(hookLines)
-              }])
-
-            if (error) {
-              console.log(error);
-              throw error
-            }
-            hookFound = true
-          }
-        }
-
-        i++
-        if (i < hooks.length && !hookFound) {
-          await formatHook()
-        }
+      if (!onScreenTextSearch) {
+        throw new Error("OnScreenText Does Not Match");
       }
 
-      await formatHook()
+      const onScreenText = onScreenTextSearch[0]
 
-      if (hookFound === false) {
-        console.log(onScreenTextResponse);
-        throw new Error("HOOK NOT FOUND");
-      }
+      console.log(onScreenText);
 
-      return { onScreenTextResponse: onScreenTextResponse }
+      // const { error } = await db.from("video_hooks")
+      //   .insert([{
+      //     video_id: id,
+      //     hook: onScreenText
+      //   }])
+
+      // if (error) {
+      //   console.log(error);
+      //   throw error
+      // }
+
+      // const hooks = onScreenTextResult.split("\n")
+
+      // let i = 0
+      // const formatHook = async () => {
+      //   const hook = hooks[i]
+
+      //   if (hook && !hook.toLowerCase().includes("titles")) {
+      //     const formatedHook = wrapText(hook)
+
+      //     if (formatedHook.length && formatedHook.length < 5) {
+      //       const hookLines = { lines: formatedHook }
+      // const { error } = await db.from("video_hooks")
+      //   .insert([{
+      //     video_id: id,
+      //     hook: JSON.stringify(hookLines)
+      //   }])
+
+      // if (error) {
+      //   console.log(error);
+      //   throw error
+      // }
+      //       hookFound = true
+      //     }
+      //   }
+
+      // i++
+      // if (i < hooks.length && !hookFound) {
+      //   await formatHook()
+      // }
+      // }
+
+      // await formatHook()
+
+      // if (hookFound === false) {
+      //   console.log(onScreenTextResponse);
+      //   throw new Error("HOOK NOT FOUND");
+      // }
+
+      // return { onScreenTextResponse: onScreenText }
     } catch (error) {
       onScreenTextRetries++
       if (onScreenTextRetries === 3) {
@@ -309,12 +351,11 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
     }
   }
 
-  const { onScreenTextResponse } = await getOnscreenText()
+  await getOnscreenText()
 
   const descriptionResponse = await sendToAI({
     prompt: videoDescriptionPrompt,
-    fileUrl: hookPromptFileUpload.file.uri,
-    key: onScreenTextResponse?.key
+    filePath: tempFilePath
   })
 
 
@@ -325,20 +366,11 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
     throw error
   }
 
-  const config: WorkerConfig = {
-    urls: {
-      deleteFile: `https://generativelanguage.googleapis.com/v1beta/${hookPromptFileUpload.file.name}`
-    },
-    requestConfig: {
-      headers: {
-        'x-goog-api-key': `${hookPromptFileUpload.key}`
-      },
-      method: "DELETE"
-    }
-  }
 
-  await worker(config)
-  await processTextPipeline(tempFilePath, id)
+  // await processTextPipeline(tempFilePath, id)
 }
 
 
+(async () => {
+  await processCropPipeline()
+})
