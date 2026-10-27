@@ -31,16 +31,16 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string {
     const formatedWord = word + " "
 
     if (line.length + formatedWord.length > maxCharsPerLine) {
-      resultLines.push(line)
+      resultLines.push(line.trim())
       line = formatedWord
       if (i === words.length - 1) {
-        resultLines.push(line)
+        resultLines.push(line.trim())
       }
       return
     }
     if (i === words.length - 1) {
       line += formatedWord
-      resultLines.push(line)
+      resultLines.push(line.trim())
       return
     }
     line += formatedWord
