@@ -94,12 +94,10 @@ async function init() {
         videoId = video.videoId
 
         const { videoUrl, description, hook } = await getVideo(videoId)
-        console.log();
-        console.log(hook.hook["lines"]);
+        console.log(videoUrl);
 
         const title = JSON.parse(hook.hook)
         const payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
-        console.log(title);
 
         switch (true) {
             case username.includes("instagram"):

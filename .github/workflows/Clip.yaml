@@ -38,4 +38,4 @@ jobs:
       run: npm ci
 
     - name: Process Clipping PipeLine
-      run: npx tsx ./scripts/edit/hook.ts
+      run: npx tsx ./scripts/publish/index.ts

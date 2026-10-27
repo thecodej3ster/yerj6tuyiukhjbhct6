@@ -4,8 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { retrive } from '../utils/retriveVideo';
 import { worker } from '../utils/worker';
 import { WorkerConfig } from '../utils/types';
-// import { processTextPipeline } from './addText';
-import { processCropPipeline } from './crop'
+import { processTextPipeline } from './addText';
 
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
@@ -22,10 +21,8 @@ function rotate(list: any[], currentElement: any) {
   return nextElement
 }
 
-function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
+function wrapText(text: string, maxCharsPerLine: number = 26): string {
 
-  const emojis = ['🤯', '😳', '😱', '👀']
-  const emoji = emojis[Math.floor(Math.random() * emojis.length)]
   const words = text.trim().replace('.', '').split(/\s+/)
   const resultLines: string[] = [];
   let line = ""
@@ -37,18 +34,19 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string[] {
       resultLines.push(line)
       line = formatedWord
       if (i === words.length - 1) {
-        resultLines.push(line + " " + emoji)
+        resultLines.push(line)
       }
       return
     }
     if (i === words.length - 1) {
       line += formatedWord
-      resultLines.push(line + " " + emoji)
+      resultLines.push(line)
       return
     }
     line += formatedWord
   })
-  return resultLines;
+
+  return JSON.stringify({ lines: resultLines });
 }
 
 let fileUploadRetries = 0
@@ -221,11 +219,8 @@ async function sendToAI({ prompt, filePath }: { prompt: string, filePath?: strin
   }
 }
 
-// let hookRetry = 0
 export async function processHookPipeline(tempFilePath: string, id: string) {
   console.log('RUNNING HOOK PIPELINE');
-  // const hookPromptFileUpload = await uploadFile(tempFilePath)
-
   const hookPromptFilePath = path.resolve("scripts/edit/prompts/onScreenTextPrompt.txt")
   const hookSelectionPromptFilePath = path.resolve("scripts/edit/prompts/hookSelectionPrompt.txt")
   const videoDescriptionPromptFilePath = path.resolve("scripts/edit/prompts/videoDescriptionPrompt.txt")
@@ -263,8 +258,6 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
 
   let onScreenTextRetries = 0
   const getOnscreenText = async function name() {
-    // let hookFound = false
-
     try {
       const onScreenTextResponse = await sendToAI({
         prompt: hookPrompt,
@@ -282,60 +275,20 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
         throw new Error("OnScreenText Does Not Match");
       }
 
-      const onScreenText = onScreenTextSearch[0]
-
+      const onScreenText = wrapText(onScreenTextSearch[0])
       console.log(onScreenText);
 
-      // const { error } = await db.from("video_hooks")
-      //   .insert([{
-      //     video_id: id,
-      //     hook: onScreenText
-      //   }])
+      const { error } = await db.from("video_hooks")
+        .insert([{
+          video_id: id,
+          hook: onScreenText
+        }])
 
-      // if (error) {
-      //   console.log(error);
-      //   throw error
-      // }
+      if (error) {
+        console.log(error);
+        throw error
+      }
 
-      // const hooks = onScreenTextResult.split("\n")
-
-      // let i = 0
-      // const formatHook = async () => {
-      //   const hook = hooks[i]
-
-      //   if (hook && !hook.toLowerCase().includes("titles")) {
-      //     const formatedHook = wrapText(hook)
-
-      //     if (formatedHook.length && formatedHook.length < 5) {
-      //       const hookLines = { lines: formatedHook }
-      // const { error } = await db.from("video_hooks")
-      //   .insert([{
-      //     video_id: id,
-      //     hook: JSON.stringify(hookLines)
-      //   }])
-
-      // if (error) {
-      //   console.log(error);
-      //   throw error
-      // }
-      //       hookFound = true
-      //     }
-      //   }
-
-      // i++
-      // if (i < hooks.length && !hookFound) {
-      //   await formatHook()
-      // }
-      // }
-
-      // await formatHook()
-
-      // if (hookFound === false) {
-      //   console.log(onScreenTextResponse);
-      //   throw new Error("HOOK NOT FOUND");
-      // }
-
-      // return { onScreenTextResponse: onScreenText }
     } catch (error) {
       onScreenTextRetries++
       if (onScreenTextRetries === 3) {
@@ -367,10 +320,5 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   }
 
 
-  // await processTextPipeline(tempFilePath, id)
+  await processTextPipeline(tempFilePath, id)
 }
-
-
-(async () => {
-  await processCropPipeline()
-})()
