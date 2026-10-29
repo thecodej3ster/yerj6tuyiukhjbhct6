@@ -108,7 +108,7 @@ async function init() {
                 break;
         }
 
-        if (time !== 'init') {
+        if (time !== 'init' && username !== 'init') {
             const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
             const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
 
