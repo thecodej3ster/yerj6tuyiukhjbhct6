@@ -97,13 +97,14 @@ async function init() {
         console.log(videoUrl);
 
         const title = JSON.parse(hook.hook)
-        const payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
-
+        let payload: any = {}
         switch (true) {
             case username.includes("instagram"):
+                payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
                 await igPublish(payload)
                 break;
             case username.includes("youtube"):
+                payload = { url: videoUrl, key: key, title: title.lines.join(' ') }
                 await ytPublish(payload)
                 break;
         }
