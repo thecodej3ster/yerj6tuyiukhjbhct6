@@ -11,7 +11,7 @@ import { processPipPipeline } from './pip';
 import { processHookPipeline } from './hook'
 import crypto from "crypto"
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs'
+import { processTextPipeline } from './addText';
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const execFileAsync = promisify(execFile);
@@ -265,12 +265,13 @@ export async function processCropPipeline() {
 
 
   const { tempOutputPath, videoId } = await handleCrop()
-  await processPipPipeline(tempOutputPath, videoId)
+  const pipPath = await processPipPipeline(tempOutputPath, videoId)
   if (hook !== null) {
     await hook
   } else {
+    await fsPromises.unlink(pipPath).catch(() => { });
     throw new Error("HOOK IS NOT INITIALIsED");
   }
-
+  await processTextPipeline(pipPath, videoId)
   return { videoId: videoId }
 }

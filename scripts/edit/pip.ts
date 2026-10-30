@@ -96,7 +96,7 @@ export async function processPipPipeline(inputPath: string, video_id: string) {
         backgroundColor: 'white',
       })
 
-      await uploadVideo({ table: 'pip_videos', id: video_id })
+      // await uploadVideo({ table: 'pip_videos', id: video_id })
 
       return outputPath
     } catch (error) {
@@ -118,5 +118,5 @@ export async function processPipPipeline(inputPath: string, video_id: string) {
   }
 
   const outputPath = await handlePip()
-  // await processHookPipeline(outputPath, video_id)
+  return outputPath
 }

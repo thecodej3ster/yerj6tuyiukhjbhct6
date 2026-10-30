@@ -1,20 +1,9 @@
 import path from 'path';
 import fsPromises from 'fs/promises';
 import { createClient } from '@supabase/supabase-js';
-import { retrive } from '../utils/retriveVideo';
-import { worker } from '../utils/worker';
-import { WorkerConfig } from '../utils/types';
-import { processTextPipeline } from './addText';
 import { sendToAI } from '../ai/chat';
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
-
-// interface Clip {
-//   url: string;
-//   video_id: string
-// }
-
-
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string {
 
@@ -62,7 +51,6 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
       const hookSelectionPromptFile = await fsPromises.readFile(hookSelectionPromptFilePath)
       const hookSelectionPrompt = hookSelectionPromptFile.toString()
-      await retrive({ table: "pip_videos", autoDelete: true, id: id })
       await fsPromises.mkdir(tempDir, { recursive: true });
       return { hookPrompt: hookPrompt, videoDescriptionPrompt: videoDescriptionPrompt, hookSelectionPrompt: hookSelectionPrompt }
     } catch (error) {
@@ -145,7 +133,4 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   if (error) {
     throw error
   }
-
-
-  await processTextPipeline(tempFilePath, id)
 }
