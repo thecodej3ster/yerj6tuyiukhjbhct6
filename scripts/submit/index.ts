@@ -72,6 +72,8 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
 
     const { handleLookup } = await worker(workerConfig) as { handleLookup: { handle: string, platform: string, resolvedUrl: string } | undefined }
 
+    console.log(handleLookup);
+    
     if (!handleLookup) {
         console.log(handleLookup);
         throw new Error('Could not Find Handle')
