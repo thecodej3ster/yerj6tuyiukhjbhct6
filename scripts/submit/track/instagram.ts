@@ -9,7 +9,7 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
     const response = arg1 as string
     const lastSubmittedPost = arg2 as string
 
-    const pattern = new RegExp(/(?<=\"pk\":\")\d+(?=\",\"code":\")/g)
+    const pattern = new RegExp('(?<=\"pk\":\")\d+(?=\",\"code":\")','g')
     const recentPostSearchMatch = response.match(pattern)
     let postId = lastSubmittedPost
 
@@ -61,7 +61,7 @@ async function track(lastSubmittedPost: PostRecord) {
 
     console.log(postToSubmit);
 
-    if (postToSubmit && postToSubmit !== lastSubmittedPost.post_id) {
+    if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
         const videoUrl = `https://www.instagram.com/p/${code}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
     }

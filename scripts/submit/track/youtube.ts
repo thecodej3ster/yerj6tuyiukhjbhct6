@@ -39,7 +39,7 @@ async function track(lastSubmittedPost: PostRecord) {
         resolverArgs: { lastSubmittedPost: lastSubmittedPost.post_id }
     }
 
-    const { postToSubmit } = await worker(config) as { postToSubmit: string | null }
+    const { postToSubmit } = await worker(config) as { postToSubmit: string }
 
     const videoUrl = `https://www.youtube.com/watch?v=${postToSubmit}`
 
@@ -47,8 +47,8 @@ async function track(lastSubmittedPost: PostRecord) {
         .from('track_points')
         .upsert(
             {
-                username:lastSubmittedPost.username,
-                platform:lastSubmittedPost.platform,
+                username: lastSubmittedPost.username,
+                platform: lastSubmittedPost.platform,
                 post_id: postToSubmit,
                 updated_at: new Date().toISOString()
             },
@@ -60,7 +60,7 @@ async function track(lastSubmittedPost: PostRecord) {
         throw error
     }
 
-    if (postToSubmit !== lastSubmittedPost.post_id) {
+    if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
         await submit({ campaignId: getCampaignId(), url: videoUrl })
     }
 }
