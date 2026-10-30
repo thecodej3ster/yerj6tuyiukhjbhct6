@@ -126,7 +126,6 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
     filePath: tempFilePath
   })
 
-
   const { error } = await db.from("video_descriptions")
     .insert([{ video_id: id, content: descriptionResponse.content }])
 
