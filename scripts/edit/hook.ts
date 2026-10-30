@@ -5,21 +5,16 @@ import { retrive } from '../utils/retriveVideo';
 import { worker } from '../utils/worker';
 import { WorkerConfig } from '../utils/types';
 import { processTextPipeline } from './addText';
-
+import { sendToAI } from '../ai/chat';
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
-interface Clip {
-  url: string;
-  video_id: string
-}
+// interface Clip {
+//   url: string;
+//   video_id: string
+// }
 
-function rotate(list: any[], currentElement: any) {
-  const currentIndex = list.indexOf(currentElement)
-  let nextIndex = currentIndex === list.length - 1 ? 0 : currentIndex + 1
-  const nextElement = list[nextIndex]
-  return nextElement
-}
+
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string {
 
@@ -49,181 +44,13 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string {
   return JSON.stringify({ lines: resultLines });
 }
 
-let fileUploadRetries = 0
-const aiKeys = JSON.parse(process.env.Ai_Key!).keys
-let apiKey = ""
 
-async function uploadFile(filePath: string) {
-  try {
-    const fileProperties = await fsPromises.stat(filePath)
-    apiKey = aiKeys[0]
-
-    const intiUploadConfig: WorkerConfig = {
-      urls: {
-        uploadUrl: `https://generativelanguage.googleapis.com/upload/v1beta/files`
-      },
-      requestConfig: {
-        headers: {
-          'x-goog-api-key': `${apiKey}`,
-          'X-Goog-Upload-Protocol': 'resumable',
-          'X-Goog-Upload-Command': 'start',
-          'X-Goog-Upload-Header-Content-Length': fileProperties.size.toString(),
-          'X-Goog-Upload-Header-Content-Type': 'video/mp4',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          file: {
-            displayName: path.basename(filePath)
-          }
-        }),
-        method: "POST",
-
-      },
-      resolverAction: async (args) => {
-        if (args.headers['x-goog-upload-url']) {
-          return args.headers['x-goog-upload-url']
-        } else {
-          return args.response
-        }
-      }
-    }
-
-    const { uploadUrl } = await worker(intiUploadConfig)
-
-    const fileStream = await fsPromises.readFile(filePath)
-
-    const uploadConfig: WorkerConfig = {
-      urls: {
-        fileUpload: uploadUrl
-      },
-      requestConfig: {
-        headers: {
-          'Content-Length': fileProperties.size.toString(),
-          'X-Goog-Upload-Offset': '0',
-          'X-Goog-Upload-Command': 'upload, finalize',
-        },
-        body: fileStream,
-        responseType: "json",
-        method: "POST"
-      },
-      direct: true
-    }
-
-    const { fileUpload } = await worker(uploadConfig) as { fileUpload: { file: { uri: string, name: string } } }
-
-    const uploadedFile = fileUpload.file
-    if (!fileUpload.file) {
-      throw new Error("File Not Uploaded")
-    }
-    return { key: apiKey, file: uploadedFile }
-  } catch (error) {
-    fileUploadRetries++
-    if (fileUploadRetries === 3) {
-      console.log("COULD NOT UPLOAD AI FILE");
-      throw error
-    }
-
-    return await new Promise<{ key: string, file: { uri: string, name: string } }>((resolve) => {
-      setTimeout(async () => {
-        apiKey = rotate(aiKeys, apiKey)
-        const data = await uploadFile(filePath)
-        resolve(data)
-      }, 5000)
-    })
-
-  }
-}
-
-let aiRetries = 0
-async function sendToAI({ prompt, filePath }: { prompt: string, filePath?: string }): Promise<{ content: string }> {
-  const geminiAPi = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent`
-  let fileUpload = { key: "", file: { uri: "", name: "" } }
-
-  if (filePath) {
-    fileUpload = await uploadFile(filePath)
-  }
-
-
-  const config: WorkerConfig = {
-    urls: {
-      chat: geminiAPi
-    },
-    requestConfig: {
-      headers: {
-        'x-goog-api-key': `${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: {
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              { text: prompt },
-              {
-                fileData: {
-                  fileUri: fileUpload.file.uri,
-                  mimeType: "video/mp4",
-                },
-              },
-            ],
-          },
-        ],
-      },
-      responseType: "json"
-    }
-  }
-
-  const { chat } = await worker(config)
-
-  const fileDeleteConfig: WorkerConfig = {
-    urls: {
-      deleteFile: `https://generativelanguage.googleapis.com/v1beta/${fileUpload.file.name}`
-    },
-    requestConfig: {
-      headers: {
-        'x-goog-api-key': `${apiKey}`
-      },
-      method: "DELETE"
-    }
-  }
-
-  await worker(fileDeleteConfig)
-
-  if (
-    chat.candidates &&
-    chat.candidates.length &&
-    chat.candidates[0] &&
-    chat.candidates[0].content &&
-    chat.candidates[0].content.parts &&
-    chat.candidates[0].content.parts.length &&
-    chat.candidates[0].content.parts[0].text
-  ) {
-    const response: string = chat.candidates[0].content.parts[0].text
-    return { content: response }
-  } else {
-    aiRetries++
-    if (aiRetries === 3) {
-      console.log(chat);
-      throw new Error("Ai Chat Failed");
-    }
-
-    return await new Promise<{ content: string }>((resolve) => {
-      setTimeout(async () => {
-        apiKey = rotate(aiKeys, apiKey)
-        const data = await sendToAI({ prompt: prompt, filePath: filePath })
-        resolve(data)
-      }, 5000)
-    })
-
-  }
-}
 
 export async function processHookPipeline(tempFilePath: string, id: string) {
   console.log('RUNNING HOOK PIPELINE');
-  const hookPromptFilePath = path.resolve("scripts/edit/prompts/onScreenTextPrompt.txt")
-  const hookSelectionPromptFilePath = path.resolve("scripts/edit/prompts/hookSelectionPrompt.txt")
-  const videoDescriptionPromptFilePath = path.resolve("scripts/edit/prompts/videoDescriptionPrompt.txt")
+  const hookPromptFilePath = path.resolve("scripts/ai/prompts/onScreenTextPrompt.txt")
+  const hookSelectionPromptFilePath = path.resolve("scripts/ai/prompts/hookSelectionPrompt.txt")
+  const videoDescriptionPromptFilePath = path.resolve("scripts/ai/prompts/videoDescriptionPrompt.txt")
   const tempDir = path.resolve("scripts", 'temp');
 
   let getResourcesRetries = 0
