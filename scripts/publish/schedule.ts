@@ -156,7 +156,7 @@ export async function initSchedule() {
     let initHour = 0
     switch (true) {
         case username.includes("instagram"):
-            initHour = igPostingHours[0]
+            initHour = 18
             break;
         case username.includes("youtube"):
             initHour = ytPostingHours[0]
