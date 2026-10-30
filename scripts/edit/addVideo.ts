@@ -26,7 +26,6 @@ async function getIdByUsername(usernames: string[]) {
             if (foundUserId) {
                 return foundUserId[0]
             }
-            return ""
         },
         requestConfig: {
             method: 'GET'
@@ -34,6 +33,8 @@ async function getIdByUsername(usernames: string[]) {
     }
 
     const accountIds = await worker(workerConfig)
+    console.log(accountIds);
+    
     return accountIds
     // await fetchPosts(accountIds)
 }
@@ -54,7 +55,7 @@ async function fetchPosts(accountId: string) {
 
     let videoUrls: Record<string, string>[] = []
 
-    const url = `https://www.instagram.com/graphql/query/?doc_id=7950326061742207&variables={"id":"${accountId}","after":"","first":12}`
+    const url = `https://www.instagram.com/graphql/query/?variables={"id":"${accountId}","after":"","first":12}`
 
     const config: WorkerConfig = {
         urls: { posts: url },
