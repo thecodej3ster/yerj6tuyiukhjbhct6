@@ -19,22 +19,20 @@ async function getIdByUsername(usernames: string[]) {
 
     const workerConfig: WorkerConfig = {
         urls: workerUrls,
-        resolverAction: async (args: Record<string, string>) => {
-            const accountData = args.response
-            const foundUserId = accountData.match(/(?<=props\":{\"id\":\")\d+/)
+        resolverAction: async ({ response }: ResolverArgs) => {
+            // const accountData = args.response
+            const foundUserId = response.match(/(?<=props\":{\"id\":\")\d+/)
 
             if (foundUserId) {
                 return foundUserId[0]
             }
-        },
-        requestConfig: {
-            method: 'GET'
+            return response
         }
     }
 
     const accountIds = await worker(workerConfig)
     console.log(accountIds);
-    
+
     return accountIds
     // await fetchPosts(accountIds)
 }
