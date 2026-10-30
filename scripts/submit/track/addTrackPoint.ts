@@ -114,14 +114,3 @@ async function add(urls: string[]) {
     }
 
 }
-
-const urls = [
-    'https://www.instagram.com/p/De4o-PeEWPt', 
-    "https://www.instagram.com/p/De4rAm2sMgM",
-    'https://www.instagram.com/p/De4oe_jj3Kj',
-    'https://www.instagram.com/p/De4oXtznTrY',
-    'https://www.instagram.com/p/De4otBSDWY5',
-    'https://youtube.com/shorts/Tu7HbAWUFjo',
-    'https://www.youtube.com/shorts/o1-viPkWKpA'
-]
-add(urls)
