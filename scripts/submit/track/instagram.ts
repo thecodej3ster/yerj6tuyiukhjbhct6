@@ -59,9 +59,9 @@ async function track(lastSubmittedPost: PostRecord) {
         throw error
     }
 
-    console.log(code);
+    console.log(postToSubmit);
 
-    if (postToSubmit !== lastSubmittedPost.post_id) {
+    if (postToSubmit && postToSubmit !== lastSubmittedPost.post_id) {
         const videoUrl = `https://www.instagram.com/p/${code}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
     }
