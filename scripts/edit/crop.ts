@@ -258,7 +258,6 @@ export async function processCropPipeline() {
     }
     finally {
       // Clean up all temporary files from system temp folder
-      await fsPromises.unlink(tempVideoPath).catch(() => { });
       await fsPromises.unlink(tempFramePath).catch(() => { });
     }
   }

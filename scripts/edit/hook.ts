@@ -133,4 +133,6 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
   if (error) {
     throw error
   }
+  await fsPromises.unlink(tempFilePath).catch(() => { });
+
 }
