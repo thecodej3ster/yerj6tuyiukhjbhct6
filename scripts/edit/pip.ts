@@ -5,7 +5,6 @@ import fs from 'fs';
 import path from "path"
 import fsPromises from 'fs/promises';
 import { uploadVideo } from '../utils/upload';
-import { processHookPipeline } from './hook';
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);
@@ -119,5 +118,5 @@ export async function processPipPipeline(inputPath: string, video_id: string) {
   }
 
   const outputPath = await handlePip()
-  await processHookPipeline(outputPath, video_id)
+  // await processHookPipeline(outputPath, video_id)
 }

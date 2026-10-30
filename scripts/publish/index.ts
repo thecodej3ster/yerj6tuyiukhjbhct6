@@ -3,9 +3,9 @@ import { initSchedule, createSchedule, deleteSchedule } from './schedule'
 import { createClient } from '@supabase/supabase-js'
 import { processCropPipeline } from '../edit/crop'
 import { retrive } from '../utils/retriveVideo'
-import fs from 'fs'
 import igPublish from './instagram'
 import ytPublish from './youtube'
+import fs from 'fs'
 
 
 interface Video {
@@ -81,14 +81,26 @@ async function init() {
     const { username, jobId, time } = inputs
     const keys = JSON.parse(process.env.Creds!)
     const key = keys[username]
-    const postingHours = [6, 11, 18, 23]
+    const igPostingHours = [6, 11, 18, 23]
+    const ytPostingHours = [18, 2]
+    let postingHours: number[] = []
+
     let videoId = ""
 
     try {
-        if (time === 'init') {
-            await initSchedule()
+        if (time === 'init' && username !== 'init' && jobId === 'init') {
+            switch (true) {
+                case username.includes("instagram"):
+                    await initSchedule(igPostingHours[0])
+                    break;
+                case username.includes("youtube"):
+                    await initSchedule(ytPostingHours[0])
+                    break;
+            }
+
             return
         }
+
 
         const video = await processCropPipeline()
         videoId = video.videoId
@@ -101,10 +113,12 @@ async function init() {
         switch (true) {
             case username.includes("instagram"):
                 payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
+                postingHours = igPostingHours
                 await igPublish(payload)
                 break;
             case username.includes("youtube"):
                 payload = { url: videoUrl, key: key, title: title.lines.join(' ') }
+                postingHours = ytPostingHours
                 await ytPublish(payload)
                 break;
         }
@@ -121,7 +135,7 @@ async function init() {
 
         let apiJobId = 0
 
-        if (jobId !== 'init') {
+        if (jobId !== 'init' && username !== 'init' && time !== 'init') {
             const { data, error } = await db.from("jobs")
                 .select("*")
                 .eq("id", jobId)
