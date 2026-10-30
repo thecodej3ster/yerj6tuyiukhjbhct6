@@ -89,15 +89,7 @@ async function init() {
 
     try {
         if (time === 'init' && username !== 'init' && jobId === 'init') {
-            switch (true) {
-                case username.includes("instagram"):
-                    await initSchedule(igPostingHours[0])
-                    break;
-                case username.includes("youtube"):
-                    await initSchedule(ytPostingHours[0])
-                    break;
-            }
-
+            await initSchedule()
             return
         }
 
