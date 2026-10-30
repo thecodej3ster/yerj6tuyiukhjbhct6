@@ -184,11 +184,6 @@ export async function processCropPipeline() {
 
         await downloadVideo(clip.url, tempVideoPath)
 
-
-        if (hook === null) {
-          hook = processHookPipeline(tempVideoPath, videoId)
-        }
-
         console.log('Extracting frame 1 with FFmpeg...');
         await execFileAsync(ffmpegPath, [
           '-i',
@@ -226,6 +221,11 @@ export async function processCropPipeline() {
         throw new Error("Ratio is Missing");
 
       }
+
+      if (hook === null) {
+        hook = processHookPipeline(tempVideoPath, videoId)
+      }
+
       const { x, y, w, h } = ratio as BoundingBox
 
       console.log(`[OpenCV Result] Crop Box -> X:${x}, Y:${y}, W:${w}, H:${h}`);
