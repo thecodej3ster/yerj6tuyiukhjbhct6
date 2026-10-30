@@ -88,7 +88,7 @@ async function init() {
     let videoId = ""
 
     try {
-        if (time === 'init' && username !== 'init' && jobId === 'init') {
+        if (time === 'init' && username === 'init' && jobId === 'init') {
             await initSchedule()
             return
         }
