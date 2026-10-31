@@ -39,6 +39,7 @@ async function track(lastSubmittedPost: PostRecord) {
         resolverAction: getPostId
     }
 
+    
     const { post } = await worker(workerConfig) as { post: { code: string, postToSubmit: string } }
     const { code, postToSubmit } = post
 
@@ -48,22 +49,23 @@ async function track(lastSubmittedPost: PostRecord) {
 
         const videoUrl = `https://www.instagram.com/p/${code}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
-        const { error } = await db
-            .from('track_points')
-            .upsert(
-                {
-                    username: lastSubmittedPost.username,
-                    platform: lastSubmittedPost.platform,
-                    post_id: postToSubmit,
-                    updated_at: new Date().toISOString()
-                },
-                { onConflict: 'username,platform' }
-            )
+    }
 
-        if (error) {
-            console.log(error)
-            throw error
-        }
+    const { error } = await db
+        .from('track_points')
+        .upsert(
+            {
+                username: lastSubmittedPost.username,
+                platform: lastSubmittedPost.platform,
+                post_id: postToSubmit,
+                updated_at: new Date().toISOString()
+            },
+            { onConflict: 'username,platform' }
+        )
+
+    if (error) {
+        console.log(error)
+        throw error
     }
 }
 

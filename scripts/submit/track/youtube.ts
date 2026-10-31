@@ -43,23 +43,23 @@ async function track(lastSubmittedPost: PostRecord) {
 
     if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
         await submit({ campaignId: getCampaignId(), url: videoUrl })
+    }
 
-        const { error } = await db
-            .from('track_points')
-            .upsert(
-                {
-                    username: lastSubmittedPost.username,
-                    platform: lastSubmittedPost.platform,
-                    post_id: postToSubmit,
-                    updated_at: new Date().toISOString()
-                },
-                { onConflict: 'username,platform' }
-            )
+    const { error } = await db
+        .from('track_points')
+        .upsert(
+            {
+                username: lastSubmittedPost.username,
+                platform: lastSubmittedPost.platform,
+                post_id: postToSubmit,
+                updated_at: new Date().toISOString()
+            },
+            { onConflict: 'username,platform' }
+        )
 
-        if (error) {
-            console.log(error)
-            throw error
-        }
+    if (error) {
+        console.log(error)
+        throw error
     }
 }
 
