@@ -9,7 +9,7 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
     const response = arg1 as string
     const lastSubmittedPost = arg2 as string
 
-    const pattern = new RegExp('(?<=\"pk\":\")\d+(?=\",\"code":\")','g')
+    const pattern = new RegExp('(?<=\"pk\":\")\d+(?=\",\"code":\")', 'g')
     const recentPostSearchMatch = response.match(pattern)
     let postId = lastSubmittedPost
 
@@ -42,28 +42,28 @@ async function track(lastSubmittedPost: PostRecord) {
     const { post } = await worker(workerConfig) as { post: { code: string, postToSubmit: string } }
     const { code, postToSubmit } = post
 
-    const { error } = await db
-        .from('track_points')
-        .upsert(
-            {
-                username: lastSubmittedPost.username,
-                platform: lastSubmittedPost.platform,
-                post_id: postToSubmit,
-                updated_at: new Date().toISOString()
-            },
-            { onConflict: 'username,platform' }
-        )
-
-    if (error) {
-        console.log(error)
-        throw error
-    }
-
-    console.log(postToSubmit);
-
     if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
+        console.log('hi');
+        console.log(postToSubmit);
+
         const videoUrl = `https://www.instagram.com/p/${code}/`
         await submit({ campaignId: getCampaignId(), url: videoUrl })
+        const { error } = await db
+            .from('track_points')
+            .upsert(
+                {
+                    username: lastSubmittedPost.username,
+                    platform: lastSubmittedPost.platform,
+                    post_id: postToSubmit,
+                    updated_at: new Date().toISOString()
+                },
+                { onConflict: 'username,platform' }
+            )
+
+        if (error) {
+            console.log(error)
+            throw error
+        }
     }
 }
 

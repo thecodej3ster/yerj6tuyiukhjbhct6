@@ -4,7 +4,6 @@ import { submit } from '..'
 import { createClient } from "@supabase/supabase-js";
 import { PostRecord } from './types';
 import { getCampaignId } from './helpers';
-import { platform } from 'os';
 
 
 async function extractVideoID({ response: arg1, lastSubmittedPost }: ResolverArgs & { lastSubmittedPost?: string }) {
@@ -30,7 +29,6 @@ async function extractVideoID({ response: arg1, lastSubmittedPost }: ResolverArg
 async function track(lastSubmittedPost: PostRecord) {
 
     const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
-
     const config: WorkerConfig = {
         urls: {
             postToSubmit: `https://www.youtube.com/@${lastSubmittedPost.username}/shorts`
@@ -43,25 +41,25 @@ async function track(lastSubmittedPost: PostRecord) {
 
     const videoUrl = `https://www.youtube.com/watch?v=${postToSubmit}`
 
-    const { error } = await db
-        .from('track_points')
-        .upsert(
-            {
-                username: lastSubmittedPost.username,
-                platform: lastSubmittedPost.platform,
-                post_id: postToSubmit,
-                updated_at: new Date().toISOString()
-            },
-            { onConflict: 'username,platform' }
-        )
-
-    if (error) {
-        console.log(error)
-        throw error
-    }
-
     if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
         await submit({ campaignId: getCampaignId(), url: videoUrl })
+
+        const { error } = await db
+            .from('track_points')
+            .upsert(
+                {
+                    username: lastSubmittedPost.username,
+                    platform: lastSubmittedPost.platform,
+                    post_id: postToSubmit,
+                    updated_at: new Date().toISOString()
+                },
+                { onConflict: 'username,platform' }
+            )
+
+        if (error) {
+            console.log(error)
+            throw error
+        }
     }
 }
 
