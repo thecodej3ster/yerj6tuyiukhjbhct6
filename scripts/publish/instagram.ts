@@ -21,31 +21,32 @@ mutation ShareReelNow($input: CreatePostInput!) {
 
 async function initPublish({ url, key, description }: { url: string, description: string, key: string }) {
 
-    const channelId = await getChannelId({ key: key, platform: "instagram" })
+  const channelId = await getChannelId({ key: key, platform: "instagram" })
 
-    const variables = {
-        input: {
-            text: description,
-            channelId: channelId,
-            schedulingType: "automatic",
-            mode: "shareNow",
-            metadata: {
-                instagram: {
-                    type: "reel",
-                    shouldShareToFeed: true
-                }
-            },
-            assets: [
-                {
-                    video: {
-                        url: url
-                    }
-                }
-            ]
+  const variables = {
+    input: {
+      text: description,
+      channelId: channelId,
+      schedulingType: "automatic",
+      mode: "customScheduled",
+      dueAt: new Date(Date.now() + 2 * 60 * 1000).toISOString(),
+      metadata: {
+        instagram: {
+          type: "reel",
+          shouldShareToFeed: true
         }
+      },
+      assets: [
+        {
+          video: {
+            url: url
+          }
+        }
+      ]
     }
+  }
 
-    await publish({ payload: { query: publishQuery, variables: variables }, key: key })
+  await publish({ payload: { query: publishQuery, variables: variables }, key: key })
 }
 
 export default initPublish
