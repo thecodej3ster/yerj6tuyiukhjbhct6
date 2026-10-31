@@ -39,10 +39,14 @@ async function track(lastSubmittedPost: PostRecord) {
         resolverAction: getPostId
     }
 
-    
+
     const { post } = await worker(workerConfig) as { post: { code: string, postToSubmit: string } }
     const { code, postToSubmit } = post
 
+    if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit)) {
+        console.log('yESSSSSSSSSSSSSSSSSSSSSSS');
+        
+    }
     if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
         console.log('hi');
         console.log(postToSubmit);
