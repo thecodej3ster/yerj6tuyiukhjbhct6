@@ -73,7 +73,7 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
     const { handleLookup } = await worker(workerConfig) as { handleLookup: { handle: string, platform: string, resolvedUrl: string } | undefined }
 
     console.log(handleLookup);
-    
+
     if (!handleLookup) {
         console.log(handleLookup);
         throw new Error('Could not Find Handle')
@@ -118,19 +118,17 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
     }
 
     const { submit } = await worker(workerConfig)
+    console.log(submit);
 
-    try {
-        const submission = JSON.parse(submit)
-        console.log(submission);
 
-        if (submission.success) {
-            const reelCodeSearch = resolvedUrl.match(/(?<=p\/)[^\/]+/)
-            if (reelCodeSearch) {
-                await reportSubmit({ username: cleanHandle })
-            }
+    const submission = JSON.parse(submit)
+    console.log(submission);
+
+    if (submission.success) {
+        const reelCodeSearch = resolvedUrl.match(/(?<=p\/)[^\/]+/)
+        if (reelCodeSearch) {
+            await reportSubmit({ username: cleanHandle })
         }
-
-    } catch (error) { }
-
+    }
     return status
 }
