@@ -114,3 +114,8 @@ async function add(urls: string[]) {
     }
 
 }
+
+
+const urls = ["https://www.instagram.com/p/De4oe_jj3Kj","https://www.instagram.com/p/De4rAm2sMgM"]
+
+add(urls)
