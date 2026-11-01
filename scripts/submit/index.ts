@@ -31,13 +31,13 @@ async function getAuth() {
         }
     }
 
-    const token = await worker(workerConfig)
+    const { token } = await worker(workerConfig)
 
     console.log(token);
-    
+
 
     // const token = JSON.parse(data.getAuth).access_
-    return token.access_token 
+    return token.access_token
 
 }
 
@@ -45,7 +45,7 @@ async function getAuth() {
 export async function submit({ campaignId, url }: { campaignId: string, url: string }) {
 
     const token = await getAuth()
-return
+
     const payload = JSON.stringify({ url: url })
 
     let workerConfig: WorkerConfig = {
