@@ -1,7 +1,6 @@
 import { worker } from "../utils/worker"
 import { WorkerConfig } from "../utils/types";
 import { reportSubmit } from './report/report'
-import { log } from "util";
 
 
 async function getAuth() {
