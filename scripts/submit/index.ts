@@ -122,9 +122,13 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
         }
     }
 
-    const { submit } = await worker(workerConfig)
+    const { submit } = await worker(workerConfig) as { submit: string }
     console.log(submit);
 
+
+    if (submit.includes("This URL is already being monitored")) {
+        return
+    }
 
     const submission = JSON.parse(submit)
     console.log(submission);
