@@ -1,6 +1,7 @@
 import { worker } from "../utils/worker"
 import { WorkerConfig } from "../utils/types";
 import { reportSubmit } from './report/report'
+import { log } from "util";
 
 
 async function getAuth() {
@@ -25,13 +26,14 @@ async function getAuth() {
                 "x-firebase-gmpid": "1:436816715910:web:99094002e79d541d403107"
             },
             method: "POST",
-            body: "grant_type=refresh_token&refresh_token=AMf-vBzkMNIzRRPylFeBpdDSNvsC2PWYjeDfaDc8xz5zgL2odVxF1wghCbIB7jhgdsw-vLp73VbYMVdK3wdxGZz7pSrSn45q-hGk6LMcS2jVYnFQ5wvAOCnF3fXFckvdudMrrs1551mz2rILaUaufRGHJ4yfhej3h0CefBXynjp1B_xZKcXqU8piqu118ppUxTQYYAUSuwu6miptl_vfFyeZyoitSdhQxfH0p_TPuEVAoMq1Vh4w2uatIltNA_ORU_ctpkWuF1wQ"
+            body: "grant_type=refresh_token&refresh_token=AMf-vBzY6WfYeawXQtzldzu658J5xIdSe4N7SuKc7Kixcbd2KVpnDv4BvXoAtlra0P2vOG2A1aFnWpKs37j7oPfwcAS9h6iY926knbQ9b5yOCQMZpVWnS4exapHMvG2Hz0M0bSOBlq1NxICx3W8LbmmcKAbbYtHEqq1ai_d5gufD6bX86aA_mMoVYP9AAiqcTTYPGq9oV1cAuyrtXXKt6Tl6mseYOHa0Kz2ELZwGF5glIYf9mcPpn8nAUcvwBc64aO6zmXLTKrkTDft9Yt5XAMoxZrXNZNOqBQ"
         }
     }
 
     const data = await worker(workerConfig)
+    console.log(data);
+    
     const token = JSON.parse(data.getAuth).access_
-token
     return token
 
 }
