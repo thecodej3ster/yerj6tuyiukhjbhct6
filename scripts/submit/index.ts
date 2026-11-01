@@ -25,15 +25,15 @@ async function getAuth() {
                 "x-firebase-gmpid": "1:436816715910:web:99094002e79d541d403107"
             },
             method: "POST",
-            body: "grant_type=refresh_token&refresh_token=AMf-vBzY6WfYeawXQtzldzu658J5xIdSe4N7SuKc7Kixcbd2KVpnDv4BvXoAtlra0P2vOG2A1aFnWpKs37j7oPfwcAS9h6iY926knbQ9b5yOCQMZpVWnS4exapHMvG2Hz0M0bSOBlq1NxICx3W8LbmmcKAbbYtHEqq1ai_d5gufD6bX86aA_mMoVYP9AAiqcTTYPGq9oV1cAuyrtXXKt6Tl6mseYOHa0Kz2ELZwGF5glIYf9mcPpn8nAUcvwBc64aO6zmXLTKrkTDft9Yt5XAMoxZrXNZNOqBQ"
+            body: "grant_type=refresh_token&refresh_token=AMf-vBzY6WfYeawXQtzldzu658J5xIdSe4N7SuKc7Kixcbd2KVpnDv4BvXoAtlra0P2vOG2A1aFnWpKs37j7oPfwcAS9h6iY926knbQ9b5yOCQMZpVWnS4exapHMvG2Hz0M0bSOBlq1NxICx3W8LbmmcKAbbYtHEqq1ai_d5gufD6bX86aA_mMoVYP9AAiqcTTYPGq9oV1cAuyrtXXKt6Tl6mseYOHa0Kz2ELZwGF5glIYf9mcPpn8nAUcvwBc64aO6zmXLTKrkTDft9Yt5XAMoxZrXNZNOqBQ",
+            responseType: "json"
         }
     }
 
-    const data = await worker(workerConfig)
-    console.log(data);
-    
-    const token = JSON.parse(data.getAuth).access_
-    return token
+    const { access_token } = await worker(workerConfig) as { access_token: string }
+
+    // const token = JSON.parse(data.getAuth).access_
+    return access_token
 
 }
 
