@@ -30,7 +30,8 @@ async function getAuth() {
     }
 
     const data = await worker(workerConfig)
-    const token = JSON.parse(data.getAuth).access_token
+    const token = JSON.parse(data.getAuth).access_
+token
     return token
 
 }
@@ -39,7 +40,6 @@ async function getAuth() {
 export async function submit({ campaignId, url }: { campaignId: string, url: string }) {
 
     const token = await getAuth()
-    const status = { suscess: false }
 
     const payload = JSON.stringify({ url: url })
 
@@ -130,5 +130,4 @@ export async function submit({ campaignId, url }: { campaignId: string, url: str
             await reportSubmit({ username: cleanHandle })
         }
     }
-    return status
 }
