@@ -9,8 +9,7 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
     const response = arg1 as string
     const lastSubmittedPost = arg2 as string
 
-    const pattern = new RegExp('(?<=\"pk\":\")\d+(?=\",\"code":\")', 'g')
-    const recentPostSearchMatch = response.match(pattern)
+    const recentPostSearchMatch = response.match(/(?<=\"pk\":\")\d+(?=\",\"code":\")/g)
     console.log(recentPostSearchMatch);
     
     let postId = lastSubmittedPost
