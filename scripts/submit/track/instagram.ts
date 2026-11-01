@@ -11,11 +11,15 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
 
     const pattern = new RegExp('(?<=\"pk\":\")\d+(?=\",\"code":\")', 'g')
     const recentPostSearchMatch = response.match(pattern)
+    console.log(recentPostSearchMatch);
+    
     let postId = lastSubmittedPost
 
     if (recentPostSearchMatch) {
         const recentPosts: string[] = recentPostSearchMatch.filter(num => BigInt(num) > BigInt(lastSubmittedPost))
 
+        console.log(recentPosts);
+        
         if (recentPosts.length) {
             recentPosts.reverse()
             postId = recentPosts[0]
