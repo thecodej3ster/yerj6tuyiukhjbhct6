@@ -1,11 +1,12 @@
 import { worker } from "../utils/worker"
 import { WorkerConfig } from "../utils/types";
 import { reportSubmit } from './report/report'
+import { Tokens } from "@google/genai";
 
 
 async function getAuth() {
     const workerConfig: WorkerConfig = {
-        urls: { getAuth: "https://securetoken.googleapis.com/v1/token?key=AIzaSyBcpP2tonTnVR3oT8LiAjjw1_h2MnArPn4" },
+        urls: { token: "https://securetoken.googleapis.com/v1/token?key=AIzaSyBcpP2tonTnVR3oT8LiAjjw1_h2MnArPn4" },
         requestConfig: {
             headers: {
                 "accept": "*/*",
@@ -30,10 +31,13 @@ async function getAuth() {
         }
     }
 
-    const { access_token } = await worker(workerConfig) as { access_token: string }
+    const token = await worker(workerConfig)
+
+    console.log(token);
+    
 
     // const token = JSON.parse(data.getAuth).access_
-    return access_token
+    return token.access_token 
 
 }
 
@@ -41,7 +45,7 @@ async function getAuth() {
 export async function submit({ campaignId, url }: { campaignId: string, url: string }) {
 
     const token = await getAuth()
-
+return
     const payload = JSON.stringify({ url: url })
 
     let workerConfig: WorkerConfig = {
