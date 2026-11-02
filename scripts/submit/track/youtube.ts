@@ -3,7 +3,6 @@ import { WorkerConfig, ResolverArgs } from '../../utils/types'
 import { submit } from '..'
 import { createClient } from "@supabase/supabase-js";
 import { PostRecord } from './types';
-import { getCampaignId } from './helpers';
 
 
 async function extractVideoID({ response: arg1, lastSubmittedPost }: ResolverArgs & { lastSubmittedPost?: string }) {
@@ -42,7 +41,7 @@ async function track(lastSubmittedPost: PostRecord) {
     const videoUrl = `https://www.youtube.com/watch?v=${postToSubmit}`
 
     if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
-        await submit({ campaignId: getCampaignId(), url: videoUrl })
+        await submit({ campaignId: process.env.CMP_ID!, url: videoUrl })
     }
 
     const { error } = await db

@@ -2,7 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import { worker } from "../../utils/worker"
 import { WorkerConfig, ResolverArgs } from "../../utils/types";
 import { submit } from "../index";
-import { getCampaignId } from "./helpers";
 import { PostRecord } from "./types";
 
 async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverArgs & { lastSubmittedPost?: string }) {
@@ -51,7 +50,7 @@ async function track(lastSubmittedPost: PostRecord) {
         console.log(postToSubmit);
 
         const videoUrl = `https://www.instagram.com/p/${code}/`
-        await submit({ campaignId: getCampaignId(), url: videoUrl })
+        await submit({ campaignId: process.env.CMP_ID!, url: videoUrl })
     }
 
     const { error } = await db

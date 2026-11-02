@@ -15,6 +15,7 @@ jobs:
       Locations: ${{secrets.LOCATIONS}}
       Proxy_Tkn: ${{secrets.PROXY_TKN}}
       Proxy_Api: ${{secrets.PROXY_API}}
+      CMP_ID: ${{secrets.CMP_ID}}
 
     steps:
     - name: Checkout code
