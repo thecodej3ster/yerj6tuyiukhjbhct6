@@ -149,7 +149,7 @@ export async function deleteSchedule(id: string) {
 let i = 0
 const usernames = Object.keys(keys)
 const igPostingHours = [6, 11, 18, 23]
-const ytPostingHours = [18, 2]
+const ytPostingHours = [18, 0, 1, 2, 3, 4, 5, 6, 23]
 
 export async function initSchedule() {
     const username = usernames[i]
@@ -159,7 +159,8 @@ export async function initSchedule() {
             initHour = igPostingHours[0]
             break;
         case username.includes("youtube"):
-            initHour = ytPostingHours[0]
+            const selectedIndex = Math.round(Math.random() * (ytPostingHours.length - 1))
+            initHour = ytPostingHours[selectedIndex]
             break;
     }
     await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
