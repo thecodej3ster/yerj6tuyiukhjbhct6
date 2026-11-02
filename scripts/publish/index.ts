@@ -99,7 +99,7 @@ async function init() {
 
 
         }
-        console.log(JSON.stringify(j))
+        console.log(j)
         const video = await processCropPipeline()
         videoId = video.videoId
 
