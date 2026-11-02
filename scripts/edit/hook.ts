@@ -120,7 +120,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
         setTimeout(async () => {
           const data = await getOnscreenText()
           resolve(data)
-        }, 5000)
+        }, onScreenTextRetriesDelay)
       })
     }
   }
