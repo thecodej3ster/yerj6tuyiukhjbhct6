@@ -91,35 +91,6 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
     }
 
     return await testServer()
-    // const shuffledServerList = [...serverList.servers].sort(() => Math.random() - 0.5);
-
-    // for (const server of shuffledServerList) {
-    //     selectedServer = server
-    //     try {
-    //         return await new Promise<tls.TLSSocket>((resolve, reject) => {
-    //             const socket = tls.connect({ host: server.host, port: 443, servername: server.host });
-
-    //             socket.setTimeout(6000);
-
-    //             socket.on("secureConnect", () => {
-    //                 socket.setTimeout(0);
-    //                 resolve(socket);
-    //             });
-    //             socket.on("timeout", () => {
-    //                 socket.destroy();
-    //                 reject(new Error("Timeout"));
-    //             });
-    //             socket.on("error", (error) => {
-    //                 socket.destroy();
-    //                 reject(error);
-    //             });
-    //         });
-    //     } catch {
-    //         continue;
-    //     }
-    // }
-
-    // throw new Error("Proxy serverlist Exhausted.");
 }
 
 function buildConnectRequst({ authHeader, targetHost, targetPort }: { authHeader: string, targetHost: string, targetPort: number }) {

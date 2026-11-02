@@ -72,6 +72,7 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
 
 
   let onScreenTextRetries = 0
+  let onScreenTextRetriesDelay = 5000
   const getOnscreenText = async function name() {
     try {
       const onScreenTextResponse = await sendToAI({
@@ -105,10 +106,15 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
       }
 
     } catch (error) {
-      onScreenTextRetries++
       if (onScreenTextRetries === 3) {
-        throw error
+        if (onScreenTextRetriesDelay < 60000) {
+          onScreenTextRetriesDelay += 5000
+        } else {
+          throw error
+        }
       }
+
+      onScreenTextRetries++
 
       return await new Promise<any>((resolve) => {
         setTimeout(async () => {
