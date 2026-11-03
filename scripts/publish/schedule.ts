@@ -2,6 +2,7 @@ import { WorkerConfig } from "../utils/types";
 import { worker } from "../utils/worker";
 import crypto from 'crypto'
 import { createClient } from "@supabase/supabase-js";
+import { ifError } from "assert";
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const keys = JSON.parse(process.env.Creds!)
@@ -113,8 +114,11 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
         }
     }
     const { job }: Record<string, { jobId: number }> = await worker(config)
-    console.log(job);
-    
+
+    if (!job.jobId) {
+        throw new Error("SCHEDULE NOT CREATED");
+    }
+
 
     await db
         .from("jobs")
@@ -123,7 +127,7 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
 
 
 
-export async function deleteSchedule(id: string) {
+export async function deleteSchedule(id: string, isInit = false) {
 
     baseHeaders["x-api-method"] = "DeleteJob"
     const payload = { jobId: id }
@@ -138,13 +142,15 @@ export async function deleteSchedule(id: string) {
     }
     const { deleteRequest }: Record<string, any> = await worker(config)
 
+    if (!isInit) {
+        await db
+            .from("jobs")
+            .delete()
+            .eq("job_id", id)
+    }
 
-    const { error } = await db
-        .from("jobs")
-        .delete()
-        .eq("job_id", id)
 
-    console.log(error)
+    // console.log(error)
 
 }
 
@@ -154,6 +160,28 @@ const igPostingHours = [6, 11, 18, 23]
 const ytPostingHours = [18, 0, 1, 2, 3, 4, 5, 6, 23]
 
 export async function initSchedule() {
+    const { data: jobQueue } = await db.from('jobs')
+        .select('*')
+
+
+    if (jobQueue) {
+        const { error } = await db
+            .from('jobs')
+            .delete()
+            .not('id', 'is', null)
+
+        if (error) {
+            console.log('Could NOT DELETE JOBS');
+            throw new Error(error.message);
+        }
+
+        for (let i = 0; i < jobQueue.length; i++) {
+            const job: { job_id: string } = jobQueue[i];
+            await deleteSchedule(job.job_id, true)
+        }
+
+    }
+
     const username = usernames[i]
     let initHour = 0
     switch (true) {
@@ -166,12 +194,20 @@ export async function initSchedule() {
             break;
     }
 
-    try {
-        await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
-
-    } catch (error) {
-
+    let createRetries = 0
+    const create = async () => {
+        try {
+            await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
+        } catch (error) {
+            if (createRetries === 10) {
+                throw new Error("FAILED To CREATE SCHEDULE");
+            }
+            createRetries++
+            await create()
+        }
     }
+    await create()
+
 
     i++
     if (i < usernames.length) {
