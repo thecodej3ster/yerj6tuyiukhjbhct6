@@ -113,7 +113,7 @@ export class ProxyAgent extends HttpsAgent {
         const connectionOpts = options as ConnectionOptions;
         let connectResponse = "";
         const hanleRequest = async () => {
-            const proxySocket = await getProxySocket()
+            let proxySocket = await getProxySocket()
             const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
             const targetHost = connectionOpts.host;
             const targetPort = connectionOpts.port || 443;
@@ -175,6 +175,13 @@ export class ProxyAgent extends HttpsAgent {
                             }
                             retried = true
                             break;
+                        case connectResponse.startsWith("HTTP/1.0 429"):
+                        case connectResponse.startsWith("HTTP/1.1 429"):
+                            // proxySocket.off("data", onData)
+                            // await getProxySocket()
+                            console.log(`This IS 429`);
+                            
+
                         default:
                             proxySocket.off("data", onData);
                             if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
