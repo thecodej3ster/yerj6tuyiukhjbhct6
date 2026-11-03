@@ -191,7 +191,7 @@ export async function initSchedule() {
     let initHour = 0
     switch (true) {
         case username.toLowerCase().includes("instagram"):
-            initHour = 11 //igPostingHours[0]
+            initHour = 23 //igPostingHours[0]
             break;
         case username.toLowerCase().includes("youtube"):
             const selectedIndex = Math.round(Math.random() * (ytPostingHours.length - 1))
