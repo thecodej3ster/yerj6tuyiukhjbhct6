@@ -208,7 +208,14 @@ export async function initSchedule() {
                 throw new Error("FAILED To CREATE SCHEDULE");
             }
             createRetries++
-            await create()
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    create()
+                            resolve()
+                        .then(() => {
+                        })
+                }, 5000);
+            })
         }
     }
     await create()
