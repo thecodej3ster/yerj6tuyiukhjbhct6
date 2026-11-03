@@ -50,7 +50,8 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
     const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
     const start = Math.floor(Math.random() * (serverList.servers.length - 1))
     let server = serverList.servers[start]
-
+    console.log(server);
+    
     function rotate(list: ServerCred[], currentElement: ServerCred) {
         const currentIndex = list.indexOf(currentElement)
 
