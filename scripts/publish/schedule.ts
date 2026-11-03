@@ -155,15 +155,19 @@ export async function initSchedule() {
     const username = usernames[i]
     let initHour = 0
     switch (true) {
-        case username.includes("instagram"):
+        case username.toLowerCase().includes("instagram"):
+            console.log(username);
+            
             initHour = 11 //igPostingHours[0]
             break;
-        case username.includes("youtube"):
+        case username.toLowerCase().includes("youtube"):
+            console.log(username);
+            
             const selectedIndex = Math.round(Math.random() * (ytPostingHours.length - 1))
             initHour = ytPostingHours[selectedIndex]
             break;
     }
-    await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
+    // await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
 
     i++
     if (i < usernames.length) {
