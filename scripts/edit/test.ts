@@ -1,17 +1,17 @@
-import { processCropPipeline } from './crop'
-import { processPipPipeline } from './pip'
-import { processHookPipeline } from './hook'
-import { processTextPipeline } from './addText'
-import { emptyGeminiStorage } from '../utils/helpers'
-import { hash } from 'node:crypto'
-import { worker } from '../utils/worker'
-import { deleteSchedule } from '../publish/schedule'
-import { WorkerConfig } from '../utils/types'
-import path from 'path'
-import fs from 'fs'
-import { createClient } from '@supabase/supabase-js'
+// import { processCropPipeline } from './crop'
+// import { processPipPipeline } from './pip'
+// import { processHookPipeline } from './hook'
+// import { processTextPipeline } from './addText'
+// import { emptyGeminiStorage } from '../utils/helpers'
+// import { hash } from 'node:crypto'
+// import { worker } from '../utils/worker'
+// import { deleteSchedule } from '../publish/schedule'
+// import { WorkerConfig } from '../utils/types'
+// import path from 'path'
+// import fs from 'fs'
+// import { createClient } from '@supabase/supabase-js'
 
-const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
+// const db = createClient("https://emosvfihxxpaqtmlniwe.supabase.co", "sb_publishable_k9AFn4eMxM1Yid-I1gh_oA_epL6Cni9")
 const g = [
   {
     "jobId": 8748161,
@@ -3049,24 +3049,24 @@ const g = [
     "requestMethod": 1
   }
 ]
-const r = async () => {
-  for (let i = 0; i < g.length; i++) {
-    const job = g[i];
-    if (job.jobId !== 8667390) {
-      await deleteSchedule(`${job.jobId}`)
-    }
-  }
+// const r = async () => {
+//   for (let i = 0; i < g.length; i++) {
+//     const job = g[i];
+//     if (job.jobId !== 8667390) {
+//       await deleteSchedule(`${job.jobId}`)
+//     }
+  // }
 
   // await emptyGeminiStorage()
   // await processCropPipeline()
   // await processPipPipeline()
   // await processHookPipeline()
   // await processTextPipeline()
-}
+// }
 
-(async () => {
+// (async () => {
 
-  await r()
+  // await r()
   //   const e = '🤯'
 
   //   const svg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -3133,7 +3133,21 @@ const r = async () => {
   //         "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0"
   //     ]
   // }
-}
-)()
+// }
+// )
 
 
+
+console.log(JSON.stringify({
+  _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
+  opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+  'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+  verdictmedia_1_instagram: 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
+  _pulsepointmedia_1_youtube: 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
+  Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
+  polispace_youtube: 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
+}))
+
+// 'thecharliekirk.daily_instagram': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+// thedebatebrief_instagram: 'uXHLmgmzBpDXFC_7hcf3pkyvgVTRyJSNAqq9uydsRwl',
+// thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
