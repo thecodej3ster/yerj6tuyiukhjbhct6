@@ -32,12 +32,14 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
     const failedWorks: string[] = []
+    let isRetry = false
+
     const fetchData = async (url: string, key: string): Promise<void> => {
 
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
             data: requestConfig?.body || null,
-            timeout:30000,
+            timeout: 30000,
             method: requestConfig?.method?.toUpperCase() || "GET",
             responseEncoding: requestConfig?.responseEncoding || "UTF-8",
             responseType: requestConfig?.responseType || "text",
@@ -83,7 +85,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
     };
 
-    let isRetry = false
     async function processWorkers(works: Record<string, string>) {
         // FIX 4: Concurrency Limit and Execution Wrapper
         const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
@@ -104,7 +105,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const newWork: Record<string, string> = {}
         if (failedWorks.length && !isRetry) {
             console.log('RETRYING ...');
-            
+
             failedWorks.map(key => {
                 newWork[key] = works[key]
             })

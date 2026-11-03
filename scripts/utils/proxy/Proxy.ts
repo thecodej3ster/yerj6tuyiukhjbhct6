@@ -29,17 +29,6 @@ export function selectKey(list: { keys: string[] }) {
     return list.keys[lastUsed]
 }
 
-function rotate(list: ServerCred[], currentElement: ServerCred) {
-    const currentIndex = list.indexOf(currentElement)
-
-    if (currentIndex === list.length) {
-        throw new Error("Proxy serverlist Exhausted.")
-    }
-
-    let nextIndex = currentIndex + 1
-    const nextElement = list[nextIndex]
-    return nextElement
-}
 
 
 /**
@@ -59,8 +48,24 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
         throw error
     }
     const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
+    const start = Math.floor(Math.random() * (serverList.servers.length - 1))
+    let server = serverList.servers[start]
 
-    let server = serverList.servers[0]
+    function rotate(list: ServerCred[], currentElement: ServerCred) {
+        const currentIndex = list.indexOf(currentElement)
+
+        if (currentIndex === start) {
+            throw new Error("Proxy serverlist Exhausted.")
+        }
+
+        if (currentIndex === list.length) {
+            return list[0]
+        }
+
+        let nextIndex = currentIndex + 1
+        const nextElement = list[nextIndex]
+        return nextElement
+    }
 
     const testServer = async () => {
         try {
@@ -175,13 +180,6 @@ export class ProxyAgent extends HttpsAgent {
                             }
                             retried = true
                             break;
-                        case connectResponse.startsWith("HTTP/1.0 429"):
-                        case connectResponse.startsWith("HTTP/1.1 429"):
-                            // proxySocket.off("data", onData)
-                            // await getProxySocket()
-                            console.log(`This IS 429`);
-                            
-
                         default:
                             proxySocket.off("data", onData);
                             if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
