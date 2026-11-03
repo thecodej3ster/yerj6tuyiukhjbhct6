@@ -92,14 +92,7 @@ async function init() {
             await initSchedule()
             return
         }
-        const j: Record<string, string> = {}
-        const o = JSON.parse(process.env.Creds!)
-        for (const key in o) {
-            j[key] = o[key]
 
-
-        }
-        console.log(j)
         const video = await processCropPipeline()
         videoId = video.videoId
 
