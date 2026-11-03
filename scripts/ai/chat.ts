@@ -3,7 +3,7 @@ import { WorkerConfig } from "../utils/types"
 import { rotate } from "./helpers"
 import { uploadFile } from "./upload"
 
-let aiRetries = 0
+let retryDelay = 5000
 const aiKeys = JSON.parse(process.env.Ai_Key!).keys
 
 async function sendToAI({ prompt, filePath, apiKey }: { prompt: string, filePath?: string, apiKey?: string }): Promise<{ content: string }> {
@@ -75,8 +75,8 @@ async function sendToAI({ prompt, filePath, apiKey }: { prompt: string, filePath
         const response: string = chat.candidates[0].content.parts[0].text
         return { content: response }
     } else {
-        aiRetries++
-        if (aiRetries === 3) {
+        retryDelay += 5000
+        if (retryDelay > 60000) {
             console.log(chat);
             throw new Error("Ai Chat Failed");
         }
@@ -86,7 +86,7 @@ async function sendToAI({ prompt, filePath, apiKey }: { prompt: string, filePath
                 apiKey = rotate(aiKeys, apiKey)
                 const data = await sendToAI({ prompt: prompt, filePath: filePath, apiKey: apiKey })
                 resolve(data)
-            }, 5000)
+            }, retryDelay)
         })
 
     }
