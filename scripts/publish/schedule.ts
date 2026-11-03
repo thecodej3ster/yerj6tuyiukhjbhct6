@@ -211,8 +211,8 @@ export async function initSchedule() {
             await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     create()
-                            resolve()
                         .then(() => {
+                            resolve()
                         })
                 }, 5000);
             })
