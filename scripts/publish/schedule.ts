@@ -115,6 +115,8 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
     }
     const { job }: Record<string, { jobId: number }> = await worker(config)
 
+    console.log(job);
+
     if (!job.jobId) {
         throw new Error("SCHEDULE NOT CREATED");
     }
@@ -150,7 +152,7 @@ export async function deleteSchedule(id: string, isInit = false) {
     }
 
 
-    // console.log(error)
+    console.log(deleteRequest)
 
 }
 
@@ -160,27 +162,30 @@ const igPostingHours = [6, 11, 18, 23]
 const ytPostingHours = [18, 0, 1, 2, 3, 4, 5, 6, 23]
 
 export async function initSchedule() {
-    const { data: jobQueue } = await db.from('jobs')
-        .select('*')
+    if (i === 0) {
+        const { data: jobQueue } = await db.from('jobs')
+            .select('*')
 
 
-    if (jobQueue) {
-        const { error } = await db
-            .from('jobs')
-            .delete()
-            .not('id', 'is', null)
+        if (jobQueue) {
+            const { error } = await db
+                .from('jobs')
+                .delete()
+                .not('id', 'is', null)
 
-        if (error) {
-            console.log('Could NOT DELETE JOBS');
-            throw new Error(error.message);
+            if (error) {
+                console.log('Could NOT DELETE JOBS');
+                throw new Error(error.message);
+            }
+
+            for (let i = 0; i < jobQueue.length; i++) {
+                const job: { job_id: string } = jobQueue[i];
+                await deleteSchedule(job.job_id, true)
+            }
+
         }
-
-        for (let i = 0; i < jobQueue.length; i++) {
-            const job: { job_id: string } = jobQueue[i];
-            await deleteSchedule(job.job_id, true)
-        }
-
     }
+
 
     const username = usernames[i]
     let initHour = 0
