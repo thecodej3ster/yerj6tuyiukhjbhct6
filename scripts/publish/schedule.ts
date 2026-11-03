@@ -113,6 +113,8 @@ export async function createSchedule({ hours, minutes, username }: { hours: numb
         }
     }
     const { job }: Record<string, { jobId: number }> = await worker(config)
+    console.log(job);
+    
 
     await db
         .from("jobs")
@@ -155,16 +157,21 @@ export async function initSchedule() {
     const username = usernames[i]
     let initHour = 0
     switch (true) {
-        case username.toLowerCase().includes("instagram"):            
+        case username.toLowerCase().includes("instagram"):
             initHour = 11 //igPostingHours[0]
             break;
-        case username.toLowerCase().includes("youtube"):            
+        case username.toLowerCase().includes("youtube"):
             const selectedIndex = Math.round(Math.random() * (ytPostingHours.length - 1))
             initHour = ytPostingHours[selectedIndex]
             break;
     }
 
-    await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
+    try {
+        await createSchedule({ username: username, hours: initHour, minutes: Math.max(5, Math.round(Math.random() * 20)) })
+
+    } catch (error) {
+
+    }
 
     i++
     if (i < usernames.length) {
