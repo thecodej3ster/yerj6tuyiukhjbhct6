@@ -1,9 +1,6 @@
 name: Process Submit PipeLine
 on:
   workflow_dispatch:
-    inputs:
-      campaignId:
-        required: true
 jobs:
   SUBMIT:
     environment: KEYS
