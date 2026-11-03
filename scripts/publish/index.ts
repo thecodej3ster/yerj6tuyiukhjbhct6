@@ -87,6 +87,8 @@ async function init() {
 
     let videoId = ""
 
+    console.log(`POSTING FOR ${username.toUpperCase()}`);
+    
     try {
         if (time === 'init' && username === 'init' && jobId === 'init') {
             await initSchedule()
