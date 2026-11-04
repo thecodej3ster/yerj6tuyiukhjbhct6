@@ -126,10 +126,16 @@ async function getLatestPostId({ response }: ResolverArgs) {
         recentPostSearchMatchArray.sort((a, b) => {
             const diff = BigInt(b) - BigInt(a);
             return diff > 0n ? 1 : diff < 0n ? -1 : 0;
-        });
-        console.log(recentPostSearchMatchArray);
+        })
 
+        if (recentPostSearchMatchArray.length > 1) {
+            return recentPostSearchMatchArray[1]
+        } else {
+            return recentPostSearchMatchArray[0]
+        }
     }
+
+    return response
 }
 
 async function register() {
@@ -161,6 +167,8 @@ async function register() {
     }
 
     const latestPostIds = await worker(igConfig)
+    console.log(latestPostIds);
+
 }
 
 // const urls = ["https://www.instagram.com/p/DfRpY2gjhhq"]
