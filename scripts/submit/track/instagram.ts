@@ -23,6 +23,7 @@ async function getPostId({ response: arg1, lastSubmittedPost: arg2 }: ResolverAr
             postId = recentPosts[0]
         }
     }
+    
     const clipCodePattern = new RegExp(`(?<=${postId}\",\"code\":\")[^\"]+`)
     const clipCodeSearch = response.match(clipCodePattern)
     if (!clipCodeSearch) {

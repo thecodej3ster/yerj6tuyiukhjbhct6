@@ -115,7 +115,53 @@ async function add(urls: string[]) {
 
 }
 
+const usernames = Object.keys(JSON.parse(process.env.Creds!))
 
-const urls = ["https://www.instagram.com/p/DfRpY2gjhhq"]
+async function getLatestPostId({ response }: ResolverArgs) {
+    const accountData = response as string
+    const recentPostSearchMatch = accountData.match(/(?<=\"pk\":\")\d+(?=\",\"code":\")/g)
+    if (recentPostSearchMatch) {
+        recentPostSearchMatch.sort((a, b) => {
+            const diff = BigInt(b) - BigInt(a);
+            return diff > 0n ? 1 : diff < 0n ? -1 : 0;
+        });
+    }
+    console.log(recentPostSearchMatch);
+}
 
-add(urls)
+async function register() {
+    const igAccounts: string[] = []
+    const ytAccounts: string[] = []
+    const igUrls: Record<string, string> = {}
+    const ytUrls: Record<string, string> = {}
+
+    usernames.map(username => {
+        switch (true) {
+            case username.includes("instagram"):
+                igAccounts.push(username)
+                break;
+            case username.includes("youtube"):
+                ytAccounts.push(username)
+                break;
+        }
+    })
+
+    igAccounts.map(account => {
+        const username = account.toLowerCase().replace('_instagram', '').trim()
+        const id = crypto.randomBytes(8).toString("hex")
+        igUrls[id] = `https://www.instagram.com/${username}`
+    })
+
+    const igConfig: WorkerConfig = {
+        urls: igUrls,
+        resolverAction: getLatestPostId
+    }
+
+    const latestPostIds = await worker(igConfig)
+}
+
+// const urls = ["https://www.instagram.com/p/DfRpY2gjhhq"]
+
+// add(urls)
+
+register()
