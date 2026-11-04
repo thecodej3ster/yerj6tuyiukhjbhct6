@@ -165,19 +165,23 @@ async function register() {
         resolverAction: getLatestPostId
     }
 
-    const latestPostIds = await worker(igConfig)
 
-    for (const key in latestPostIds) {
-        const postId = latestPostIds[key]
-        if (!/[a-zA-Z]/.test(postId)) {
-            console.log('YESSSSSSSSSS');
-            console.log(postId);
-        } else {
-            console.log('NOOOOOOOOOOOO');
-            console.log(postId);
+    const runGetPostID = async () => {
+        const latestPostIds = await worker(igConfig)
+        for (const key in latestPostIds) {
+            const postId = latestPostIds[key]
+            if (!/[a-zA-Z]/.test(postId)) {
+                delete igUrls[key]
+            }
+
+            if (Object.keys(igUrls).length) {
+                await runGetPostID()
+            }
+
         }
-
     }
+
+    await runGetPostID()
 
 }
 
