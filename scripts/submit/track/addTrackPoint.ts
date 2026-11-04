@@ -143,6 +143,7 @@ async function register() {
     const ytAccounts: string[] = []
     const igUrls: Record<string, string> = {}
     const ytUrls: Record<string, string> = {}
+    const postIds:Record<string, string> = {}
 
     usernames.map(username => {
         switch (true) {
@@ -171,6 +172,7 @@ async function register() {
         for (const key in latestPostIds) {
             const postId = latestPostIds[key]
             if (!/[a-zA-Z]/.test(postId)) {
+                postIds[key] = postId
                 delete igUrls[key]
             }
 
@@ -182,7 +184,7 @@ async function register() {
     }
 
     await runGetPostID()
-
+    console.log(postIds)
 }
 
 
