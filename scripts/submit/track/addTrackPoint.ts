@@ -120,13 +120,16 @@ const usernames = Object.keys(JSON.parse(process.env.Creds!))
 async function getLatestPostId({ response }: ResolverArgs) {
     const accountData = response as string
     const recentPostSearchMatch = accountData.match(/(?<=\"pk\":\")\d+(?=\",\"code":\")/g)
+
     if (recentPostSearchMatch) {
-        recentPostSearchMatch.sort((a, b) => {
+        const recentPostSearchMatchArray = Array.from(recentPostSearchMatch)
+        recentPostSearchMatchArray.sort((a, b) => {
             const diff = BigInt(b) - BigInt(a);
             return diff > 0n ? 1 : diff < 0n ? -1 : 0;
         });
+        console.log(recentPostSearchMatchArray);
+
     }
-    console.log(recentPostSearchMatch);
 }
 
 async function register() {
