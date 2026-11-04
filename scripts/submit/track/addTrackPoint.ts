@@ -157,8 +157,7 @@ async function register() {
 
     igAccounts.map(account => {
         const username = account.toLowerCase().replace('_instagram', '').trim()
-        const id = crypto.randomBytes(8).toString("hex")
-        igUrls[id] = `https://www.instagram.com/${username}`
+        igUrls[username] = `https://www.instagram.com/${username}`
     })
 
     const igConfig: WorkerConfig = {
@@ -167,9 +166,21 @@ async function register() {
     }
 
     const latestPostIds = await worker(igConfig)
-    console.log(latestPostIds);
+
+    for (const key in latestPostIds) {
+        const postId = latestPostIds[key]
+        if ((/\d\d{5,}(?=\d{5,})/.test(postId))) {
+            console.log('YESSSSSSSSSS');
+            console.log(postId);
+        } else {
+            console.log('NOOOOOOOOOOOO');
+            console.log(postId);
+        }
+
+    }
 
 }
+
 
 // const urls = ["https://www.instagram.com/p/DfRpY2gjhhq"]
 
