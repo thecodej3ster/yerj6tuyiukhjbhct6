@@ -169,7 +169,7 @@ async function register() {
 
     for (const key in latestPostIds) {
         const postId = latestPostIds[key]
-        if ((/\d\d{5,}(?=\d{5,})/.test(postId))) {
+        if (!/[a-zA-Z]/.test(postId)) {
             console.log('YESSSSSSSSSS');
             console.log(postId);
         } else {
