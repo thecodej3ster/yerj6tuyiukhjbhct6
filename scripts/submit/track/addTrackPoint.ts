@@ -138,12 +138,29 @@ async function getLatestPostId({ response }: ResolverArgs) {
     return response
 }
 
+async function getLatestVideoId({ response }: ResolverArgs) {
+    const accountData = response as string
+    const videoIdSearchMatches = accountData.match(/[^-'"]{11}(?=","accessibilityText"[:])/mg)
+
+    if (videoIdSearchMatches) {
+        if (videoIdSearchMatches.length > 1) {
+            return [0]
+        } else {
+            return [1]
+        }
+    }
+
+
+
+}
+
 async function register() {
     const igAccounts: string[] = []
     const ytAccounts: string[] = []
     const igUrls: Record<string, string> = {}
     const ytUrls: Record<string, string> = {}
-    const postIds:Record<string, string> = {}
+    const postIds: Record<string, string> = {}
+    const videoIds: Record<string, string> = {}
 
     usernames.map(username => {
         switch (true) {
@@ -167,6 +184,16 @@ async function register() {
     }
 
 
+    ytAccounts.map(account => {
+        const username = account.toLowerCase().replace('_youtube', '').trim()
+        ytUrls[username] = `https://www.youtube.com/@${username}/shorts`
+    })
+
+    const ytConfig: WorkerConfig = {
+        urls: ytUrls,
+        resolverAction: getLatestVideoId
+    }
+
     const runGetPostID = async () => {
         const latestPostIds = await worker(igConfig)
         for (const key in latestPostIds) {
@@ -175,16 +202,36 @@ async function register() {
                 postIds[key] = postId
                 delete igUrls[key]
             }
+        }
+        if (Object.keys(igUrls).length) {
+            await runGetPostID()
+        }
+    }
 
-            if (Object.keys(igUrls).length) {
-                await runGetPostID()
+
+    const runGetVideoId = async () => {
+        const latestVideoIds = await worker(ytConfig) as Record<string, string>
+        for (const key in latestVideoIds) {
+            const videoId = latestVideoIds[key]
+            if (!videoId.toLowerCase().includes('error') || !/.{10}/.test(videoId)) {
+                videoIds[key] = videoId
+                delete ytUrls[key]
             }
+        }
 
+        if (Object.keys(ytUrls).length) {
+            await runGetVideoId()
         }
     }
 
     await runGetPostID()
+    await runGetVideoId()
+
+
+
     console.log(postIds)
+    console.log(videoIds);
+
 }
 
 
