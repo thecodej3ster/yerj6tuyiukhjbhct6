@@ -204,6 +204,8 @@ async function register() {
             }
         }
         if (Object.keys(igUrls).length) {
+            console.log(igUrls);
+            
             await runGetPostID()
         }
     }
@@ -220,6 +222,8 @@ async function register() {
         }
 
         if (Object.keys(ytUrls).length) {
+            console.log(ytUrls);
+            
             await runGetVideoId()
         }
     }
