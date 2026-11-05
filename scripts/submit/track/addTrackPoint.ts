@@ -215,6 +215,8 @@ async function register() {
         const latestVideoIds = await worker(ytConfig) as Record<string, string>
         for (const key in latestVideoIds) {
             const videoId = latestVideoIds[key]
+            console.log(videoId);
+            
             if (!videoId.toLowerCase().includes('error') || !/.{10}/.test(videoId)) {
                 videoIds[key] = videoId
                 delete ytUrls[key]
@@ -223,7 +225,6 @@ async function register() {
 
         if (Object.keys(ytUrls).length) {
             console.log(ytUrls);
-            
             await runGetVideoId()
         }
     }
