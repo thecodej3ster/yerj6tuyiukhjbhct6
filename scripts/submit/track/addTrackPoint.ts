@@ -217,22 +217,25 @@ async function register() {
             const videoId = latestVideoIds[key]
             console.log(videoId);
 
-            if (!videoId.toLowerCase().includes('error') || !/.{10}/.test(videoId)) {
+            if (!videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId)) {
                 videoIds[key] = videoId
                 delete ytUrls[key]
+            } else {
+                console.log(videoId);
+                
             }
         }
 
         if (Object.keys(ytUrls).length) {
-            console.log(ytUrls);
+            // console.log(ytUrls);
             // await runGetVideoId()
             // console.log();
-            
+
         }
     }
 
     await runGetPostID()
-    await runGetVideoId()
+    // await runGetVideoId()
 
 
 
