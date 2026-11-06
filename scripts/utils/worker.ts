@@ -66,6 +66,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
         try {
             let response = await axios(selectedRequestConfig);
+            console.log(response);
+            
             result[key] = await response.data
         } catch (error) {
             failedWorks.push(key)
