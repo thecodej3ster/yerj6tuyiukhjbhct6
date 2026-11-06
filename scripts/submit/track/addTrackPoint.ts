@@ -149,6 +149,7 @@ async function getLatestVideoId({ response }: ResolverArgs) {
             return videoIdSearchMatches[1]
         }
     }
+console.log(response);
 
 
 
