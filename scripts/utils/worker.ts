@@ -17,9 +17,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
-    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
-        console.log(response);
-        
+    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {        
         workerResponse = response
         if (resolverAction) {
             if (resolverArgs) {
@@ -67,9 +65,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
         try {
-            let response = await axios(selectedRequestConfig);
-            console.log(response);
-            
+            let response = await axios(selectedRequestConfig);            
             result[key] = await response.data
         } catch (error) {
             failedWorks.push(key)

@@ -23,6 +23,7 @@ jobs:
       Locations: ${{secrets.LOCATIONS}}
       Proxy_Tkn: ${{secrets.PROXY_TKN}}
       Proxy_Api: ${{secrets.PROXY_API}}
+      NODE_OPTIONS: "--max-http-header-size=16384"
 
     steps:
     - name: Checkout code

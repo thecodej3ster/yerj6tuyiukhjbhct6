@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
-    "render": "ts-node scripts/processVideo.ts"
+    "upHeaderSize": "tsx --node-arg=\"--max-http-header-size=16384\" ./scripts/utils/worker.ts"
   },
   "dependencies": {
     "@google/genai": "^2.27.0",
