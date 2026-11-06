@@ -216,7 +216,6 @@ async function register() {
         const latestVideoIds = await worker(ytConfig) as Record<string, string>
         for (const key in latestVideoIds) {
             const videoId = latestVideoIds[key]
-            console.log(videoId);
 
             if (!videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId) || videoId === null) {
                 videoIds[key] = videoId
@@ -225,9 +224,7 @@ async function register() {
         }
 
         if (Object.keys(ytUrls).length) {
-            // console.log(ytUrls);
-            // await runGetVideoId()
-            // console.log();
+            await runGetVideoId()
 
         }
     }
