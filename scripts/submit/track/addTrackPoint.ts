@@ -139,9 +139,7 @@ async function getLatestPostId({ response }: ResolverArgs) {
 }
 
 async function getLatestVideoId({ response }: ResolverArgs) {
-    const accountData = response as string
-    console.log(accountData);
-    
+    const accountData = response as string    
     const videoIdSearchMatches = accountData.match(/[^-'"]{11}(?=","accessibilityText"[:])/mg)
 
     if (videoIdSearchMatches) {
@@ -230,8 +228,6 @@ async function register() {
     }
 
     // await runGetPostID()
-    console.log(ytUrls);
-
     await runGetVideoId()
 
 
