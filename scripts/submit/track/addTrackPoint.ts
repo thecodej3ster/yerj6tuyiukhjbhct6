@@ -140,6 +140,8 @@ async function getLatestPostId({ response }: ResolverArgs) {
 
 async function getLatestVideoId({ response }: ResolverArgs) {
     const accountData = response as string
+    console.log(accountData);
+    
     const videoIdSearchMatches = accountData.match(/[^-'"]{11}(?=","accessibilityText"[:])/mg)
 
     if (videoIdSearchMatches) {
@@ -148,12 +150,9 @@ async function getLatestVideoId({ response }: ResolverArgs) {
         } else {
             return videoIdSearchMatches[1]
         }
-    } else {
-        return null
     }
 
-
-
+    return null
 }
 
 async function register() {
@@ -222,9 +221,6 @@ async function register() {
             if (!videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId) || videoId === null) {
                 videoIds[key] = videoId
                 delete ytUrls[key]
-            } else {
-                console.log(videoId);
-
             }
         }
 
