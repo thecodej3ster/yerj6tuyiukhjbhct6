@@ -148,8 +148,9 @@ async function getLatestVideoId({ response }: ResolverArgs) {
         } else {
             return videoIdSearchMatches[1]
         }
+    } else {
+        return null
     }
-console.log(response);
 
 
 
@@ -218,12 +219,12 @@ async function register() {
             const videoId = latestVideoIds[key]
             console.log(videoId);
 
-            if (!videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId)) {
+            if (!videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId) || videoId === null) {
                 videoIds[key] = videoId
                 delete ytUrls[key]
             } else {
                 console.log(videoId);
-                
+
             }
         }
 
@@ -237,7 +238,7 @@ async function register() {
 
     // await runGetPostID()
     console.log(ytUrls);
-    
+
     await runGetVideoId()
 
 

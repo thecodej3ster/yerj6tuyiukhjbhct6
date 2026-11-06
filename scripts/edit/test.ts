@@ -3143,7 +3143,7 @@ console.log(JSON.stringify({
   opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
   'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
   verdictmedia_1_instagram: 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
-  '_pulsepointmedia.1_youtube': 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
+  'pulsepointmedia.1_youtube': 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
   Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
   'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
 }))
