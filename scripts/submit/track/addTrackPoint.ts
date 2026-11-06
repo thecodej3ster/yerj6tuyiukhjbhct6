@@ -236,6 +236,8 @@ async function register() {
     }
 
     // await runGetPostID()
+    console.log(ytUrls);
+    
     await runGetVideoId()
 
 
