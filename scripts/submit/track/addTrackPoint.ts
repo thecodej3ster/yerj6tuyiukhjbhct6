@@ -139,7 +139,7 @@ async function getLatestPostId({ response }: ResolverArgs) {
 }
 
 async function getLatestVideoId({ response }: ResolverArgs) {
-    const accountData = response as string    
+    const accountData = response as string
     const videoIdSearchMatches = accountData.match(/[^-'"]{11}(?=","accessibilityText"[:])/mg)
 
     if (videoIdSearchMatches) {
@@ -215,7 +215,7 @@ async function register() {
         for (const key in latestVideoIds) {
             const videoId = latestVideoIds[key]
 
-            if (!videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId) || videoId === null) {
+            if (videoId === null || !videoId.toLowerCase().startsWith('error') || !/.{10}/.test(videoId)) {
                 videoIds[key] = videoId
                 delete ytUrls[key]
             }
