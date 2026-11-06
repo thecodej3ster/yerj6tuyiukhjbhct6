@@ -236,7 +236,7 @@ async function register() {
     }
 
     await runGetPostID()
-    // await runGetVideoId()
+    await runGetVideoId()
 
 
 
