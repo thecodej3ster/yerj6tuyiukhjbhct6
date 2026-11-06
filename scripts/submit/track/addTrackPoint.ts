@@ -263,9 +263,4 @@ async function register() {
     }
 }
 
-
-// const urls = ["https://www.instagram.com/p/DfRpY2gjhhq"]
-
-// add(urls)
-
-register()
+export { register }

@@ -6,6 +6,7 @@ import { retrive } from '../utils/retriveVideo'
 import igPublish from './instagram'
 import ytPublish from './youtube'
 import fs from 'fs'
+import { register } from "../submit/track/addTrackPoint"
 
 
 interface Video {
@@ -88,10 +89,11 @@ async function init() {
     let videoId = ""
 
     console.log(`POSTING FOR ${username.toUpperCase()}`);
-    
+
     try {
         if (time === 'init' && username === 'init' && jobId === 'init') {
             await initSchedule()
+            await register()
             return
         }
 
@@ -120,11 +122,20 @@ async function init() {
             const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
             const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
 
-            await createSchedule({ hours: selectedHours, username: inputs.username, minutes: selectedMinutes })
+            await createSchedule({ hours: selectedHours, username: username, minutes: selectedMinutes })
         }
 
 
-    } finally {
+    }
+
+    catch (error) {
+        const minutes = (new Date().getMinutes()) + 5
+        if (minutes < 60) {
+            await createSchedule({ hours: Number(time), username: username, minutes: minutes })
+        }
+    }
+
+    finally {
 
         let apiJobId = 0
 
