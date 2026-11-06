@@ -135,7 +135,7 @@ async function getLatestPostId({ response }: ResolverArgs) {
         }
     }
 
-    return response
+    return null
 }
 
 async function getLatestVideoId({ response }: ResolverArgs) {
@@ -197,14 +197,12 @@ async function register() {
         const latestPostIds = await worker(igConfig)
         for (const key in latestPostIds) {
             const postId = latestPostIds[key]
-            if (!/[a-zA-Z]/.test(postId)) {
+            if (postId === null || !/[a-zA-Z]/.test(postId)) {
                 postIds[key] = postId
                 delete igUrls[key]
             }
         }
         if (Object.keys(igUrls).length) {
-            console.log(igUrls);
-
             await runGetPostID()
         }
     }
@@ -227,14 +225,42 @@ async function register() {
         }
     }
 
-    // await runGetPostID()
+    await runGetPostID()
     await runGetVideoId()
 
+    const payload: (PostRecord & { updated_at: string })[] = []
+    for (const username in postIds) {
+        if (postIds[username]) {
+            const record: PostRecord & { updated_at: string } = {
+                username: username,
+                post_id: postIds[username],
+                platform: "instagram",
+                updated_at: new Date().toISOString()
+            }
+            payload.push(record)
+        }
+    }
 
+    for (const username in videoIds) {
+        if (videoIds[username]) {
+            const record: PostRecord & { updated_at: string } = {
+                username: username,
+                post_id: videoIds[username],
+                platform: "youtube",
+                updated_at: new Date().toISOString()
+            }
+            payload.push(record)
+        }
+    }
 
-    console.log(postIds)
-    console.log(videoIds);
+    const { error } = await db
+        .from('track_points')
+        .upsert(payload, { onConflict: 'username,platform' })
 
+    if (error) {
+        console.log(error);
+        throw error
+    }
 }
 
 
