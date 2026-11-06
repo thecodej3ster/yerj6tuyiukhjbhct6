@@ -225,7 +225,9 @@ async function register() {
 
         if (Object.keys(ytUrls).length) {
             console.log(ytUrls);
-            await runGetVideoId()
+            // await runGetVideoId()
+            // console.log();
+            
         }
     }
 
