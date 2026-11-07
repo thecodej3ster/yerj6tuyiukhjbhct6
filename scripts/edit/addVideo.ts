@@ -257,5 +257,8 @@ async function init() {
         }
         await runfetchPosts()
     }
+
+    await runGetUserId()
+    await runfetchPosts()
 }
 init()
