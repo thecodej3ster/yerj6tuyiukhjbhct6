@@ -54,16 +54,16 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
     // const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${accountId}","after":"","first":12}`
     const url = "https://www.instagram.com/api/graphql"
 
-    const variables = {
+    const variables = JSON.stringify({
         "after": pageId,
         "first": 12,
         "id": userId,
         "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
-    }
+    })
 
     const payload = new URLSearchParams()
     payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
-    payload.append("variables", encodeURIComponent(JSON.stringify(variables)))
+    payload.append("variables", encodeURIComponent(variables))
     payload.append("doc_id", "28904005159232689")
 
     const config: WorkerConfig = {
@@ -261,6 +261,7 @@ async function init() {
         const username = usernames[fetchPostsWorkIndex]
         const posts = await fetchPosts({ username: username, userId: userIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
+        
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
             return
