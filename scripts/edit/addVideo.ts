@@ -76,12 +76,13 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
                 "Referer": `https://www.instagram.com/${username}`
             },
             method: "POST",
-            body: payload
+            body: payload,
+            responseType:"json"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
-            const accountInfo = JSON.parse(response)
-            console.log(accountInfo);
+            // const accountInfo = JSON.parse(response)
+            console.log(response);
 
             // const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
             // result.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
