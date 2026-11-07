@@ -63,7 +63,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
 
     const payload = new FormData()
     payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
-    payload.append("variables", JSON.stringify(variables))
+    payload.append("variables", encodeURIComponent(JSON.stringify(variables)))
     payload.append("doc_id", "28904005159232689")
 
     const config: WorkerConfig = {
