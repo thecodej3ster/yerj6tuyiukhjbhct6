@@ -56,7 +56,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 "Sec-Fetch-User": "?1",
                 "Priority": "u=0, i",
                 "TE": "trailers",
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
                 ...incomingHeaders,
             } as Record<string, string>
         };
@@ -65,9 +65,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
         try {
-            let response = await axios(selectedRequestConfig);     
-            console.log(response);
-                   
+            let response = await axios(selectedRequestConfig);            
             result[key] = await response.data
         } catch (error) {
             failedWorks.push(key)

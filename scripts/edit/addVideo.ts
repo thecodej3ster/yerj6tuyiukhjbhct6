@@ -61,7 +61,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
         "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
     }
 
-    const payload = new FormData()
+    const payload = new URLSearchParams()
     payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
     payload.append("variables", encodeURIComponent(JSON.stringify(variables)))
     payload.append("doc_id", "28904005159232689")
