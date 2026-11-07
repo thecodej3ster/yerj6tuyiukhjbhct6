@@ -58,11 +58,14 @@ async function fetchPosts(accountId: string) {
 
     const config: WorkerConfig = {
         urls: { posts: url },
-        resolverAction: async ({ response }: ResolverArgs): Promise<VideoSearchRespose> => {
+        resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
             // const accountInfo = response as string
             const accountInfo = JSON.parse(response)
-            console.log(accountInfo);
+            if (accountInfo.status === 'fail') {
+                return null
+            }
+            // console.log(accountInfo);
 
             const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
             result.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
