@@ -65,6 +65,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
     payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
     payload.append("variables", encodeURIComponent(variables))
     payload.append("doc_id", "28904005159232689")
+    payload.append("csrftoken", "j08CBzZtuPmDNwhq_Oli3V")
 
     const config: WorkerConfig = {
         urls: { posts: url },
@@ -77,7 +78,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
             },
             method: "POST",
             body: payload,
-            responseType:"json"
+            responseType: "json"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
@@ -261,7 +262,7 @@ async function init() {
         const username = usernames[fetchPostsWorkIndex]
         const posts = await fetchPosts({ username: username, userId: userIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
-        
+
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
             return
