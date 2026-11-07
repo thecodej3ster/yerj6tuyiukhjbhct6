@@ -50,7 +50,7 @@ async function fetchPosts({ userId, username }: { userId: string, username: stri
     const url = "https://www.instagram.com/api/graphql"
 
     const variables = {
-        after: "",
+        "after": "",
         "first": 12,
         "id": userId,
         "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
