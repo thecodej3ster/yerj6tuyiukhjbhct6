@@ -73,6 +73,8 @@ async function fetchPosts(accountId: string) {
 
 
     const { posts } = await worker(config)
+    console.log(posts);
+
 
 
 
