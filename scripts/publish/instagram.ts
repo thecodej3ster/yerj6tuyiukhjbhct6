@@ -28,8 +28,7 @@ async function initPublish({ url, key, description }: { url: string, description
       text: description,
       channelId: channelId,
       schedulingType: "automatic",
-      mode: "customScheduled",
-      dueAt: new Date(Date.now() + 2 * 60 * 1000).toISOString(),
+      mode: "shareNow",
       metadata: {
         instagram: {
           type: "reel",
