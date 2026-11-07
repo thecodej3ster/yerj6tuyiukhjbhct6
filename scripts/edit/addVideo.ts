@@ -14,26 +14,31 @@ async function getIdByUsername(username: string) {
         urls: { userId: `https://www.instagram.com/${username}` },
         resolverAction: async ({ response }: ResolverArgs) => {
             const accountData = response as string
+            let userId = ""
+            let pageId = ""
             const foundUserId = accountData.match(/(?<=props\":{\"id\":\")\d+/)
+            const foundPageId = accountData.match(/(?<={\"end_cursor\":\")[^"]+/)
 
             if (foundUserId) {
-                return foundUserId[0]
+                userId = foundUserId[0]
             }
-            return response
+
+            if (foundPageId) {
+                pageId = foundPageId[0]
+            }
+            return { userId: userId, pageId: pageId }
         }
     }
 
 
-    const { userId } = await worker(workerConfig) as { userId: string }
-
-    return userId
-    // await fetchPosts(accountIds)
+    const user = await worker(workerConfig) as { userId: string, pageId: string }
+    return user
 }
 
 
 
 
-async function fetchPosts({ userId, username }: { userId: string, username: string }) {
+async function fetchPosts({ userId, username, pageId }: { userId: string, username: string, pageId: string }) {
 
     interface VideoSearchRespose {
         foundVideos: string[],
@@ -50,7 +55,7 @@ async function fetchPosts({ userId, username }: { userId: string, username: stri
     const url = "https://www.instagram.com/api/graphql"
 
     const variables = {
-        "after": "",
+        "after": pageId,
         "first": 12,
         "id": userId,
         "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
@@ -234,11 +239,14 @@ async function savePosts(posts: string[]) {
 async function init() {
     const usernames: string[] = ["theflashpoint88"]
     const userIds: string[] = []
+    const pageIds: Record<string, string> = {}
 
     let userIDWorkIndex = 0
     const runGetUserId = async () => {
-        const userId = await getIdByUsername(usernames[userIDWorkIndex])
-        userIds.push(userId)
+        const username = usernames[userIDWorkIndex]
+        const user = await getIdByUsername(username)
+        userIds.push(user.userId)
+        pageIds[username] = user.pageId
         userIDWorkIndex++
 
         if (userIDWorkIndex === usernames.length) {
@@ -249,7 +257,8 @@ async function init() {
 
     let fetchPostsWorkIndex = 0
     const runfetchPosts = async () => {
-        const posts = await fetchPosts({ username: usernames[fetchPostsWorkIndex], userId: userIds[fetchPostsWorkIndex] })
+        const username = usernames[fetchPostsWorkIndex]
+        const posts = await fetchPosts({ username: username, userId: userIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
