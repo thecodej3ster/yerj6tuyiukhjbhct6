@@ -8,20 +8,13 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 
 
-async function getIdByUsername(usernames: string[]) {
-
-    const workerUrls: Record<string, string> = {}
-
-    for (let i = 0; i < usernames.length; i++) {
-        workerUrls[usernames[i]] = `https://www.instagram.com/${usernames[i]}`
-    }
-
+async function getIdByUsername(username: string) {
 
     const workerConfig: WorkerConfig = {
-        urls: workerUrls,
+        urls: { userId: `https://www.instagram.com/${username}` },
         resolverAction: async ({ response }: ResolverArgs) => {
-            // const accountData = args.response
-            const foundUserId = response.match(/(?<=props\":{\"id\":\")\d+/)
+            const accountData = response as string
+            const foundUserId = accountData.match(/(?<=props\":{\"id\":\")\d+/)
 
             if (foundUserId) {
                 return foundUserId[0]
@@ -31,17 +24,16 @@ async function getIdByUsername(usernames: string[]) {
     }
 
 
-    const accountIds = await worker(workerConfig)
-    console.log(accountIds);
+    const { userId } = await worker(workerConfig) as { userId: string }
 
-    return accountIds
+    return userId
     // await fetchPosts(accountIds)
 }
 
 
 
 
-async function fetchPosts(accountId: string) {
+async function fetchPosts({ userId, username }: { userId: string, username: string }) {
 
     interface VideoSearchRespose {
         foundVideos: string[],
@@ -54,17 +46,36 @@ async function fetchPosts(accountId: string) {
 
     let videoUrls: Record<string, string>[] = []
 
-    const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${accountId}","after":"","first":12}`
+    // const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${accountId}","after":"","first":12}`
+    const url = "https://www.instagram.com/api/graphql"
+
+    const variables = {
+        after: "",
+        "first": 12,
+        "id": userId,
+        "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
+    }
+
+    const payload = new FormData()
+    payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
+    payload.append("variables", JSON.stringify(variables))
+    payload.append("doc_id", "28904005159232689")
 
     const config: WorkerConfig = {
         urls: { posts: url },
+        requestConfig: {
+            headers: {
+                "origin": "https://www.instagram.com",
+                "x-fb-lsd": "AdRXMrl7XuP_BlBb1TYbntj72gA",
+                "content-type": "application/x-www-form-urlencoded",
+                "Referer": `https://www.instagram.com/${username}`
+            },
+            method: "POST",
+            body: payload
+        },
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
-            // const accountInfo = response as string
             const accountInfo = JSON.parse(response)
-            if (accountInfo.status === 'fail') {
-                return null
-            }
             console.log(accountInfo);
 
             // const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
@@ -219,14 +230,32 @@ async function savePosts(posts: string[]) {
 }
 
 // const accounts: string[] = ["theflashpoint88","unfilteredstate","thinkerzcircle"]
-const accounts: string[] = ["theflashpoint88"]
 
 async function init() {
-    const accountIds = await getIdByUsername(accounts)
-    await fetchPosts(accountIds[0])
-    // for (let i = 0; i < accountIds.length; i++) {
-    //     const element = array[i];
+    const usernames: string[] = ["theflashpoint88"]
+    const userIds: string[] = []
 
-    // }
+    let userIDWorkIndex = 0
+    const runGetUserId = async () => {
+        const userId = await getIdByUsername(usernames[userIDWorkIndex])
+        userIds.push(userId)
+        userIDWorkIndex++
+
+        if (userIDWorkIndex === usernames.length) {
+            return
+        }
+        await runGetUserId()
+    }
+
+    let fetchPostsWorkIndex = 0
+    const runfetchPosts = async () => {
+        const posts = await fetchPosts({ username: usernames[fetchPostsWorkIndex], userId: userIds[fetchPostsWorkIndex] })
+
+        fetchPostsWorkIndex++
+        if (fetchPostsWorkIndex === userIds.length) {
+            return
+        }
+        await runfetchPosts()
+    }
 }
 init()
