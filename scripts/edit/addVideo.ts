@@ -54,7 +54,7 @@ async function fetchPosts(accountId: string) {
 
     let videoUrls: Record<string, string>[] = []
 
-    const url = `https://www.instagram.com/graphql/query/?doc_id=7950326061742207&variables={"id":"${accountId}","after":"","first":12}`
+    const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${accountId}","after":"","first":12}`
 
     const config: WorkerConfig = {
         urls: { posts: url },
