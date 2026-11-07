@@ -65,12 +65,12 @@ async function fetchPosts(accountId: string) {
             if (accountInfo.status === 'fail') {
                 return null
             }
-            // console.log(accountInfo);
+            console.log(accountInfo);
 
-            const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
-            result.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
-            nodesObjects.map(nodesObject => result.foundVideos.push(nodesObject.node.shortcode))
-            return result
+            // const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
+            // result.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
+            // nodesObjects.map(nodesObject => result.foundVideos.push(nodesObject.node.shortcode))
+            // return result
         }
     }
 
