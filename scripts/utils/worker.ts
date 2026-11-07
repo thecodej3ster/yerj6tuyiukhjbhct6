@@ -65,7 +65,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
         try {
-            let response = await axios(selectedRequestConfig);            
+            let response = await axios(selectedRequestConfig)
+            console.log(response);
+                     
             result[key] = await response.data
         } catch (error) {
             failedWorks.push(key)
