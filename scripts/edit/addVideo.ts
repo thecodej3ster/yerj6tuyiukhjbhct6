@@ -16,11 +16,13 @@ async function getIdByUsername(username: string) {
     const workerConfig: WorkerConfig = {
         urls: { userId: `https://www.instagram.com/${username}` },
         resolverAction: async ({ response }: ResolverArgs) => {
+            console.log(response);
+            
             const accountData = response as string
             let userId = ""
             let pageId = ""
             const foundUserId = accountData.match(/(?<=props\":{\"id\":\")\d+/)
-            const foundPageId = accountData.match(/(?<={\"end_cursor\":\")[^"]+/)
+            const foundPageId = accountData.match(/(?<={\"end_cursor\":\")[^"]+/m)
 
             if (foundUserId) {
                 userId = foundUserId[0]
@@ -37,15 +39,16 @@ async function getIdByUsername(username: string) {
     const user = await worker(workerConfig) as { userId: string, pageId: string }
     if (!user.userId || !user.pageId) {
         delay += 5000
-        return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
-            if (delay === 60000) {
-                reject("RETRY  LIMIT EXHUASTED")
-            }
-            setTimeout(async () => {
-                const user = await getIdByUsername(username)
-                resolve(user)
-            }, delay)
-        })
+        
+        // return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
+        //     if (delay === 60000) {
+        //         reject("RETRY  LIMIT EXHUASTED")
+        //     }
+        //     setTimeout(async () => {
+        //         const user = await getIdByUsername(username)
+        //         resolve(user)
+        //     }, delay)
+        // })
     }
     return user
 }
