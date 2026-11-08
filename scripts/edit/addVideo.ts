@@ -33,6 +33,11 @@ async function getIdByUsername(username: string) {
 
 
     const user = await worker(workerConfig) as { userId: string, pageId: string }
+    if (!user.userId || user.pageId) {
+
+    } else {
+
+    }
     return user
 }
 
@@ -47,13 +52,13 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
                 "x-fb-lsd": lsd,
                 "Referer": `https://www.instagram.com/${username}`
             },
-            body: `lsd=${lsd}&variables=%7B%22id%22%3A%${userId}%22%7D&doc_id=27840486182295820`,
+            body: `lsd=${lsd}&variables=${encodeURIComponent('{"id":"13874292508"}')}&doc_id=27840486182295820`,
             responseType: "json",
             method: "POST"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
             console.log(response);
-            
+
             // const queryInfo = response as { data: { xig_user_by_igid_v2: { id: string } } }
             // return queryInfo.data.xig_user_by_igid_v2.id
         }
@@ -281,7 +286,7 @@ async function init() {
     let fetchPostsWorkIndex = 0
     const runfetchPosts = async () => {
         const username = usernames[fetchPostsWorkIndex]
-        
+
         await fetchPosts({ username: username, queryId: queryIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
         fetchPostsWorkIndex++
