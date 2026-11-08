@@ -45,8 +45,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 .concat(axios.defaults.transformResponse || [])
                 .concat([handleResolver]).filter(Boolean),
             headers: {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "accept-language": "en-US,en;q=0.5",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
                 "Accept-Encoding": "gzip, deflate, br, zstd",
                 "Connection": "keep-alive",
                 "Upgrade-Insecure-Requests": "1",

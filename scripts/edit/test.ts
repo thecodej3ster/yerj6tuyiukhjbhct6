@@ -3152,6 +3152,12 @@ const g = [
 // thedebatebrief_instagram: 'uXHLmgmzBpDXFC_7hcf3pkyvgVTRyJSNAqq9uydsRwl',
 // thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
 
+const variables = {
+  after: "AQHTwYPugPok2NKH4hwJT-QGN6c-SWwORdDCRd6gePHVbAai4a2dEP7NK6-ZzmgBZvJUTWlBhdRHBCi-sl-NLdrAiw",
+  first: 12,
+  id: "17841413815264286",
+  __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: false
+}
 
 fetch("https://www.instagram.com/api/graphql",
   {
@@ -3175,7 +3181,7 @@ fetch("https://www.instagram.com/api/graphql",
       "x-fb-lsd": "AdRXMrl7XuP_BlBb1TYbntj72gA",
       "Referer": "https://www.instagram.com/theflashpoint88"
     },
-    "body": "lsd=AdRXMrl7XuP_BlBb1TYbntj72gA&variables=%7B%22after%22%3A%22AQHTwYPugPok2NKH4hwJT-QGN6c-SWwORdDCRd6gePHVbAai4a2dEP7NK6-ZzmgBZvJUTWlBhdRHBCi-sl-NLdrAiw%22%2C%22first%22%3A12%2C%22id%22%3A%2217841413815264286%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689",
+    "body": `lsd=AdRXMrl7XuP_BlBb1TYbntj72gA&variables=${JSON.stringify(variables)}&doc_id=28904005159232689`,
     // 'lsd=AdRXMrl7XuP_BlBb1TYbntj7-Uc&variables=%7B%22after%22%3A%22AQHT5K2M9u79cg-vKWpI2onBukkAn7984X3Q9sDC9KzoDl4hbDUr4uIPRYuBe3Xdt2WXkhwQ7EjjOq-3wUnL1Opygg%22%2C%22first%22%3A12%2C%22id%22%3A%2217841413815264286%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689',
     "method": "POST"
   }).then(o => {
