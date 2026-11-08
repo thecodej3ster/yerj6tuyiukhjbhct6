@@ -11,6 +11,8 @@ const lsd = crypto.randomBytes(8).toString("hex")
 
 async function getIdByUsername(username: string) {
 
+    let delay = 0
+
     const workerConfig: WorkerConfig = {
         urls: { userId: `https://www.instagram.com/${username}` },
         resolverAction: async ({ response }: ResolverArgs) => {
@@ -34,15 +36,22 @@ async function getIdByUsername(username: string) {
 
     const user = await worker(workerConfig) as { userId: string, pageId: string }
     if (!user.userId || user.pageId) {
-
-    } else {
-
+        delay += 5000
+        return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
+            if (delay === 60000) {
+                reject("RETRY  LIMIT EXHUASTED")
+            }
+            setTimeout(async () => {
+                const user = await getIdByUsername(username)
+                resolve(user)
+            }, delay)
+        })
     }
     return user
 }
 
 async function getQueryID({ userId, username }: { userId: string, username: string }) {
-
+    let delay = 0
     const config: WorkerConfig = {
         urls: { queryId: 'https://www.instagram.com/api/graphql' },
         requestConfig: {
@@ -57,14 +66,25 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
             method: "POST"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
-            console.log(response);
-
-            // const queryInfo = response as { data: { xig_user_by_igid_v2: { id: string } } }
-            // return queryInfo.data.xig_user_by_igid_v2.id
+            const queryInfo = response as { data?: { xig_user_by_igid_v2?: { id?: string } } }
+            return queryInfo?.data?.xig_user_by_igid_v2?.id
         }
     }
 
     const { queryId } = await worker(config)
+
+    if (!queryId) {
+        delay += 5000
+        return await new Promise<string>((resolve, reject) => {
+            if (delay === 60000) {
+                reject("RETRY  LIMIT EXHUASTED")
+            }
+            setTimeout(async () => {
+                const queryId = await getQueryID({ userId: userId, username: username })
+                resolve(queryId)
+            }, delay)
+        })
+    }
     return queryId
 }
 
@@ -81,6 +101,7 @@ async function fetchPosts({ queryId, username, pageId }: { queryId: string, user
         node: { shortcode: string }
     }
 
+    let delay = 0
     let videoUrls: Record<string, string>[] = []
     const url = "https://www.instagram.com/api/graphql"
 
@@ -90,6 +111,7 @@ async function fetchPosts({ queryId, username, pageId }: { queryId: string, user
         id: queryId,
         __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: false
     }
+
 
     const config: WorkerConfig = {
         urls: { posts: url },
@@ -119,6 +141,19 @@ async function fetchPosts({ queryId, username, pageId }: { queryId: string, user
 
 
     const { posts } = await worker(config)
+
+    // if (!queryId) {
+    //     delay += 5000
+    //     return await new Promise<string>((resolve, reject) => {
+    //         if (delay === 60000) {
+    //             reject("RETRY  LIMIT EXHUASTED")
+    //         }
+    //         setTimeout(async () => {
+    //             const queryId = await getQueryID({ userId: userId, username: username })
+    //             resolve(queryId)
+    //         }, delay)
+    //     })
+    // }
     console.log(posts);
 
 
@@ -310,7 +345,7 @@ async function init() {
 
     await runGetUserId()
     await runGetQueryID()
-    // await runfetchPosts()
+    await runfetchPosts()
     console.log(lsd);
 
 }
