@@ -306,7 +306,7 @@ async function init() {
     await runGetUserId()
     await runGetQueryID()
     // await runfetchPosts()
-    // console.log(queryIds);
+    console.log(lsd);
 
 }
 init()
