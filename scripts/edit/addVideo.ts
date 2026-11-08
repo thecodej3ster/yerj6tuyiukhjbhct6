@@ -21,9 +21,6 @@ async function getIdByUsername(username: string) {
 
             if (foundUserId) {
                 userId = foundUserId[0]
-            }else{
-                console.log(`noooooooooNOOOOOOOOOOOONOOOOOOOOOOOOOO`);
-                
             }
 
             if (foundPageId) {
@@ -38,14 +35,38 @@ async function getIdByUsername(username: string) {
     return user
 }
 
+async function getQueryID({ userId, username }: { userId: string, username: string }) {
+    const lsd = crypto.randomBytes(8).toString("hex")
+
+    const config: WorkerConfig = {
+        urls: { queryId: 'https://www.instagram.com/api/graphql' },
+        requestConfig: {
+            headers: {
+                "origin": 'https://www.instagram.com',
+                "content-type": "application/x-www-form-urlencoded",
+                "x-fb-lsd": lsd,
+                "Referer": `https://www.instagram.com/${username}`
+            },
+            body: `lsd=${lsd}&variables={"id":"${userId}"}&doc_id=27840486182295820`,
+            responseType: "json",
+            method: "POST"
+        },
+        resolverAction: async ({ response }: ResolverArgs) => {
+            const queryInfo = response as { data: { xig_user_by_igid_v2: { id: string } } }
+            return queryInfo.data.xig_user_by_igid_v2.id
+        }
+    }
+
+    const { queryId } = await worker(config)
+    return queryId
+}
 
 
 
 async function fetchPosts({ userId, username, pageId }: { userId: string, username: string, pageId: string }) {
 
-    console.log(userId);
-return    
-    
+    const lsd = crypto.randomBytes(8).toString("hex")
+
     interface VideoSearchRespose {
         foundVideos: string[],
         next: string
@@ -71,11 +92,12 @@ return
             headers: {
                 "origin": 'https://www.instagram.com',
                 "content-type": "application/x-www-form-urlencoded",
-                "x-fb-lsd": "AdRXMrl7XuP_BlBb1TYbntj72gA",
+                "x-fb-lsd": lsd,
                 "Referer": `https://www.instagram.com/${username}`
             },
-            "body": `lsd=AdRXMrl7XuP_BlBb1TYbntj72gA&variables=${JSON.stringify(variables)}&doc_id=28904005159232689`,
-            "method": "POST"
+            body: `lsd=${lsd}&variables=${JSON.stringify(variables)}&doc_id=28904005159232689`,
+            responseType: "json",
+            method: "POST"
 
         },
         resolverAction: async ({ response }: ResolverArgs) => {
@@ -240,6 +262,7 @@ async function init() {
     const usernames: string[] = ["theflashpoint88"]
     const userIds: string[] = []
     const pageIds: Record<string, string> = {}
+    const queryIds: Record<string, string> = {}
 
     let userIDWorkIndex = 0
     const runGetUserId = async () => {
@@ -260,7 +283,6 @@ async function init() {
         const username = usernames[fetchPostsWorkIndex]
         const posts = await fetchPosts({ username: username, userId: userIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
-
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
             return
@@ -268,7 +290,22 @@ async function init() {
         await runfetchPosts()
     }
 
-    await runGetUserId()    
+    let getQueryIdWorkIndex = 0
+    const runGetQueryID = async () => {
+        const username = usernames[getQueryIdWorkIndex]
+        queryIds[username] = await getQueryID({ username: username, userId: userIds[getQueryIdWorkIndex] })
+
+        getQueryIdWorkIndex++
+        if (getQueryIdWorkIndex === userIds.length) {
+            return
+        }
+        await runGetQueryID()
+    }
+
+    await runGetUserId()
+    await runGetQueryID()
     await runfetchPosts()
+    console.log(queryIds);
+
 }
 init()
