@@ -63,7 +63,7 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
 
 
 
-async function fetchPosts({ userId, username, pageId }: { userId: string, username: string, pageId: string }) {
+async function fetchPosts({ queryId, username, pageId }: { queryId: string, username: string, pageId: string }) {
 
     const lsd = crypto.randomBytes(8).toString("hex")
 
@@ -82,7 +82,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
     const variables = {
         after: pageId,
         first: 12,
-        id: userId,
+        id: queryId,
         __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: false
     }
 
@@ -281,7 +281,7 @@ async function init() {
     let fetchPostsWorkIndex = 0
     const runfetchPosts = async () => {
         const username = usernames[fetchPostsWorkIndex]
-        const posts = await fetchPosts({ username: username, userId: userIds[fetchPostsWorkIndex], pageId: pageIds[username] })
+        const posts = await fetchPosts({ username: username, queryId: queryIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
