@@ -8,10 +8,10 @@ const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const lsd = crypto.randomBytes(8).toString("hex")
 
 
+let delay = 0
 
 async function getIdByUsername(username: string) {
 
-    let delay = 0
 
     const workerConfig: WorkerConfig = {
         urls: { user: `https://www.instagram.com/${username}` },
@@ -40,6 +40,7 @@ async function getIdByUsername(username: string) {
 
         // return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
         //     if (delay === 60000) {
+                    // console.log('COULD NOT GET USERINFO')
         //         reject("RETRY  LIMIT EXHUASTED")
         //     }
         //     setTimeout(async () => {
@@ -51,8 +52,8 @@ async function getIdByUsername(username: string) {
     return user
 }
 
+delay = 0
 async function getQueryID({ userId, username }: { userId: string, username: string }) {
-    let delay = 0
     const config: WorkerConfig = {
         urls: { queryId: 'https://www.instagram.com/api/graphql' },
         requestConfig: {
@@ -78,6 +79,7 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
         delay += 5000
         return await new Promise<string>((resolve, reject) => {
             if (delay === 60000) {
+                console.log('COULD NOT GET QUERYID');
                 reject("RETRY  LIMIT EXHUASTED")
             }
             setTimeout(async () => {
@@ -345,13 +347,12 @@ async function init() {
     }
 
     await runGetUserId()
-    await runGetQueryID()
+    // await runGetQueryID()
     console.log(queryIds);
-    
+
     console.log(pageIds);
 
-    await runfetchPosts()
-    console.log(lsd);
+    // await runfetchPosts()
 
 }
 init()
