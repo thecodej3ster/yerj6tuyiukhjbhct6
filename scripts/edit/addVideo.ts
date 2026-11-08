@@ -281,7 +281,8 @@ async function init() {
     let fetchPostsWorkIndex = 0
     const runfetchPosts = async () => {
         const username = usernames[fetchPostsWorkIndex]
-        const posts = await fetchPosts({ username: username, queryId: queryIds[fetchPostsWorkIndex], pageId: pageIds[username] })
+        
+        await fetchPosts({ username: username, queryId: queryIds[fetchPostsWorkIndex], pageId: pageIds[username] })
 
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
@@ -304,8 +305,8 @@ async function init() {
 
     await runGetUserId()
     await runGetQueryID()
-    await runfetchPosts()
-    console.log(queryIds);
+    // await runfetchPosts()
+    // console.log(queryIds);
 
 }
 init()
