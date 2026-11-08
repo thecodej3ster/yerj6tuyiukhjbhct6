@@ -51,50 +51,29 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
 
     let videoUrls: Record<string, string>[] = []
 
-    // const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${accountId}","after":"","first":12}`
-    const url = "https://www.instagram.com/api/graphql"
+    const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${userId}","after":"","first":12}`
+    // const url = "https://www.instagram.com/api/graphql"
 
-    const variables = JSON.stringify({
-        "after": pageId,
-        "first": 12,
-        "id": userId,
-        "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
-    })
+    // const variables = JSON.stringify({
+    //     "after": pageId,
+    //     "first": 12,
+    //     "id": userId,
+    //     "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
+    // })
 
-    const payload = new URLSearchParams()
-    payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
-    payload.append("variables", variables)
-    payload.append("doc_id", "28904005159232689")
+    // const payload = new URLSearchParams()
+    // payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
+    // payload.append("variables", variables)
+    // payload.append("doc_id", "28904005159232689")
     // payload.append("csrftoken", "j08CBzZtuPmDNwhq_Oli3V")
 
     const config: WorkerConfig = {
         urls: { posts: url },
         requestConfig: {
-            headers: {
-                "accept": "*/*",
-                "accept-language": "en-US,en;q=0.8",
-                "cache-control": "no-cache",
-                "content-type": "application/x-www-form-urlencoded",
-                "pragma": "no-cache",
-                "priority": "u=1, i",
-                "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
-                "sec-ch-ua-full-version-list": "\"Brave\";v=\"143.0.0.0\", \"Chromium\";v=\"143.0.0.0\", \"Not A(Brand\";v=\"24.0.0.0\"",
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-model": "\"\"",
-                "sec-ch-ua-platform": "\"Linux\"",
-                "sec-ch-ua-platform-version": "\"6.14.0\"",
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-origin",
-                "sec-gpc": "1",
-                "x-fb-lsd": "AdRXMrl7XuP_BlBb1TYbntj72gA",
-                "Referer": `https://www.instagram.com/${username}`
-            },
-            method: "POST",
-            body: payload,
+            // method: "POST",
+            // body: payload,
             responseType: "json"
         },
-        direct:true,
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
             // const accountInfo = JSON.parse(response)
