@@ -123,7 +123,6 @@ async function fetchPosts({ queryId, username, pageId }: { queryId: string, user
                 "Referer": `https://www.instagram.com/${username}`
             },
             body: `lsd=${lsd}&variables=%7B%22after%22%3A%22${pageId}%22%2C%22first%22%3A12%2C%22id%22%3A%22${queryId}%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689`,
-            // `lsd=${lsd}&variables=${encodeURIComponent(JSON.stringify(variables))}&doc_id=28904005159232689`,
             responseType: "json",
             method: "POST"
 
