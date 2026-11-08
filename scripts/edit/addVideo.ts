@@ -98,7 +98,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
             // const accountInfo = JSON.parse(response)
             console.log(response);
-
+            return response
             // const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
             // result.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
             // nodesObjects.map(nodesObject => result.foundVideos.push(nodesObject.node.shortcode))
