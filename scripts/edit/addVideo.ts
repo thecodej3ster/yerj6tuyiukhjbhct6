@@ -55,7 +55,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
     const url = "https://www.instagram.com/api/graphql"
 
     const variables = JSON.stringify({
-        "after": "",
+        "after": pageId,
         "first": 12,
         "id": userId,
         "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
@@ -94,6 +94,7 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
             body: payload,
             responseType: "json"
         },
+        direct:true,
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
             // const accountInfo = JSON.parse(response)
