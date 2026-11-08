@@ -47,7 +47,7 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
                 "x-fb-lsd": lsd,
                 "Referer": `https://www.instagram.com/${username}`
             },
-            body: `lsd=${lsd}&variables={"id":"${userId}"}&doc_id=27840486182295820`,
+            body: `lsd=${lsd}&variables=%7B%22id%22%3A%${userId}%22%7D&doc_id=27840486182295820`,
             responseType: "json",
             method: "POST"
         },
