@@ -35,7 +35,7 @@ async function getIdByUsername(username: string) {
 
 
     const user = await worker(workerConfig) as { userId: string, pageId: string }
-    if (!user.userId || user.pageId) {
+    if (!user.userId || !user.pageId) {
         delay += 5000
         return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
             if (delay === 60000) {
