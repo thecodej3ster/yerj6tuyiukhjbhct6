@@ -21,6 +21,9 @@ async function getIdByUsername(username: string) {
 
             if (foundUserId) {
                 userId = foundUserId[0]
+            }else{
+                console.log(`noooooooooNOOOOOOOOOOOONOOOOOOOOOOOOOO`);
+                
             }
 
             if (foundPageId) {
