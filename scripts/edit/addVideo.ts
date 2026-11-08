@@ -91,8 +91,8 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
                 "Referer": `https://www.instagram.com/${username}`
             },
             method: "POST",
-            body:   'lsd=AdRXMrl7XuP_BlBb1TYbntj7-Uc&variables=%7B%22after%22%3A%22AQHT5K2M9u79cg-vKWpI2onBukkAn7984X3Q9sDC9KzoDl4hbDUr4uIPRYuBe3Xdt2WXkhwQ7EjjOq-3wUnL1Opygg%22%2C%22first%22%3A12%2C%22id%22%3A%2217841413815264286%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689',
-            responseType: "json"
+            body:   'lsd=AdRXMrl7XuP_BlBb1TYbntj7-Uc&variables=%7B%22after%22%3A%22AQHT5K2M9u79cg-vKWpI2onBukkAn7984X3Q9sDC9KzoDl4hbDUr4uIPRYuBe3Xdt2WXkhwQ7EjjOq-3wUnL1Opygg%22%2C%22first%22%3A12%2C%22id%22%3A%2217841413815264286%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689'
+            // responseType: "json"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
