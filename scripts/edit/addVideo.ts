@@ -51,7 +51,14 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
 
     let videoUrls: Record<string, string>[] = []
 
-    const url = `https://www.instagram.com/graphql/query/?doc_id=28904005159232689&variables={"id":"${userId}","after":"","first":12}`
+    const url = `https://www.instagram.com/graphql/query/`
+    // ?doc_id=28904005159232689&variables={"id":"${userId}","after":"","first":12}`
+    const payload = {
+        id: userId,
+        after: "",
+        first: 12,
+        doc_id: 28904005159232689
+    }
     // const url = "https://www.instagram.com/api/graphql"
 
     // const variables = JSON.stringify({
@@ -70,8 +77,8 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
     const config: WorkerConfig = {
         urls: { posts: url },
         requestConfig: {
-            // method: "POST",
-            // body: payload,
+            method: "POST",
+            body: JSON.stringify(payload),
             responseType: "json"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
