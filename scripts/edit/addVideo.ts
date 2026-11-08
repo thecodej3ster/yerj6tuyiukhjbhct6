@@ -122,7 +122,7 @@ async function fetchPosts({ queryId, username, pageId }: { queryId: string, user
                 "x-fb-lsd": lsd,
                 "Referer": `https://www.instagram.com/${username}`
             },
-            body: `lsd=${lsd}&variables=${JSON.stringify(variables)}&doc_id=28904005159232689`,
+            body: `lsd=${lsd}&variables=${encodeURIComponent(JSON.stringify(variables))}&doc_id=28904005159232689`,
             responseType: "json",
             method: "POST"
 
