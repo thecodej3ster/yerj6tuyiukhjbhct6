@@ -14,10 +14,8 @@ async function getIdByUsername(username: string) {
     let delay = 0
 
     const workerConfig: WorkerConfig = {
-        urls: { userId: `https://www.instagram.com/${username}` },
+        urls: { user: `https://www.instagram.com/${username}` },
         resolverAction: async ({ response }: ResolverArgs) => {
-            console.log(response);
-            
             const accountData = response as string
             let userId = ""
             let pageId = ""
@@ -39,7 +37,7 @@ async function getIdByUsername(username: string) {
     const user = await worker(workerConfig) as { userId: string, pageId: string }
     if (!user.userId || !user.pageId) {
         delay += 5000
-        
+
         // return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
         //     if (delay === 60000) {
         //         reject("RETRY  LIMIT EXHUASTED")
@@ -64,7 +62,7 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
                 "x-fb-lsd": lsd,
                 "Referer": `https://www.instagram.com/${username}`
             },
-            body: `lsd=${lsd}&variables=${encodeURIComponent('{"id":"13874292508"}')}&doc_id=27840486182295820`,
+            body: `lsd=${lsd}&variables=${encodeURIComponent(JSON.stringify({ id: userId }))}&doc_id=27840486182295820`,
             responseType: "json",
             method: "POST"
         },
@@ -349,7 +347,7 @@ async function init() {
     await runGetUserId()
     await runGetQueryID()
     console.log(pageIds);
-    
+
     await runfetchPosts()
     console.log(lsd);
 
