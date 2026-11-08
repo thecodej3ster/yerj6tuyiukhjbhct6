@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js"
 
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+const lsd = crypto.randomBytes(8).toString("hex")
 
 
 
@@ -36,7 +37,6 @@ async function getIdByUsername(username: string) {
 }
 
 async function getQueryID({ userId, username }: { userId: string, username: string }) {
-    const lsd = crypto.randomBytes(8).toString("hex")
 
     const config: WorkerConfig = {
         urls: { queryId: 'https://www.instagram.com/api/graphql' },
@@ -64,8 +64,6 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
 
 
 async function fetchPosts({ queryId, username, pageId }: { queryId: string, username: string, pageId: string }) {
-
-    const lsd = crypto.randomBytes(8).toString("hex")
 
     interface VideoSearchRespose {
         foundVideos: string[],
