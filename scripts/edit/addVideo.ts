@@ -346,6 +346,8 @@ async function init() {
 
     await runGetUserId()
     await runGetQueryID()
+    console.log(queryIds);
+    
     console.log(pageIds);
 
     await runfetchPosts()
