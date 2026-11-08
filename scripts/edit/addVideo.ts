@@ -52,8 +52,10 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
             method: "POST"
         },
         resolverAction: async ({ response }: ResolverArgs) => {
-            const queryInfo = response as { data: { xig_user_by_igid_v2: { id: string } } }
-            return queryInfo.data.xig_user_by_igid_v2.id
+            console.log(response);
+            
+            // const queryInfo = response as { data: { xig_user_by_igid_v2: { id: string } } }
+            // return queryInfo.data.xig_user_by_igid_v2.id
         }
     }
 
