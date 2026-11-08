@@ -3055,112 +3055,138 @@ const g = [
 //     if (job.jobId !== 8667390) {
 //       await deleteSchedule(`${job.jobId}`)
 //     }
-  // }
+// }
 
-  // await emptyGeminiStorage()
-  // await processCropPipeline()
-  // await processPipPipeline()
-  // await processHookPipeline()
-  // await processTextPipeline()
+// await emptyGeminiStorage()
+// await processCropPipeline()
+// await processPipPipeline()
+// await processHookPipeline()
+// await processTextPipeline()
 // }
 
 // (async () => {
 
-  // await r()
-  //   const e = '🤯'
+// await r()
+//   const e = '🤯'
 
-  //   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-  // <svg width="60" height="60" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
-  //   <rect width="60" height="60" fill="none" />
-  //   <style>
-  //     text {
-  //       font-size: 60px;
-  //     }
-  //   </style>
-  //   <text x="20" y="60">${e}</text>
-  // </svg>`
-
-
-  // const {error} = await db.from('serverlists')
-  //     .upsert([{ id: 'tv-xxx', data: JSON.stringify(serverList) }])
-  //     .eq("id", 'tv-xxx')
-
-  //     console.log(error);
+//   const svg = `<?xml version="1.0" encoding="UTF-8"?>
+// <svg width="60" height="60" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+//   <rect width="60" height="60" fill="none" />
+//   <style>
+//     text {
+//       font-size: 60px;
+//     }
+//   </style>
+//   <text x="20" y="60">${e}</text>
+// </svg>`
 
 
-  // const gg = path.resolve("scripts",'temp')
+// const {error} = await db.from('serverlists')
+//     .upsert([{ id: 'tv-xxx', data: JSON.stringify(serverList) }])
+//     .eq("id", 'tv-xxx')
+
+//     console.log(error);
+
+
+// const gg = path.resolve("scripts",'temp')
 
 
 
 
-  // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
-  // const { t } = await worker(config)
-  // console.log(t);
+// const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
+// const { t } = await worker(config)
+// console.log(t);
 
-  // for (let i = 0; i < 5; i++) {
-  //     await r()
+// for (let i = 0; i < 5; i++) {
+//     await r()
 
-  // }
-  // const o = {
-  //     keys: [
-  //         "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq",
-  //         "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2",
-  //         "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht",
-  //         "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2",
-  //         "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1",
-  //         "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0"
-  //     ]
-  // }
+// }
+// const o = {
+//     keys: [
+//         "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq",
+//         "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2",
+//         "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht",
+//         "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2",
+//         "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1",
+//         "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0"
+//     ]
+// }
 
-  //     const o = {
-  //   keys: [
-  //     "AQ.Ab8RN6JBLXkIdNG5UNEUZzFjD9ywYZ6bvOLxRqJoDZPaexS8zQ",
-  //     'AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ',
-  //     'AQ.Ab8RN6JqYnGOApdqW1U4Jv-oZE07d0HvHd6qqFvBm6cH1oSSCQ',
-  //     'AQ.Ab8RN6IXQmX7D_6KtqDsT2vw2M4yZ_3DaO9U-IR9pBMAU3E5ag',
-  //     'AQ.Ab8RN6JY2R5mnOCYIUaspfbRtY235up0jtuLNtsdCVnL6pw_Wg'
-  //   ]
-  // }
-  //     console.log(JSON.stringify(o));
+//     const o = {
+//   keys: [
+//     "AQ.Ab8RN6JBLXkIdNG5UNEUZzFjD9ywYZ6bvOLxRqJoDZPaexS8zQ",
+//     'AQ.Ab8RN6KcqtK8f5pZaJjb2h3d7yJu5BDvLUXRxYN0tRGJ2oFzzQ',
+//     'AQ.Ab8RN6JqYnGOApdqW1U4Jv-oZE07d0HvHd6qqFvBm6cH1oSSCQ',
+//     'AQ.Ab8RN6IXQmX7D_6KtqDsT2vw2M4yZ_3DaO9U-IR9pBMAU3E5ag',
+//     'AQ.Ab8RN6JY2R5mnOCYIUaspfbRtY235up0jtuLNtsdCVnL6pw_Wg'
+//   ]
+// }
+//     console.log(JSON.stringify(o));
 
-  // const fhgjhk = {
-  //     vbnmn: [
-  //         "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq",
-  //         "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2",
-  //         "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht",
-  //         "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2",
-  //         "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1",
-  //         "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0"
-  //     ]
-  // }
+// const fhgjhk = {
+//     vbnmn: [
+//         "ZTdoNjkwc3ItemVxZzNicDpyc2Z2YWVnbTZq",
+//         "NDdxeHdhNTYtN3dlM3Q5ajp4ajkzcnE3ZGV2",
+//         "M2ptbTVsc3UteHpiNTZqcDphanNnY2Y4ZGht",
+//         "NnI0OGJ2MjktdjdjMjY1ZTp1bnZ4NWV6OTg2",
+//         "d3I2OGtlNnktMnhjczM2cDpkanlna3Nobjd1",
+//         "ZDd2Y2M0NnYtZ2J2dXNkZjplcnFiMnpqZGF0"
+//     ]
+// }
 // }
 // )
 
 
 
-console.log(JSON.stringify({
-  _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
-  opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-  'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-  verdictmedia_1_instagram: 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
-  'pulsepointmedia.1_youtube': 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
-  Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
-  'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
-}))
+// console.log(JSON.stringify({
+//   _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
+//   opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+//   'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+//   verdictmedia_1_instagram: 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
+//   'pulsepointmedia.1_youtube': 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
+//   Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
+//   'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
+// }))
 
 // 'thecharliekirk.daily_instagram': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
 // thedebatebrief_instagram: 'uXHLmgmzBpDXFC_7hcf3pkyvgVTRyJSNAqq9uydsRwl',
 // thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
 
 
-    const variables = {
-        "after": "pageId",
-        "first": 12,
-        "id": userId,
-        "__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider": false
-    }
+fetch("https://www.instagram.com/api/graphql",
+  {
+    "headers": {
+      "accept": "*/*",
+      "accept-language": "en-US,en;q=0.8",
+      "cache-control": "no-cache",
+      "content-type": "application/x-www-form-urlencoded",
+      "pragma": "no-cache",
+      "priority": "u=1, i",
+      "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+      "sec-ch-ua-full-version-list": "\"Brave\";v=\"143.0.0.0\", \"Chromium\";v=\"143.0.0.0\", \"Not A(Brand\";v=\"24.0.0.0\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-platform": "\"Linux\"",
+      "sec-ch-ua-platform-version": "\"6.14.0\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "sec-gpc": "1",
+      "x-asbd-id": "359341",
+      "x-csrftoken": "8MMH47etTy-Clxt0AszczB",
+      "x-fb-entry-nonce": "DolxFmr9",
+      "x-fb-friendly-name": "PolarisLoggedOutDesktopWWWProfilePostsTabContentQuery_connection",
+      "x-fb-lsd": "AdRXMrl7XuP_BlBb1TYbntj72gA",
+      "x-ig-app-id": "936619743392459",
+      "x-ig-max-touch-points": "0",
+      "Referer": "https://www.instagram.com/theflashpoint88"
+    },
+    "body": "av=0&__d=www&__user=0&__a=1&__req=o&__hs=20764.HYP%3Ainstagram_web_pkg.2.1...0&dpr=1&__ccg=EXCELLENT&__rev=1053563438&__s=lus5rz%3Avr4ucu%3Acobf3h&__hsi=7705339893985871874&__dyn=7xe5WwlEnwn8yEqxemh0no6u5U4e1ZyUW3qi7UK360CEboG0le4o0B-q1ew6ywMwto2awgo9oO0n24oaEnxO1ywOwv89k2C1FwnE6a0D85m263ifK0EUjwGzEaE2iwNwmE2eUlwhE2Lw6OyES1TwVwDwHg2ZwrUK2K2WErwcW269wr84-6o5qdwBwUQp1yU426V8aUuwm8jwsE2xyVrx60hK3KawOCwgo6K1cweW3mdg5e1awNw&__csr=g94aNlMJ96Nkn95H258hlcJNcWSBEGEAAA-Lmy5Ahem_8BlAdOdJqFr4h2aG7JGAVeXggHZqAAiOaBqkEyV5lcB9ftRkJVaiPmJAJdPlkFujCij-GxhuiBGeVpFGCGmHmWy94GiKCcguypoqzRyosAzV4byHJohAxKaCxSWHLyE4CmFWKEHgWeBz-eJ1qq9x6eyUjghzd7xzyoSfAGm7o8UPADG2fEx88U-5ElWjiUyQmU8F8qwg8rw2gUycxa06Z801njU088oco1SIw0H_x204crc042Uqg3TUK0Fov80DCq9gOG810wIxK2C1dG5oeU6cyxl1so0-80gewQP3920Bw2kEiw15J1y01Otw2xo046O0frw&__hsdp=g8YI23Egw8f2FP4VmATgO5o-EB6igGF99NKQcwOxGP91mCsl4xWbxm3fx9wiE31wG8d84m26EK2bxV1yi4Cqsyg4yi10KfDw4fxu1MwExi58lK3a1vzE5S78e83QwfSjAxy1eDwmEuxmi2yEb82Hwr8ow4Mw6kw5sw4Wwl80osweTwpE1g83BU1JUqw4Fw6dU0MC08OEw5acwtU1fE5KdU85l0&__hblp=0hU663-3a78cEGcxaucwOwZw-wxwyzUuyo4Saguz8hw8-4EepRxCaxKAbDAAxiq7UG3610KfDzo722O3O2q5Xwr8a8kAwBK3a3S26ewFwPx2bwUg2GzGwSwg82yxCRAxy1eDwmEuxmi2yEb8d-E6W1Ixy0wo2GK1uwVxa5oO0NoeE7u1owk81eE5i0d1wr80zm3u3a0AE9-3m323q1fwi8kxu3KuE0FO6E12-6XzU1uu0c9xu0iGbwaa5UyfzW81iz8y1Kw8m18wAwiE5KdU85l0&__sjsp=g8YI23FO88gosay4vBqjt38lxa9hAAdypNKQcws8fE0y2&__comet_req=7&lsd=AdRXMrl7XuP_BlBb1TYbntj72gA&jazoest=22332&__spin_r=1053563438&__spin_b=trunk&__spin_t=1794039247&__crn=comet.igweb.PolarisLoggedOutDesktopWWWProfileRoute&fb_api_caller_class=RelayModern&fb_api_req_friendly_name=PolarisLoggedOutDesktopWWWProfilePostsTabContentQuery_connection&server_timestamps=true&variables=%7B%22after%22%3A%22AQHTwYPugPok2NKH4hwJT-QGN6c-SWwORdDCRd6gePHVbAai4a2dEP7NK6-ZzmgBZvJUTWlBhdRHBCi-sl-NLdrAiw%22%2C%22first%22%3A12%2C%22id%22%3A%2217841413815264286%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689",
+    "method": "POST"
+  }).then(o => {
+    o.text()
+      .then(p => {
+        console.log(p);
+      })
 
-    const payload = new URLSearchParams()
-    payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
-    payload.append("variables", encodeURIComponent(JSON.stringify(variables)))
-    payload.append("doc_id", "28904005159232689")
+  })
