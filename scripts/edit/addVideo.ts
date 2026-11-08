@@ -40,6 +40,9 @@ async function getIdByUsername(username: string) {
 
 async function fetchPosts({ userId, username, pageId }: { userId: string, username: string, pageId: string }) {
 
+    console.log(userId);
+return    
+    
     interface VideoSearchRespose {
         foundVideos: string[],
         next: string
@@ -262,7 +265,7 @@ async function init() {
         await runfetchPosts()
     }
 
-    await runGetUserId()
+    await runGetUserId()    
     await runfetchPosts()
 }
 init()
