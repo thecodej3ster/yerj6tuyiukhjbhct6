@@ -50,35 +50,14 @@ async function fetchPosts({ userId, username, pageId }: { userId: string, userna
     }
 
     let videoUrls: Record<string, string>[] = []
-
-    // ?doc_id=28904005159232689&variables={"id":"${userId}","after":"","first":12}`
-    const payload = new URLSearchParams()
-    payload.append("id", userId)
-    payload.append("after", "")
-    payload.append("first", "12")
-    payload.append("doc_id", "28904005159232689")
-    // const url = `https://www.instagram.com/graphql/query/${payload}`
-
-    // const payload = {
-    //     id: userId,
-    //     after: "",
-    //     first: 12,
-    //     doc_id: 28904005159232689
-    // }
     const url = "https://www.instagram.com/api/graphql"
 
     const variables = {
         after: pageId,
         first: 12,
-        id: "17841413815264286",
+        id: userId,
         __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: false
     }
-
-    // const payload = new URLSearchParams()
-    // payload.append("lsd", "AdRXMrl7XuP_BlBb1TYbntj72gA")
-    // payload.append("variables", variables)
-    // payload.append("doc_id", "28904005159232689")
-    // payload.append("csrftoken", "j08CBzZtuPmDNwhq_Oli3V")
 
     const config: WorkerConfig = {
         urls: { posts: url },
