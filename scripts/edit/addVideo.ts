@@ -224,12 +224,12 @@ async function init() {
     await runfetchPosts()
 
     let sortVideosWorkIndex = 0
-    const runSortVideo = async () => {
+    const runSortVideo = async (currentUser = "") => {
         let videoUrls: Record<string, string> = {}
         let validVideos: { code: string }[] = []
 
         const run = async () => {
-            const username = usernames[sortVideosWorkIndex]
+            const username = currentUser || usernames[sortVideosWorkIndex]
             const videos = posts[username].foundVideos
 
             if (!videos.length) {
@@ -272,12 +272,16 @@ async function init() {
         await run()
 
         console.log(validVideos);
-        
+
         const { data, error } = await db.from('videosX').insert(validVideos).select()
         if (error) {
             throw new Error(error.message);
         }
         console.log(data);
+
+        if (currentUser) {
+            return
+        }
 
         validVideos = []
         sortVideosWorkIndex++
@@ -289,19 +293,28 @@ async function init() {
     await runSortVideo()
 
 
-    // console.log(dbPayload);
-
-
     let iteratePaginationWorkIndex = 0
+
     const iteratePagination = async () => {
         const username = usernames[iteratePaginationWorkIndex]
-        const page = posts[username].next
+        const pageId = posts[username].next
 
+        if (!pageId) {
+            return
+        }
 
+        posts[username] = await fetchPosts({ username: username, pageId: pageId })
+        await runSortVideo(username)
+        if (posts[username].next) {
+            return await iteratePagination()
+        }
 
-
-
-
+        iteratePaginationWorkIndex++
+        if (iteratePaginationWorkIndex === usernames.length) {
+            return
+        }
+        await iteratePagination()
     }
+    await iteratePagination()
 }
 init()
