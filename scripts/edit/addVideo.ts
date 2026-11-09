@@ -249,7 +249,7 @@ async function init() {
 
             videoUrls = {}
             for (const key in sortedVideos) {
-                if (sortedVideos[key] !== "error") {
+                if (typeof sortedVideos[key] !== 'string') {
                     delete videoUrls[key]
                 }
             }
