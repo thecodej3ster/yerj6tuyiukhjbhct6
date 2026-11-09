@@ -244,12 +244,12 @@ async function init() {
             const config: WorkerConfig = { urls: videoUrls, resolverAction: sortVideos }
             const sortedVideos = await worker(config) as Record<string, { code: string } | string | null>
 
-            const sucessfulVideos = [...Object.values(sortedVideos).filter(v => v !== null && v !== 'error')] as { code: string }[]
+            const sucessfulVideos = [...Object.values(sortedVideos).filter(v => v !== null && !v.toString().toLowerCase().includes("error"))] as { code: string }[]
             validVideos = validVideos.concat(sucessfulVideos)
 
             videoUrls = {}
             for (const key in sortedVideos) {
-                if (typeof sortedVideos[key] !== 'string') {
+                if (typeof sortedVideos[key] === "object" && sortedVideos[key]?.code) {
                     delete videoUrls[key]
                 }
             }
