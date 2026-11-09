@@ -233,9 +233,9 @@ async function init() {
             })
             const config: WorkerConfig = { urls: urls, resolverAction: sortVideos }
             const sortedVideos = await worker(config) as Record<string, { code: string }>
-            const dbPayload = Object.values(sortedVideos)
+            const dbPayload = [...Object.values(sortedVideos).filter(v => !!v)]
             console.log(sortedVideos);
-            
+
             const { data, error } = await db.from('videosX').insert(dbPayload).select()
             if (error) {
                 throw new Error(error.message);
