@@ -93,18 +93,15 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
 
 
 delay = 0
+interface VideoSearchRespose {
+    foundVideos: string[],
+    next: string
+}
+
+interface VideoNode {
+    node: { code: string }
+}
 async function fetchPosts({ username, pageId }: { username: string, pageId?: string }) {
-
-    interface VideoSearchRespose {
-        foundVideos: string[],
-        next: string
-    }
-
-    interface VideoNode {
-        node: { code: string }
-    }
-
-    let videoUrls: Record<string, string>[] = []
 
     const variables: { after?: string, first: number, username: string, __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: boolean } = {
         first: 12,
@@ -147,144 +144,21 @@ async function fetchPosts({ username, pageId }: { username: string, pageId?: str
         }
     }
 
-
     const { posts } = await worker(config) as { posts: VideoSearchRespose }
 
-    console.log(posts);
-    console.log("hi");
-    
-    
-    // if (!posts.foundVideos.length) {
-    //     delay += 5000
-    //     return await new Promise<{ posts: VideoSearchRespose } | VideoSearchRespose>((resolve, reject) => {
-    //         if (delay === 60000) {
-    //             reject("RETRY  LIMIT EXHUASTED")
-    //         }
-    //         setTimeout(async () => {
-    //             const posts = await fetchPosts({ username: username, pageId: pageId })
-    //             resolve(posts)
-    //         }, delay)
-    //     })
-    // }
+    if (!posts.foundVideos.length) {
+        delay += 5000
+        return await new Promise<VideoSearchRespose>((resolve, reject) => {
+            if (delay === 60000) {
+                reject("RETRY  LIMIT EXHUASTED")
+            }
+            setTimeout(async () => {
+                const { posts } = await worker(config) as { posts: VideoSearchRespose }
+                resolve(posts)
+            }, delay)
+        })
+    }
     return posts
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // const send = async (urls: Record<string, string>) => {
-    //     const workerConfig: WorkerConfig = {
-    //         urls: urls,
-    //         resolverAction: async (args: Record<string, string>): Promise<string> => {
-    //             let foundVideos: string = ""
-    //             const workerResponse: VideoSearchRespose = { foundVideos: "", next: "" }
-    //             const response = args.response
-    //             const accountInfo = JSON.parse(response)
-    //             const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
-    //             workerResponse.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
-    //             nodesObjects.map(nodesObject => foundVideos += `${nodesObject.node.shortcode},`)
-    //             workerResponse.foundVideos = foundVideos
-    //             return JSON.stringify(workerResponse)
-    //         }
-    //     }
-
-    //     const workerResponse = await worker(workerConfig)
-
-    //     for (const id in workerResponse) {
-    //         try {
-    //             const data: VideoSearchRespose = JSON.parse(workerResponse[id])
-    //             videoUrls.push(workerResponse)
-    //             if (data.next.length) {
-    //                 workerUrls[id] = `https://www.instagram.com/graphql/query/?doc_id=7950326061742207&variables={"id":"${id}","after":"${data.next}","first":12}`
-    //             } else {
-    //                 delete workerUrls[id]
-    //             }
-    //         } catch (error) {
-    //             console.log(error);
-    //             console.log(workerResponse[id]);
-
-    //             throw error
-
-    //         }
-
-    //     }
-
-
-    //     if (!Object.keys(workerUrls).length) {
-    //         return
-    //     }
-
-
-
-    //     await send(workerUrls)
-    // }
-
-    // const workerUrls: Record<string, string> = {}
-
-    // for (let i = 0; i < accountIds.length; i++) {
-    //     workerUrls[accountIds[i]] =
-    //         `https://www.instagram.com/graphql/query/?doc_id=7950326061742207&variables={"id":"${accountIds[i]}","after":"","first":12}`
-    // }
-
-    // await send(workerUrls)
-
-
-
-    // for (let i = 0; i < videoUrls.length; i++) {
-    //     const response = videoUrls[i]
-    //     for (const accountId in response) {
-    //         const data: VideoSearchRespose = JSON.parse(response[accountId])
-    //         const foundVideos: string[] = data.foundVideos.split(",").flat()
-    //         foundVideos.pop()
-    //         for (let j = 0; j < foundVideos.length; j++) {
-    //             const username = Object.fromEntries(Object.entries(accounts).map(([key, val]) => [val, key]))[accountId]
-    //             const key = crypto.randomBytes(8).toString("hex")
-    //             workerUrls[key] = `https://www.instagram.com/${username}/reel/${foundVideos[j]}/`
-    //         }
-    //     }
-    // }
-
-    // const workerConfig: WorkerConfig = {
-    //     urls: workerUrls,
-    //     resolverAction: async (args: Record<string, string>): Promise<string> => {
-    //         const resolverResponse: { error: string, data: string } = { error: "", data: "" }
-    //         const maxDuration = 40
-    //         const durationMatch = args.response.match(/(?<=mediaPresentationDuration=\\"PT)[0-9]+/)
-    //         if (!durationMatch || Number(durationMatch[0]) > maxDuration) {
-    //             resolverResponse.error = "too long"
-    //         } else {
-    //             const codeMatch = args.response.match(/(?<=reel\/)[^\/]+/)
-    //             resolverResponse.data = codeMatch ? codeMatch[0] : ""
-    //         }
-    //         return JSON.stringify(resolverResponse)
-    //     }
-    // }
-
-    // const videoFilterWorkerResponse = await worker(workerConfig)
-    // const filteredVieos: string[] = []
-
-    // for (const id in videoFilterWorkerResponse) {
-    //     const response: { data: string, error: string } = JSON.parse(videoFilterWorkerResponse[id])
-
-    //     if (response.data.length > 0) {
-    //         filteredVieos.push(response.data)
-    //     }
-    // }
-
-    // try {
-    //     await savePosts(filteredVieos)
-    // } catch (error) {
-    //     console.log(error);
-    // }
-    // console.log(filteredVieos);
 }
 
 async function savePosts(posts: string[]) {
@@ -310,58 +184,83 @@ async function savePosts(posts: string[]) {
 
 // const accounts: string[] = ["theflashpoint88","unfilteredstate","thinkerzcircle"]
 
+async function sortVideos({ response }: ResolverArgs) {
+    const videoData = response as string
+    const maxDuration = 41
+    const durationMatch = videoData.match(/(?<=mediaPresentationDuration=\\"PT)[0-9]+/)
+
+    if (durationMatch && Number(durationMatch[0]) < maxDuration) {
+        const videoCode = videoData.match(/(?<=reel\/)[^\/]+/)
+        if (videoCode) {
+            return { code: videoCode[0] }
+        }
+    }
+    return null
+}
+
 async function init() {
     const usernames: string[] = ["theflashpoint88"]
     const userIds: string[] = []
     const pageIds: Record<string, string> = {}
     const queryIds: Record<string, string> = {}
-
-    let userIDWorkIndex = 0
-    const runGetUserId = async () => {
-        const username = usernames[userIDWorkIndex]
-        const user = await getIdByUsername(username)
-        userIds.push(user.userId)
-        pageIds[username] = user.pageId
-        userIDWorkIndex++
-
-        if (userIDWorkIndex === usernames.length) {
-            return
-        }
-        await runGetUserId()
-    }
+    const posts: Record<string, VideoSearchRespose> = {}
 
     let fetchPostsWorkIndex = 0
     const runfetchPosts = async () => {
         const username = usernames[fetchPostsWorkIndex]
 
-        await fetchPosts({ username: username })
+        posts[username] = await fetchPosts({ username: username })
 
         fetchPostsWorkIndex++
-        if (fetchPostsWorkIndex === usernames.length) {            
+        if (fetchPostsWorkIndex === usernames.length) {
             return
         }
         await runfetchPosts()
     }
 
-    let getQueryIdWorkIndex = 0
-    const runGetQueryID = async () => {
-        const username = usernames[getQueryIdWorkIndex]
-        queryIds[username] = await getQueryID({ username: username, userId: userIds[getQueryIdWorkIndex] })
+    await runfetchPosts()
 
-        getQueryIdWorkIndex++
-        if (getQueryIdWorkIndex === userIds.length) {
+    let sortVideosWorkIndex = 0
+    const runSortVideo = async () => {
+        const username = usernames[sortVideosWorkIndex]
+        const videos = posts[username].foundVideos
+        const urls: Record<string, string> = {}
+
+        if (videos.length) {
+            videos.map(code => {
+                const id = crypto.randomBytes(8).toString("hex")
+                urls[id] = `https://www.instagram.com/${username}/reel/${code}/`
+            })
+            const config: WorkerConfig = { urls: urls, resolverAction: sortVideos }
+            const sortedVideos = await worker(config) as Record<string, { code: string }>
+            const dbPayload = Object.values(sortedVideos)
+            const { data, error } = await db.from('videosX').insert(dbPayload).select()
+            if (error) {
+                throw new Error(error.message);
+            }
+            console.log(data);
+
+
+        }
+
+        sortVideosWorkIndex++
+        if (sortVideosWorkIndex === usernames.length) {
             return
         }
-        await runGetQueryID()
+        await runSortVideo()
     }
+    await runSortVideo()
 
-    // await runGetUserId()
-    // await runGetQueryID()
-    // console.log(queryIds);
+    let iteratePaginationWorkIndex = 0
+    const iteratePagination = async () => {
+        const username = usernames[iteratePaginationWorkIndex]
+        const page = posts[username].next
 
-    // console.log(pageIds);
 
-    await runfetchPosts()
+
+
+
+    }
 
 }
 init()
