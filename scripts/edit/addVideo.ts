@@ -183,11 +183,14 @@ async function savePosts(posts: string[]) {
 }
 
 // const accounts: string[] = ["theflashpoint88","unfilteredstate","thinkerzcircle"]
-
 async function sortVideos({ response }: ResolverArgs) {
     const videoData = response as string
     const maxDuration = 41
     const durationMatch = videoData.match(/(?<=mediaPresentationDuration=\\"PT)[0-9]+/)
+
+    if (!durationMatch) {
+        return "error"
+    }
 
     if (durationMatch && Number(durationMatch[0]) < maxDuration) {
         const videoCode = videoData.match(/(?<=reel\/)[^\/]+/)
@@ -222,29 +225,59 @@ async function init() {
 
     let sortVideosWorkIndex = 0
     const runSortVideo = async () => {
-        const username = usernames[sortVideosWorkIndex]
-        const videos = posts[username].foundVideos
-        const urls: Record<string, string> = {}
+        let videoUrls: Record<string, string> = {}
+        let validVideos: { code: string }[] = []
 
-        if (videos.length) {
+        const run = async () => {
+            const username = usernames[sortVideosWorkIndex]
+            const videos = posts[username].foundVideos
+
+            if (!videos.length) {
+                return
+            }
+
             videos.map(code => {
                 const id = crypto.randomBytes(8).toString("hex")
-                urls[id] = `https://www.instagram.com/${username}/reel/${code}/`
+                videoUrls[id] = `https://www.instagram.com/${username}/reel/${code}/`
             })
-            const config: WorkerConfig = { urls: urls, resolverAction: sortVideos }
-            const sortedVideos = await worker(config) as Record<string, { code: string }>
-            const dbPayload = [...Object.values(sortedVideos).filter(v => !!v)]
-            console.log(dbPayload);
 
-            const { data, error } = await db.from('videosX').insert(dbPayload).select()
-            if (error) {
-                throw new Error(error.message);
+            const config: WorkerConfig = { urls: videoUrls, resolverAction: sortVideos }
+            const sortedVideos = await worker(config) as Record<string, { code: string } | string | null>
+
+            const sucessfulVideos = [...Object.values(sortedVideos).filter(v => v !== null && v !== 'error')] as { code: string }[]
+            validVideos = validVideos.concat(sucessfulVideos)
+
+            videoUrls = {}
+            for (const key in sortedVideos) {
+                if (sortedVideos[key] !== "error") {
+                    delete videoUrls[key]
+                }
             }
-            console.log(data);
 
-
+            if (Object.keys(videoUrls).length) {
+                delay += 5000
+                return await new Promise<void>((resolve, reject) => {
+                    if (delay === 60000) {
+                        reject("RETRY  LIMIT EXHUASTED")
+                    }
+                    setTimeout(async () => {
+                        await run()
+                        resolve()
+                    }, delay)
+                })
+            }
+            delay = 0
         }
 
+        await run()
+
+        const { data, error } = await db.from('videosX').insert(validVideos).select()
+        if (error) {
+            throw new Error(error.message);
+        }
+        console.log(data);
+
+        validVideos = []
         sortVideosWorkIndex++
         if (sortVideosWorkIndex === usernames.length) {
             return
@@ -252,6 +285,10 @@ async function init() {
         await runSortVideo()
     }
     await runSortVideo()
+
+
+    // console.log(dbPayload);
+
 
     let iteratePaginationWorkIndex = 0
     const iteratePagination = async () => {
@@ -262,7 +299,7 @@ async function init() {
 
 
 
-    }
 
+    }
 }
 init()
