@@ -337,12 +337,9 @@ async function init() {
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
             return
-        }else{
-            console.log('NOOOOOOOOOOOOOOOOOOOOOOO');
-            
         }
-        // const posts = await runfetchPosts()
-        // console.log(posts);
+        const posts = await runfetchPosts()
+        console.log(posts);
 
     }
 
