@@ -336,13 +336,13 @@ async function init() {
 
         await fetchPosts({ username: username })
 
-        fetchPostsWorkIndex++
-        if (fetchPostsWorkIndex === userIds.length) {
-            console.log('DONEEEEEEEEEEEEEEEEEEEEE');
+        // fetchPostsWorkIndex++
+        // if (fetchPostsWorkIndex === userIds.length) {
+        //     console.log('DONEEEEEEEEEEEEEEEEEEEEE');
             
-            return
-        }
-        await runfetchPosts()
+        //     return
+        // }
+        // await runfetchPosts()
     }
 
     let getQueryIdWorkIndex = 0
