@@ -151,6 +151,8 @@ async function fetchPosts({ username, pageId }: { username: string, pageId?: str
     const { posts } = await worker(config) as { posts: VideoSearchRespose }
 
     console.log(posts);
+    console.log("hi");
+    
     
     // if (!posts.foundVideos.length) {
     //     delay += 5000
@@ -338,9 +340,7 @@ async function init() {
         if (fetchPostsWorkIndex === userIds.length) {
             return
         }
-        const posts = await runfetchPosts()
-        console.log(posts);
-
+        await runfetchPosts()
     }
 
     let getQueryIdWorkIndex = 0
