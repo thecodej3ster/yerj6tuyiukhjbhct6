@@ -150,18 +150,20 @@ async function fetchPosts({ username, pageId }: { username: string, pageId?: str
 
     const { posts } = await worker(config) as { posts: VideoSearchRespose }
 
-    if (!posts.foundVideos.length) {
-        delay += 5000
-        return await new Promise<{ posts: VideoSearchRespose } | VideoSearchRespose>((resolve, reject) => {
-            if (delay === 60000) {
-                reject("RETRY  LIMIT EXHUASTED")
-            }
-            setTimeout(async () => {
-                const posts = await fetchPosts({ username: username, pageId: pageId })
-                resolve(posts)
-            }, delay)
-        })
-    }
+    console.log(posts);
+    
+    // if (!posts.foundVideos.length) {
+    //     delay += 5000
+    //     return await new Promise<{ posts: VideoSearchRespose } | VideoSearchRespose>((resolve, reject) => {
+    //         if (delay === 60000) {
+    //             reject("RETRY  LIMIT EXHUASTED")
+    //         }
+    //         setTimeout(async () => {
+    //             const posts = await fetchPosts({ username: username, pageId: pageId })
+    //             resolve(posts)
+    //         }, delay)
+    //     })
+    // }
     return posts
 
 
