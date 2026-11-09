@@ -92,8 +92,8 @@ async function getQueryID({ userId, username }: { userId: string, username: stri
 }
 
 
-
-async function fetchPosts({ username, pageId }: { queryId: string, username: string, pageId: string }) {
+delay = 0
+async function fetchPosts({ username, pageId }: { username: string, pageId?: string }) {
 
     interface VideoSearchRespose {
         foundVideos: string[],
@@ -101,12 +101,10 @@ async function fetchPosts({ username, pageId }: { queryId: string, username: str
     }
 
     interface VideoNode {
-        node: { shortcode: string }
+        node: { code: string }
     }
 
-    let delay = 0
     let videoUrls: Record<string, string>[] = []
-    const url = "https://www.instagram.com/api/graphql"
 
     const variables: { after?: string, first: number, username: string, __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: boolean } = {
         first: 12,
@@ -120,7 +118,7 @@ async function fetchPosts({ username, pageId }: { queryId: string, username: str
 
 
     const config: WorkerConfig = {
-        urls: { posts: url },
+        urls: { posts: "https://www.instagram.com/api/graphql" },
         requestConfig: {
             headers: {
                 "origin": 'https://www.instagram.com',
@@ -129,39 +127,42 @@ async function fetchPosts({ username, pageId }: { queryId: string, username: str
                 "Referer": `https://www.instagram.com/${username}`
             },
             body: `lsd=${lsd}&variables=${encodeURIComponent(JSON.stringify(variables))}&doc_id=29483846714553007`,
-            // body: `lsd=${lsd}&variables=%7B%22after%22%3A%22${pageId}%22%2C%22first%22%3A12%2C%22id%22%3A%22${queryId}%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689`,
             responseType: "json",
             method: "POST"
 
         },
         resolverAction: async ({ response }: ResolverArgs) => {
             const result: VideoSearchRespose = { foundVideos: [], next: "" }
-            // const accountInfo = JSON.parse(response)
-            console.log(response);
+            const accountInfo = response as { data?: { xig_user_by_username?: { polaris_ordered_timeline_connection?: { edges?: VideoNode[], page_info?: { end_cursor?: string } } } } }
+            const nodesObjects: VideoNode[] | undefined = accountInfo?.data?.xig_user_by_username?.polaris_ordered_timeline_connection?.edges
 
-            // const nodesObjects: VideoNode[] = accountInfo.data.user.edge_owner_to_timeline_media.edges
-            // result.next = accountInfo.data.user.edge_owner_to_timeline_media.page_info.end_cursor
-            // nodesObjects.map(nodesObject => result.foundVideos.push(nodesObject.node.shortcode))
-            // return result
+            if (nodesObjects) {
+                const next = accountInfo?.data?.xig_user_by_username?.polaris_ordered_timeline_connection?.page_info?.end_cursor
+                if (next) {
+                    result.next = next
+                }
+                nodesObjects.map(nodesObject => result.foundVideos.push(nodesObject.node.code))
+            }
+            return result
         }
     }
 
 
-    const { posts } = await worker(config)
+    const { posts } = await worker(config) as { posts: VideoSearchRespose }
 
-    // if (!queryId) {
-    //     delay += 5000
-    //     return await new Promise<string>((resolve, reject) => {
-    //         if (delay === 60000) {
-    //             reject("RETRY  LIMIT EXHUASTED")
-    //         }
-    //         setTimeout(async () => {
-    //             const queryId = await getQueryID({ userId: userId, username: username })
-    //             resolve(queryId)
-    //         }, delay)
-    //     })
-    // }
-    console.log(posts);
+    if (!posts.foundVideos.length) {
+        delay += 5000
+        return await new Promise<{ posts: VideoSearchRespose } | VideoSearchRespose>((resolve, reject) => {
+            if (delay === 60000) {
+                reject("RETRY  LIMIT EXHUASTED")
+            }
+            setTimeout(async () => {
+                const posts = await fetchPosts({ username: username, pageId: pageId })
+                resolve(posts)
+            }, delay)
+        })
+    }
+    return posts
 
 
 
@@ -329,13 +330,15 @@ async function init() {
     const runfetchPosts = async () => {
         const username = usernames[fetchPostsWorkIndex]
 
-        await fetchPosts({ username: username, queryId: queryIds[fetchPostsWorkIndex], pageId: pageIds[username] })
+        await fetchPosts({ username: username })
 
         fetchPostsWorkIndex++
         if (fetchPostsWorkIndex === userIds.length) {
             return
         }
-        await runfetchPosts()
+        const posts = await runfetchPosts()
+        console.log(posts);
+
     }
 
     let getQueryIdWorkIndex = 0
