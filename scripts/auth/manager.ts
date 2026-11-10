@@ -1,11 +1,9 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig } from '../utils/types'
-import { ResolverArgs } from '../utils/types'
 
 
 const headers = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
-    "Cookies": 'buffer_access_token=A--2q9etQSD-kYOpdvFeaPln_lr6ytI3IcG3wlM9W61',
     "Content-Type": 'application/json',
     "Origin": 'https://publish.buffer.com',
     "Referer": 'https://publish.buffer.com/',
@@ -16,6 +14,8 @@ const headers = {
 }
 
 const keys = process.env.Creds!
+const tokens = JSON.parse(keys)
+const auths = JSON.parse(process.env.Auth!)
 
 async function generate() {
     const config: WorkerConfig = {
@@ -31,8 +31,7 @@ async function generate() {
     }
 }
 
-function revoke() {
-    const tokens = JSON.parse(keys)
+async function revoke() {
     const usernames = Object.keys(tokens)
 
     const config: WorkerConfig = {
@@ -45,12 +44,25 @@ function revoke() {
             responseType: "json",
         }
     }
+
+
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i];
         if (config.requestConfig) {
             config.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
+            if (config.requestConfig.headers) {
+                config.requestConfig.headers["Cookies"] = auths["manager"][username]
+            }
         }
 
+        const { authRevoke } = await worker(config)
+        console.log(authRevoke)
     }
 
 }
+
+async function auth() {
+    await revoke()
+}
+
+export default auth
