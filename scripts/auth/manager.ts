@@ -32,7 +32,7 @@ async function getAuthPermission() {
         },
         resolverAction: getAuthToken
     }
-    
+
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i];
         if (username !== "verdictmedia_1_instagram") {
@@ -42,6 +42,8 @@ async function getAuthPermission() {
         if (config.requestConfig) {
             if (config.requestConfig.headers) {
                 config.requestConfig.headers["Cookie"] = auths["manager"][username]
+                console.log(config);
+                
                 const { authToken } = await worker(config)
             }
         }
