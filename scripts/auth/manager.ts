@@ -28,7 +28,8 @@ async function getAuthPermission() {
             authToken: 'https://callbacks.buffer.com/auth/oidc/authorize'
         },
         requestConfig: {
-            headers: {}
+            headers: {},
+            maxRedirects:0
         },
         resolverAction: getAuthToken
     }
