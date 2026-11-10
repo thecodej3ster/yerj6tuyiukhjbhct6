@@ -29,7 +29,8 @@ async function getAuthPermission() {
         },
         requestConfig: {
             headers: {},
-            maxRedirects:0
+            maxRedirects: 0,
+            validateStatus: (status) => ((status >= 200 && status < 300) || (status >= 300 && status < 400))
         },
         resolverAction: getAuthToken
     }
@@ -44,7 +45,7 @@ async function getAuthPermission() {
             if (config.requestConfig.headers) {
                 config.requestConfig.headers["Cookie"] = auths["manager"][username]
                 console.log(config);
-                
+
                 const { authToken } = await worker(config)
             }
         }
