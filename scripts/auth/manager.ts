@@ -59,6 +59,8 @@ async function revoke() {
         }
 
         const { authRevoke } = await worker(config)
+        console.log(config);
+        
         console.log(authRevoke)
     }
 
