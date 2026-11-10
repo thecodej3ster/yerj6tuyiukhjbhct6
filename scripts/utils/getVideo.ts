@@ -65,12 +65,14 @@ export async function getVideo(
         } else {
             const { data, error } = await db
                 .from(table)
-                .select('*')
+                .select("*")
+                .order("updated_at", { ascending: true })
                 .limit(1)
                 .single<Video>()
             video = data
             videoSelectError = error
         }
+        
         if (videoSelectError || !video || !video.code) {
             console.error('Error selecting video:', videoSelectError)
             return null
@@ -80,7 +82,7 @@ export async function getVideo(
         const { error } = await db.from("videos")
             .update({ updated_at: new Date().toISOString() })
             .eq("code", video.code)
-            
+
         if (error) {
             throw new Error(error.message);
         }

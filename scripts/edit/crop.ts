@@ -173,13 +173,12 @@ export async function processCropPipeline() {
     try {
 
       const extractVideoRatio = async (ffmpegPath: string) => {
-        const clip = await getVideo({ table: 'videos', isRandom: true })
+        const clip = await getVideo({ table: 'videos', isRandom: false })
 
         tempVideoPath = path.resolve(tempDir, `temp_input_${Date.now()}.mp4`)
         if (!clip || !clip.url) {
           console.log(clip)
           throw new Error("Video Url Not Found");
-
         }
 
         await downloadVideo(clip.url, tempVideoPath)
