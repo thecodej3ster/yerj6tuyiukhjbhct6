@@ -48,6 +48,9 @@ async function revoke() {
 
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i];
+        if (username !== "verdictmedia_1_instagram") {
+            continue
+        }
         if (config.requestConfig) {
             config.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
             if (config.requestConfig.headers) {
@@ -56,7 +59,7 @@ async function revoke() {
         }
 
         const { authRevoke } = await worker(config)
-        console.log(authRevoke)
+        console.log((authRevoke))
     }
 
 }

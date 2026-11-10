@@ -3138,23 +3138,23 @@ const g = [
 
 
 
-// console.log(JSON.stringify({
-//   _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
-//   opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-//   'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-//   verdictmedia_1_instagram: 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
-//   'pulsepointmedia.1_youtube': 'gTTYLbJhdB-jxklP0PsBvX4gpbhdlfhECCSqCIvPmhC',
-//   Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
-//   'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
-// }))
+console.log(JSON.stringify({
+  _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
+  opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+  'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+  verdictmedia_1_instagram: 'PPmu7xpw8p3cHJo2GZ3vPzb_7exarayPIl_gDHGrRQr',
+  'pulsepointmedia.1_youtube': 'PPmu7xpw8p3cHJo2GZ3vPzb_7exarayPIl_gDHGrRQr',
+  Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
+  'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
+}))
 
 // 'thecharliekirk.daily_instagram': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
 // thedebatebrief_instagram: 'uXHLmgmzBpDXFC_7hcf3pkyvgVTRyJSNAqq9uydsRwl',
 // thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
 
 
-console.log(JSON.stringify({
-  manager: {
-    verdictmedia_1_instagram: 'buffer_access_token=A--2q9etQSD-kYOpdvFeaPln_lr6ytI3IcG3wlM9W61',
-  }
-}));
+// console.log(JSON.stringify({
+//   manager: {
+//     verdictmedia_1_instagram: 'buffer_access_token=A--2q9etQSD-kYOpdvFeaPln_lr6ytI3IcG3wlM9W61',
+//   }
+// }))
