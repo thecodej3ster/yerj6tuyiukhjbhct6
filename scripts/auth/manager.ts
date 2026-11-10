@@ -1,8 +1,8 @@
 import { worker } from '../utils/worker'
-import { WorkerConfig } from '../utils/types'
+import { WorkerConfig, ResolverArgs } from '../utils/types'
 
 
-const headers = {
+const commonHeaders = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
     "Content-Type": 'application/json',
     "Origin": 'https://publish.buffer.com',
@@ -16,6 +16,36 @@ const headers = {
 const keys = process.env.Creds!
 const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
+const usernames = Object.keys(tokens)
+
+async function getAuthPermission() {
+    const getAuthToken = async ({ headers }: ResolverArgs) => {
+        console.log(headers);
+    }
+
+    const config: WorkerConfig = {
+        urls: {
+            authToken: 'https://callbacks.buffer.com/auth/oidc/authorize'
+        },
+        requestConfig: {
+            headers: {}
+        },
+        resolverAction: getAuthToken
+    }
+    for (let i = 0; i < usernames.length; i++) {
+        const username = usernames[i];
+        if (username !== "verdictmedia_1_instagram") {
+            continue
+        }
+
+        if (config.requestConfig) {
+            if (config.requestConfig.headers) {
+                config.requestConfig.headers["Cookie"] = auths["manager"][username]
+            }
+        }
+    }
+
+}
 
 async function generate() {
     const config: WorkerConfig = {
@@ -23,7 +53,7 @@ async function generate() {
             authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
         },
         requestConfig: {
-            headers: headers,
+            headers: commonHeaders,
             method: "POST",
             responseType: "json",
             body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
@@ -32,14 +62,13 @@ async function generate() {
 }
 
 async function revoke() {
-    const usernames = Object.keys(tokens)
 
     const config: WorkerConfig = {
         urls: {
             authRevoke: 'https://graph.buffer.com/?_o=revokePersonalAccessToken',
         },
         requestConfig: {
-            headers: headers,
+            headers: commonHeaders,
             method: "POST",
             responseType: "json",
         }
@@ -60,14 +89,15 @@ async function revoke() {
 
         const { authRevoke } = await worker(config)
         console.log(config);
-        
+
         console.log(authRevoke)
     }
 
 }
 
 async function auth() {
-    await revoke()
+    // await revoke()
+    await getAuthPermission()
 }
 
 export default auth

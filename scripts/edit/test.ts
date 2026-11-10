@@ -3153,8 +3153,8 @@ console.log(JSON.stringify({
 // thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
 
 
-// console.log(JSON.stringify({
-//   manager: {
-//     verdictmedia_1_instagram: 'buffer_access_token=A--2q9etQSD-kYOpdvFeaPln_lr6ytI3IcG3wlM9W61',
-//   }
-// }))
+console.log(JSON.stringify({
+  manager: {
+    verdictmedia_1_instagram: '_oidc_session=eFaKo-5RIVNJ1yPllGG6O3NUu0hA_0DnCXxFLCY9Zza',
+  }
+}))
