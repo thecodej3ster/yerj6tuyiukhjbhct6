@@ -1,6 +1,5 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig } from '../utils/types'
-import { ResolverArgs } from '../utils/types'
 
 const p = {
     manager: {
@@ -50,6 +49,8 @@ async function revoke() {
             responseType: "json",
         }
     }
+
+
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i];
         if (config.requestConfig) {
@@ -59,6 +60,7 @@ async function revoke() {
             }
         }
 
+<<<<<<< HEAD
 
 
 
@@ -67,6 +69,16 @@ async function revoke() {
         console.log(authRevoke);
 
 
+=======
+        const { authRevoke } = await worker(config)
+        console.log(authRevoke)
+>>>>>>> dev
     }
 
 }
+
+async function auth() {
+    await revoke()
+}
+
+export default auth

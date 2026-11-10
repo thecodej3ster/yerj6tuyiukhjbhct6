@@ -3152,42 +3152,9 @@ const g = [
 // thedebatebrief_instagram: 'uXHLmgmzBpDXFC_7hcf3pkyvgVTRyJSNAqq9uydsRwl',
 // thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
 
-const variables = {
-  after: "AQHTwYPugPok2NKH4hwJT-QGN6c-SWwORdDCRd6gePHVbAai4a2dEP7NK6-ZzmgBZvJUTWlBhdRHBCi-sl-NLdrAiw",
-  first: 12,
-  id: "17841413815264286",
-  __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: false
-}
 
-fetch("https://www.instagram.com/api/graphql",
-  {
-    "headers": {
-      "accept": "*/*",
-      "accept-language": "en-US,en;q=0.8",
-      "cache-control": "no-cache",
-      "content-type": "application/x-www-form-urlencoded",
-      "pragma": "no-cache",
-      "priority": "u=1, i",
-      "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
-      "sec-ch-ua-full-version-list": "\"Brave\";v=\"143.0.0.0\", \"Chromium\";v=\"143.0.0.0\", \"Not A(Brand\";v=\"24.0.0.0\"",
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-model": "\"\"",
-      "sec-ch-ua-platform": "\"Linux\"",
-      "sec-ch-ua-platform-version": "\"6.14.0\"",
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-origin",
-      "sec-gpc": "1",
-      "x-fb-lsd": "AdRXMrl7XuP_BlBb1T",
-      "Referer": "https://www.instagram.com/theflashpoint88"
-    },
-    "body": `lsd=AdRXMrl7XuP_BlBb1T&variables=${JSON.stringify(variables)}&doc_id=28904005159232689`,
-    // 'lsd=AdRXMrl7XuP_BlBb1TYbntj7-Uc&variables=%7B%22after%22%3A%22AQHT5K2M9u79cg-vKWpI2onBukkAn7984X3Q9sDC9KzoDl4hbDUr4uIPRYuBe3Xdt2WXkhwQ7EjjOq-3wUnL1Opygg%22%2C%22first%22%3A12%2C%22id%22%3A%2217841413815264286%22%2C%22__relay_internal__pv__PolarisSEOIsCrawlerrelayprovider%22%3Afalse%7D&doc_id=28904005159232689',
-    "method": "POST"
-  }).then(o => {
-    o.text()
-      .then(p => {
-        console.log(p);
-      })
-
-  })
+console.log(JSON.stringify({
+  manager: {
+    verdictmedia_1_instagram: 'buffer_access_token=A--2q9etQSD-kYOpdvFeaPln_lr6ytI3IcG3wlM9W61',
+  }
+}));
