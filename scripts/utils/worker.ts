@@ -38,12 +38,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             url: url,
             data: requestConfig?.body || null,
             // timeout: 60000,
-            method: requestConfig?.method?.toUpperCase() || "GET",
-            responseEncoding: requestConfig?.responseEncoding || "UTF-8",
-            responseType: requestConfig?.responseType || "text",
+            method: "GET",
+            responseEncoding: "UTF-8",
+            responseType: "text",
             transformResponse: ([] as AxiosResponseTransformer[])
                 .concat(axios.defaults.transformResponse || [])
                 .concat([handleResolver]).filter(Boolean),
+            ...requestConfig,
             headers: {
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
