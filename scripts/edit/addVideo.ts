@@ -6,93 +6,8 @@ import { createClient } from "@supabase/supabase-js"
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const lsd = crypto.randomBytes(8).toString("hex")
-
-
 let delay = 0
 
-async function getIdByUsername(username: string) {
-
-
-    const workerConfig: WorkerConfig = {
-        urls: { user: `https://www.instagram.com/${username}` },
-        resolverAction: async ({ response }: ResolverArgs) => {
-            const accountData = response as string
-            let userId = ""
-            let pageId = ""
-            const foundUserId = accountData.match(/(?<=props\":{\"id\":\")\d+/)
-            const foundPageId = accountData.match(/(?<={\"end_cursor\":\")[^"]+/m)
-
-            if (foundUserId) {
-                userId = foundUserId[0]
-            }
-
-            if (foundPageId) {
-                pageId = foundPageId[0]
-            }
-            return { userId: userId, pageId: pageId }
-        }
-    }
-
-
-    const user = await worker(workerConfig) as { userId: string, pageId: string }
-    if (!user.userId || !user.pageId) {
-        delay += 5000
-
-        // return await new Promise<{ userId: string, pageId: string }>((resolve, reject) => {
-        //     if (delay === 60000) {
-        // console.log('COULD NOT GET USERINFO')
-        //         reject("RETRY  LIMIT EXHUASTED")
-        //     }
-        //     setTimeout(async () => {
-        //         const user = await getIdByUsername(username)
-        //         resolve(user)
-        //     }, delay)
-        // })
-    }
-    return user
-}
-
-delay = 0
-async function getQueryID({ userId, username }: { userId: string, username: string }) {
-    const config: WorkerConfig = {
-        urls: { queryId: 'https://www.instagram.com/api/graphql' },
-        requestConfig: {
-            headers: {
-                "origin": 'https://www.instagram.com',
-                "content-type": "application/x-www-form-urlencoded",
-                "x-fb-lsd": lsd,
-                "Referer": `https://www.instagram.com/${username}`
-            },
-            body: `lsd=${lsd}&variables=${encodeURIComponent(JSON.stringify({ id: userId }))}&doc_id=27840486182295820`,
-            responseType: "json",
-            method: "POST"
-        },
-        resolverAction: async ({ response }: ResolverArgs) => {
-            const queryInfo = response as { data?: { xig_user_by_igid_v2?: { id?: string } } }
-            return queryInfo?.data?.xig_user_by_igid_v2?.id
-        }
-    }
-
-    const { queryId } = await worker(config)
-
-    if (!queryId) {
-        delay += 5000
-        return await new Promise<string>((resolve, reject) => {
-            if (delay === 60000) {
-                console.log('COULD NOT GET QUERYID');
-                reject("RETRY  LIMIT EXHUASTED")
-            }
-            setTimeout(async () => {
-                const queryId = await getQueryID({ userId: userId, username: username })
-                resolve(queryId)
-            }, delay)
-        })
-    }
-    return queryId
-}
-
-
-delay = 0
 interface VideoSearchRespose {
     foundVideos: string[],
     next: string
@@ -101,6 +16,7 @@ interface VideoSearchRespose {
 interface VideoNode {
     node: { code: string }
 }
+
 async function fetchPosts({ username, pageId }: { username: string, pageId?: string }) {
 
     const variables: { after?: string, first: number, username: string, __relay_internal__pv__PolarisSEOIsCrawlerrelayprovider: boolean } = {
@@ -161,27 +77,6 @@ async function fetchPosts({ username, pageId }: { username: string, pageId?: str
     return posts
 }
 
-async function savePosts(posts: string[]) {
-    const dbPayload: Record<string, string>[] = []
-
-    for (let i = 0; i < posts.length; i++) {
-        console.log(`https://www.instagram.com/reel/${posts[i]}`)
-
-        const field: Record<string, string> = { code: posts[i] }
-        dbPayload.push(field)
-    }
-
-    const { data, error } = await db.from("videos").insert(dbPayload).select("*")
-
-    if (error) {
-        console.log(error);
-        throw error
-    }
-
-    console.log(data);
-
-}
-
 // const accounts: string[] = ["theflashpoint88","unfilteredstate","thinkerzcircle"]
 async function sortVideos({ response }: ResolverArgs) {
     const videoData = response as string
@@ -202,10 +97,7 @@ async function sortVideos({ response }: ResolverArgs) {
 }
 
 async function init() {
-    const usernames: string[] = ["theflashpoint88"]
-    const userIds: string[] = []
-    const pageIds: Record<string, string> = {}
-    const queryIds: Record<string, string> = {}
+    const usernames: string[] = ["_unfiltered.talk_"]
     const posts: Record<string, VideoSearchRespose> = {}
 
     let fetchPostsWorkIndex = 0
