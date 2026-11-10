@@ -28,9 +28,9 @@ async function getAuthPermission() {
             authToken: 'https://callbacks.buffer.com/auth/oidc/authorize'
         },
         requestConfig: {
-            headers: {},
-            maxRedirects: 0,
-            validateStatus: (status) => ((status >= 200 && status < 300) || (status >= 300 && status < 400))
+            headers: {}
+            // maxRedirects: 0,
+            // validateStatus: (status) => ((status >= 200 && status < 300) || (status >= 300 && status < 400))
         },
         resolverAction: getAuthToken
     }
