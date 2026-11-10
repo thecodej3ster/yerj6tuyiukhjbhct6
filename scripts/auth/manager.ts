@@ -15,7 +15,7 @@ const headers = {
 
 const keys = process.env.Creds!
 const tokens = JSON.parse(keys)
-const auths = JSON.parse(process.env.Auth!)
+const auths = JSON.parse(process.env.Auths!)
 
 async function generate() {
     const config: WorkerConfig = {
