@@ -165,7 +165,7 @@ async function init() {
 
         console.log(validVideos);
 
-        const { data, error } = await db.from('videosX').insert(validVideos).select()
+        const { data, error } = await db.from('videos').insert(validVideos).select()
         if (error) {
             throw new Error(error.message);
         }
