@@ -59,7 +59,7 @@ async function revoke() {
         }
 
         const { authRevoke } = await worker(config)
-        console.log(JSON.stringify(authRevoke))
+        console.log(authRevoke)
     }
 
 }
