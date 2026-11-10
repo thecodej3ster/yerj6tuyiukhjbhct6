@@ -77,6 +77,13 @@ export async function getVideo(
         }
 
 
+        const { error } = await db.from("videos")
+            .update({ updated_at: new Date().toISOString() })
+            .eq("code", video.code)
+            
+        if (error) {
+            throw new Error(error.message);
+        }
         return video
     }
 
@@ -106,6 +113,6 @@ export async function getVideo(
             console.log(error);
         }
     }
-    
-    return { url: cleanUrl(videoUrl) ,code:selectedVideo.code}
+
+    return { url: cleanUrl(videoUrl), code: selectedVideo.code }
 }

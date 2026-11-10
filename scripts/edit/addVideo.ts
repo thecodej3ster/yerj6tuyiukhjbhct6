@@ -77,7 +77,7 @@ async function fetchPosts({ username, pageId }: { username: string, pageId?: str
     return posts
 }
 
-// const accounts: string[] = ["theflashpoint88","unfilteredstate","thinkerzcircle"]
+
 async function sortVideos({ response }: ResolverArgs) {
     const videoData = response as string
     const maxDuration = 41
@@ -162,8 +162,6 @@ async function init() {
         }
 
         await run()
-
-        console.log(validVideos);
 
         const { data, error } = await db.from('videos').insert(validVideos).select()
         if (error) {
