@@ -54,12 +54,12 @@ async function revoke() {
         if (config.requestConfig) {
             config.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
             if (config.requestConfig.headers) {
-                config.requestConfig.headers["Cookies"] = auths["manager"][username]
+                config.requestConfig.headers["Cookie"] = auths["manager"][username]
             }
         }
 
-        // const { authRevoke } = await worker(config)
-        console.log(config)
+        const { authRevoke } = await worker(config)
+        console.log(authRevoke)
     }
 
 }
