@@ -40,7 +40,7 @@ async function track(lastSubmittedPost: PostRecord) {
 
     const videoUrl = `https://www.youtube.com/watch?v=${postToSubmit}`
 
-    if (/\d\d{5,}(?=\d{5,})/.test(postToSubmit) && postToSubmit !== lastSubmittedPost.post_id) {
+    if (!postToSubmit.toLowerCase().includes("error") && postToSubmit !== lastSubmittedPost.post_id) {
         await submit({ campaignId: process.env.CMP_ID!, url: videoUrl })
     }
 
