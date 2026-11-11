@@ -48,6 +48,7 @@ async function auth() {
 
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         authUrls[username] = authUrl
+        console.log(authUrl);
 
         return//Remove
         getAuthUrlWorkIndex++
@@ -70,7 +71,8 @@ async function auth() {
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
         console.log("AUTH");
-        
+        console.log(authUrls);
+
         const username = "verdictmedia_1_instagram" //usernames[getAuthTokenWorkIndex]
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
@@ -84,7 +86,7 @@ async function auth() {
         }
 
         console.log(getAuthTokenConfig);
-        
+
         return//Remove
         getAuthTokenWorkIndex++
         if (getAuthTokenWorkIndex === usernames.length) {
