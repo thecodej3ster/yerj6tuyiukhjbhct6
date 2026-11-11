@@ -17,40 +17,80 @@ const keys = process.env.Creds!
 const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
 const usernames = Object.keys(tokens)
+const authUrls: Record<string, string> = {}
 
-async function getAuthPermission() {
+async function auth() {
     const getAuthToken = async ({ headers }: ResolverArgs) => {
         console.log(headers);
     }
 
-    const config: WorkerConfig = {
+    const getAuthUrl = async ({ headers }: ResolverArgs) => {
+        return headers["location"]
+    }
+
+    const getAuthUrlConfig: WorkerConfig = {
         urls: {
             authToken: 'https://callbacks.buffer.com/auth/oidc/authorize'
         },
         requestConfig: {
-            headers: {}
-            // maxRedirects: 0,
-            // validateStatus: (status) => ((status >= 200 && status < 300) || (status >= 300 && status < 400))
+            headers: {},
+            maxRedirects: 0,
+            validateStatus: (status) => status < 400 && status > 199
+        },
+        resolverAction: getAuthUrl
+    }
+
+    let getAuthUrlWorkIndex = 0
+    const runGetAuthUrl = async () => {
+        const username = "verdictmedia_1_instagram" //usernames[getAuthUrlWorkIndex]
+
+        if (!getAuthUrlConfig.requestConfig || !getAuthUrlConfig.requestConfig.headers) return
+
+        getAuthUrlConfig.requestConfig.headers["Cookie"] = auths["manager"][username]
+
+        const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
+        authUrls[username] = authUrl
+
+        return//Remove
+        getAuthUrlWorkIndex++
+        if (getAuthUrlWorkIndex === usernames.length) {
+            return
+        }
+        runGetAuthUrl()
+    }
+
+    const getAuthTokenConfig: WorkerConfig = {
+        urls: {},
+        requestConfig: {
+            headers: {},
+            maxRedirects: 0,
+            validateStatus: (status) => status < 400 && status > 199
         },
         resolverAction: getAuthToken
     }
 
-    for (let i = 0; i < usernames.length; i++) {
-        const username = usernames[i];
-        if (username !== "verdictmedia_1_instagram") {
-            continue
-        }
+    let getAuthTokenWorkIndex = 0
+    const runGetAuthToken = async () => {
+        const username = "verdictmedia_1_instagram" //usernames[getAuthTokenWorkIndex]
 
-        if (config.requestConfig) {
-            if (config.requestConfig.headers) {
-                config.requestConfig.headers["Cookie"] = auths["manager"][username]
-                console.log(config);
+        if (!getAuthTokenConfig.requestConfig || !getAuthTokenConfig.requestConfig.headers || !getAuthTokenConfig.urls) return
 
-                const { authToken } = await worker(config)
-            }
+        getAuthTokenConfig.requestConfig.headers.Cookie = auths.manager[username]
+        getAuthTokenConfig.urls.authToken = authUrls[username]
+
+        const { authToken } = await worker(getAuthTokenConfig) as { authToken: string }
+
+        return//Remove
+        getAuthTokenWorkIndex++
+        if (getAuthTokenWorkIndex === usernames.length) {
+            return
         }
+        runGetAuthToken()
     }
 
+
+    await runGetAuthUrl()
+    await runGetAuthToken()
 }
 
 async function generate() {
@@ -98,12 +138,8 @@ async function revoke() {
 
         console.log(authRevoke)
     }
-
 }
 
-async function auth() {
-    // await revoke()
-    await getAuthPermission()
-}
+
 
 export default auth
