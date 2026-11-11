@@ -25,6 +25,9 @@ async function auth() {
     }
 
     const getAuthUrl = async ({ headers }: ResolverArgs) => {
+        console.log(headers);
+        console.log(headers["location"]);
+        
         return headers["location"]
     }
 
@@ -77,7 +80,7 @@ async function auth() {
 
         getAuthTokenConfig.requestConfig.headers.Cookie = auths.manager[username]
         getAuthTokenConfig.urls.authToken = authUrls[username]
-        
+
         if (getAuthTokenConfig.urls.authToken) {
             const { authToken } = await worker(getAuthTokenConfig) as { authToken: string }
 
