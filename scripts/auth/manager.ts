@@ -42,9 +42,9 @@ async function auth() {
     const runGetAuthUrl = async () => {
         const username = "verdictmedia_1_instagram" //usernames[getAuthUrlWorkIndex]
 
-        if (!getAuthUrlConfig.requestConfig || !getAuthUrlConfig.requestConfig.headers) return
+        if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.requestConfig.headers === undefined) return
 
-        getAuthUrlConfig.requestConfig.headers["Cookie"] = auths["manager"][username]
+        getAuthUrlConfig.requestConfig.headers.Cookie = auths.manager[username]
 
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         authUrls[username] = authUrl
@@ -71,7 +71,7 @@ async function auth() {
     const runGetAuthToken = async () => {
         const username = "verdictmedia_1_instagram" //usernames[getAuthTokenWorkIndex]
 
-        if (!getAuthTokenConfig.requestConfig || !getAuthTokenConfig.requestConfig.headers || getAuthTokenConfig.urls === undefined) return
+        if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
         getAuthTokenConfig.requestConfig.headers.Cookie = auths.manager[username]
         getAuthTokenConfig.urls.authToken = authUrls[username]
