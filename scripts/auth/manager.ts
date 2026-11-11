@@ -67,7 +67,7 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getAuthToken
+        resolverAction: getAuthSessionUrl
     }
 
     let getAuthSessionUrlWorkIndex = 0
