@@ -18,13 +18,16 @@ const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
 const usernames = Object.keys(tokens)
 const authUrls: Record<string, string> = {}
+const authSessionUrls: Record<string, string> = {}
 
 async function auth() {
+
+
+    const getAuthUrl = async ({ headers }: ResolverArgs) => headers.location
+    const getAuthSessionUrl = async ({ headers }: ResolverArgs) => headers.location
     const getAuthToken = async ({ headers }: ResolverArgs) => {
         console.log(headers);
     }
-
-    const getAuthUrl = async ({ headers }: ResolverArgs) => headers.location
 
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
@@ -57,6 +60,39 @@ async function auth() {
         runGetAuthUrl()
     }
 
+    const getAuthSessionUrlConfig: WorkerConfig = {
+        urls: {},
+        requestConfig: {
+            headers: {},
+            maxRedirects: 0,
+            validateStatus: (status) => status < 400 && status > 199
+        },
+        resolverAction: getAuthToken
+    }
+
+    let getAuthSessionUrlWorkIndex = 0
+    const runGetAuthSessionUrl = async () => {
+        const username = "verdictmedia_1_instagram" //usernames[getAuthSessionUrlWorkIndex]
+
+        if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
+
+        getAuthSessionUrlConfig.requestConfig.headers.Cookie = auths.manager[username]
+        getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
+
+        if (getAuthSessionUrlConfig.urls.AuthSessionUrl) {
+            const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
+
+        }
+
+        return//Remove
+        getAuthSessionUrlWorkIndex++
+        if (getAuthSessionUrlWorkIndex === usernames.length) {
+            return
+        }
+        runGetAuthSessionUrl()
+    }
+
+
     const getAuthTokenConfig: WorkerConfig = {
         urls: {},
         requestConfig: {
@@ -74,7 +110,7 @@ async function auth() {
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
         getAuthTokenConfig.requestConfig.headers.Cookie = auths.manager[username]
-        getAuthTokenConfig.urls.authToken = authUrls[username]
+        getAuthTokenConfig.urls.authToken = authSessionUrls[username]
 
         if (getAuthTokenConfig.urls.authToken) {
             const { authToken } = await worker(getAuthTokenConfig) as { authToken: string }
