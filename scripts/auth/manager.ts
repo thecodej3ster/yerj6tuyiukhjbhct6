@@ -127,6 +127,7 @@ async function auth() {
 
 
     await runGetAuthUrl()
+    await runGetAuthSessionUrl()
     await runGetAuthToken()
 }
 
