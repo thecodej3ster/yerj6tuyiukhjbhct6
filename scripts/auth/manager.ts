@@ -24,7 +24,7 @@ async function auth() {
         console.log(headers);
     }
 
-    const getAuthUrl = async ({ headers }: ResolverArgs) => headers.location
+    const getAuthUrl = async ({ headers }: ResolverArgs) => headers["location"]
 
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
