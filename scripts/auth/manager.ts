@@ -79,9 +79,9 @@ async function auth() {
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = auths.manager[username]
         getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
 
-        if (getAuthSessionUrlConfig.urls.AuthSessionUrl) {
+        if (getAuthSessionUrlConfig.urls.authSessionUrl) {
             const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
-
+            authSessionUrls[username] = authSessionUrl
         }
 
         return//Remove
