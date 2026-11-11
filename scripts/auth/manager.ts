@@ -24,15 +24,11 @@ async function auth() {
         console.log(headers);
     }
 
-    const getAuthUrl = async ({ headers }: ResolverArgs) => {
-        console.log(Object.keys(headers));
-        const authUrl = headers['location']
-        return authUrl
-    }
+    const getAuthUrl = async ({ headers }: ResolverArgs) => headers.location
 
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
-            authToken: 'https://callbacks.buffer.com/auth/oidc/authorize'
+            authUrl: 'https://callbacks.buffer.com/auth/oidc/authorize'
         },
         requestConfig: {
             headers: {},
@@ -52,7 +48,6 @@ async function auth() {
 
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         authUrls[username] = authUrl
-        console.log(authUrl);
 
         return//Remove
         getAuthUrlWorkIndex++
@@ -74,9 +69,6 @@ async function auth() {
 
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
-        console.log("AUTH");
-        console.log(authUrls);
-
         const username = "verdictmedia_1_instagram" //usernames[getAuthTokenWorkIndex]
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
@@ -88,8 +80,6 @@ async function auth() {
             const { authToken } = await worker(getAuthTokenConfig) as { authToken: string }
 
         }
-
-        console.log(getAuthTokenConfig);
 
         return//Remove
         getAuthTokenWorkIndex++

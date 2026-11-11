@@ -41,6 +41,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             method: "GET",
             responseEncoding: "UTF-8",
             responseType: "text",
+            transformResponse: ([] as AxiosResponseTransformer[])
+                .concat(axios.defaults.transformResponse || [])
+                .concat([handleResolver]).filter(Boolean),
             ...requestConfig,
             headers: {
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -56,10 +59,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 "TE": "trailers",
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
                 ...incomingHeaders,
-            } as Record<string, string>,
-            transformResponse: ([] as AxiosResponseTransformer[])
-                .concat(axios.defaults.transformResponse || [])
-                .concat([handleResolver]).filter(Boolean)
+            } as Record<string, string>
         };
 
         if (!direct) {
