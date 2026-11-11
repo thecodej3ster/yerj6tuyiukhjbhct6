@@ -25,7 +25,7 @@ async function auth() {
     }
 
     const getAuthUrl = async ({ headers }: ResolverArgs) => {
-        console.log(headers);
+        console.log(Object.keys(headers));
         
         return headers["location"]
     }
