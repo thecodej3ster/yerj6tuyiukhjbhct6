@@ -24,12 +24,7 @@ async function auth() {
         console.log(headers);
     }
 
-    const getAuthUrl = async ({ headers }: ResolverArgs) => {
-        console.log(headers);
-        console.log(headers["location"]);
-        
-        return headers["location"]
-    }
+    const getAuthUrl = async ({ headers }: ResolverArgs) => headers.location
 
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
@@ -76,7 +71,7 @@ async function auth() {
     const runGetAuthToken = async () => {
         const username = "verdictmedia_1_instagram" //usernames[getAuthTokenWorkIndex]
 
-        if (!getAuthTokenConfig.requestConfig || !getAuthTokenConfig.requestConfig.headers || !getAuthTokenConfig.urls) return
+        if (!getAuthTokenConfig.requestConfig || !getAuthTokenConfig.requestConfig.headers || getAuthTokenConfig.urls === undefined) return
 
         getAuthTokenConfig.requestConfig.headers.Cookie = auths.manager[username]
         getAuthTokenConfig.urls.authToken = authUrls[username]
