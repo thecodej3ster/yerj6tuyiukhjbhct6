@@ -247,8 +247,8 @@ async function auth() {
     await runGetAuthSessionUrl()
     await runGetAuthToken()
 
-    await revokeAccesssToken()
-    // await createAccesssToken()
+    // await revokeAccesssToken()
+    await createAccesssToken()
 
 }
 export default auth
