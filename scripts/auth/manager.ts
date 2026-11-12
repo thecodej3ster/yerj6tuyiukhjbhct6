@@ -26,6 +26,10 @@ async function auth() {
 
     const setCookie = (cookies: string[]) => {
         cookies.map(cookie => {
+            const cookieParts =  cookie.split(";")
+            const cookieString = cookieParts[0].replace("=",';').split(";")
+            console.log(cookieString);
+            
             const parsedCokie = cookie.split("=")
             cookieStore[parsedCokie[0]] = parsedCokie[1]
         })
