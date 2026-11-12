@@ -63,7 +63,7 @@ async function auth() {
         let cookie = auths.manager[username] + ";"
 
         for (const cookieName in cookieStore[username]) {
-            cookie += `${cookieName}=${cookieStore[cookieName]};`
+            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
         }
 
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
@@ -104,8 +104,8 @@ async function auth() {
 
         let cookie = auths.manager[username] + ";"
 
-        for (const cookieName in cookieStore) {
-            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        for (const cookieName in cookieStore[username]) {
+            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
         }
 
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
@@ -148,8 +148,8 @@ async function auth() {
 
         let cookie = auths.manager[username] + ";"
 
-        for (const cookieName in cookieStore) {
-            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        for (const cookieName in cookieStore[username]) {
+            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
         }
 
         getAuthTokenConfig.requestConfig.headers.Cookie = cookie
@@ -190,8 +190,8 @@ async function auth() {
 
         let cookie = auths.manager[username] + ";"
 
-        for (const cookieName in cookieStore) {
-            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        for (const cookieName in cookieStore[username]) {
+            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
         }
 
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
@@ -239,8 +239,8 @@ async function auth() {
 
         let cookie = auths.manager[username] + ";"
 
-        for (const cookieName in cookieStore) {
-            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        for (const cookieName in cookieStore[username]) {
+            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
         }
 
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
