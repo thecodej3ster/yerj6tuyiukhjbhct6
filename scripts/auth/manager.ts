@@ -24,15 +24,10 @@ async function auth() {
 
     const cookieStore: Record<string, string> = {}
 
-    const setCookie = (cookies: string[]) => {
-        console.log(cookies);
-        
+    const setCookie = (cookies: string[]) => {        
         cookies.map(cookie => {
             const cookieParts =  cookie.split(";")
-            const cookieString = cookieParts[0].replace("=",';').split(";")
-            console.log(cookieString);
-            
-            const parsedCokie = cookie.split("=")
+            const parsedCokie = cookieParts[0].replace("=",';').split(";")
             cookieStore[parsedCokie[0]] = parsedCokie[1]
         })
     }
@@ -217,8 +212,8 @@ async function auth() {
 
         console.log(cookie);
 
-        // const { authRevoke } = await worker(revokeAuthTokenConfig)
-        // console.log(authRevoke);
+        const { authRevoke } = await worker(revokeAuthTokenConfig)
+        console.log(authRevoke);
 
         return//Remove
         revokeWorkIndex++
