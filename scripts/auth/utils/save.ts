@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest"
 import sodium from "libsodium-wrappers"
 
 async function save({ value, name }: { value: string, name: string }) {
-    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+    const octokit = new Octokit({ auth: process.env.G_Key });
 
     const [owner, repo] = process.env.GITHUB_REPOSITORY!.split('/');
     const environmentName = process.env.Environment!
