@@ -37,8 +37,6 @@ async function auth() {
         if (username) {
             setCookie(username, cookies)
         }
-        console.log(cookies);
-
         return headers.location
     }
 
@@ -256,8 +254,13 @@ async function auth() {
     }
 
     await runGetAuthUrl()
+    console.log(cookieStore);
+
     await runGetAuthSessionUrl()
+    console.log(cookieStore);
     await runGetAuthToken()
+    console.log(cookieStore);
+
 
     // await revokeAccesssToken()
     // await createAccesssToken()
