@@ -3154,15 +3154,15 @@ const g = [
 console.log(JSON.stringify({
   manager:
   {
-    'thecharliekirk.daily_instagram': 'oidcsession=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
-    thedebatebrief_instagram: 'oidcsession=X58PeENAwEEScAPwv3mb6eerkhrAgSk_q_SRjmUQyzq',
-    thecharliekirkdaily_instagram: 'oidcsession=toLCKMftYuIlOI2dJ5KCrBSiPQCNWjV_T-PVQ0Com0N',
-    _pulsepointmedia_instagram: 'oidcsession=HzO33BSEAbjRSWUgOdNzIMVf6Owx9dHnk5ubrrK702Q',
-    opinionspace_1_youtube: 'oidcsession=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
-    'verdictmedia.1_youtube': 'oidcsession=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
-    verdictmedia_1_instagram: 'oidcsession=WMw_5nqJhAFYXslG3EZHj6mu3EyXbrvcJ2-OLcNQDvJ',
-    'pulsepointmedia.1_youtube': 'oidcsession=WMw_5nqJhAFYXslG3EZHj6mu3EyXbrvcJ2-OLcNQDvJ',
-    Civicpulseconner_instagram: 'oidcsession=5gy5tf6zAMM5cPp7SFRI9l928Yt4OygzZHnFCc85gvF',
-    'polispace.1_youtube': 'oidcsession=8rms5pZJPwM8_tzpSTz6AVK0ldQjhXPS2lJcHON5w6e'
+    'thecharliekirk.daily_instagram': '_oidc_session=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
+    thedebatebrief_instagram: '_oidc_session=X58PeENAwEEScAPwv3mb6eerkhrAgSk_q_SRjmUQyzq',
+    thecharliekirkdaily_instagram: '_oidc_session=toLCKMftYuIlOI2dJ5KCrBSiPQCNWjV_T-PVQ0Com0N',
+    _pulsepointmedia_instagram: '_oidc_session=HzO33BSEAbjRSWUgOdNzIMVf6Owx9dHnk5ubrrK702Q',
+    opinionspace_1_youtube: '_oidc_session=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
+    'verdictmedia.1_youtube': '_oidc_session=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
+    verdictmedia_1_instagram: '_oidc_session=WMw_5nqJhAFYXslG3EZHj6mu3EyXbrvcJ2-OLcNQDvJ',
+    'pulsepointmedia.1_youtube': '_oidc_session=WMw_5nqJhAFYXslG3EZHj6mu3EyXbrvcJ2-OLcNQDvJ',
+    Civicpulseconner_instagram: '_oidc_session=5gy5tf6zAMM5cPp7SFRI9l928Yt4OygzZHnFCc85gvF',
+    'polispace.1_youtube': '_oidc_session=8rms5pZJPwM8_tzpSTz6AVK0ldQjhXPS2lJcHON5w6e'
   }
 }))

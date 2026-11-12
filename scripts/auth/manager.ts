@@ -1,7 +1,6 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { save } from './utils/save'
-import { log } from 'util'
 
 const commonHeaders = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
@@ -41,8 +40,6 @@ async function auth() {
         if (username) {
             setCookie(username, cookies)
         }
-        console.log(headers);
-        
         return headers.location
     }
 
@@ -61,7 +58,7 @@ async function auth() {
 
     let getAuthUrlWorkIndex = 0
     const runGetAuthUrl = async () => {
-        const username = 'verdictmedia_1_instagram'// usernames[getAuthUrlWorkIndex]
+        const username = usernames[getAuthUrlWorkIndex]
 
         if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
         let cookie = auths.manager[username] + ";"
@@ -73,14 +70,12 @@ async function auth() {
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthUrlConfig.resolverArgs.username = username
 
-        console.log(getAuthUrlConfig);
-        
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         if (!authUrl.toLowerCase().startsWith("http")) {
             throw new Error("Invalid Url Recived");
         }
         authUrls[username] = authUrl
-return
+
 
         getAuthUrlWorkIndex++
         if (getAuthUrlWorkIndex === usernames.length) {
@@ -102,7 +97,7 @@ return
 
     let getAuthSessionUrlWorkIndex = 0
     const runGetAuthSessionUrl = async () => {
-        const username = 'verdictmedia_1_instagram'// usernames[getAuthSessionUrlWorkIndex]
+        const username = usernames[getAuthSessionUrlWorkIndex]
 
 
         if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
@@ -117,7 +112,6 @@ return
 
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthSessionUrlConfig.resolverArgs.username = username
-console.log(getAuthSessionUrlConfig);
 
         if (getAuthSessionUrlConfig.urls.authSessionUrl) {
             const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
@@ -125,7 +119,7 @@ console.log(getAuthSessionUrlConfig);
             authSessionUrls[username] = authSessionUrl
         }
 
-return
+
         getAuthSessionUrlWorkIndex++
         if (getAuthSessionUrlWorkIndex === usernames.length) {
             return
@@ -147,7 +141,7 @@ return
 
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
-        const username = 'verdictmedia_1_instagram'//usernames[getAuthTokenWorkIndex]
+        const username = usernames[getAuthTokenWorkIndex]
         console.log(authSessionUrls);
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
@@ -162,13 +156,11 @@ return
 
         getAuthTokenConfig.requestConfig.headers.Cookie = cookie
         getAuthTokenConfig.resolverArgs.username = username
-console.log(getAuthTokenConfig);
 
         if (getAuthTokenConfig.urls.authToken) {
             await worker(getAuthTokenConfig) as { authToken: string }
 
         }
-        return
 
 
         getAuthTokenWorkIndex++
