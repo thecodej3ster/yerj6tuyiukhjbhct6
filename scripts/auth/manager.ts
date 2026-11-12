@@ -35,6 +35,8 @@ async function auth() {
     const getCookie = async ({ headers }: ResolverArgs) => {
         const cookies = headers["set-cookie"] as string[]
         setCookie(cookies)
+        console.log(cookies);
+        
         return headers.location
     }
 
@@ -64,9 +66,12 @@ async function auth() {
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
 
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
+        if (!authUrl.toLowerCase().startsWith("http")) {
+            throw new Error("Invalid Url Recived");
+        }
         authUrls[username] = authUrl
 
-        
+
         getAuthUrlWorkIndex++
         if (getAuthUrlWorkIndex === usernames.length) {
             return
@@ -88,6 +93,7 @@ async function auth() {
     const runGetAuthSessionUrl = async () => {
         const username = usernames[getAuthSessionUrlWorkIndex]
 
+
         if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
 
         getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
@@ -105,7 +111,7 @@ async function auth() {
             authSessionUrls[username] = authSessionUrl
         }
 
-        
+
         getAuthSessionUrlWorkIndex++
         if (getAuthSessionUrlWorkIndex === usernames.length) {
             return
@@ -147,7 +153,7 @@ async function auth() {
 
         }
 
-        
+
         getAuthTokenWorkIndex++
         if (getAuthTokenWorkIndex === usernames.length) {
             return
