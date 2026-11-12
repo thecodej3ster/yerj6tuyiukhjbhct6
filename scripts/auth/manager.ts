@@ -24,10 +24,10 @@ async function auth() {
 
     const cookieStore: Record<string, string> = {}
 
-    const setCookie = (cookies: string[]) => {        
+    const setCookie = (cookies: string[]) => {
         cookies.map(cookie => {
-            const cookieParts =  cookie.split(";")
-            const parsedCokie = cookieParts[0].replace("=",';').split(";")
+            const cookieParts = cookie.split(";")
+            const parsedCokie = cookieParts[0].replace("=", ';').split(";")
             cookieStore[parsedCokie[0]] = parsedCokie[1]
         })
     }
@@ -167,19 +167,41 @@ async function auth() {
 
 
 
-
-    async function create() {
-        const config: WorkerConfig = {
-            urls: {
-                authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
-            },
-            requestConfig: {
-                headers: commonHeaders,
-                method: "POST",
-                responseType: "json",
-                body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
-            }
+    const config: WorkerConfig = {
+        urls: {
+            authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
+        },
+        requestConfig: {
+            headers: commonHeaders,
+            method: "POST",
+            responseType: "json",
+            body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
         }
+    }
+
+    let createAccesssTokenWorkIndex = 0
+    async function createAccesssToken() {
+        const username = "verdictmedia_1_instagram" //usernames[createAccesssTokenWorkIndex]
+
+        if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
+
+        let cookie = auths.manager[username] + ";"
+
+        for (const cookieName in cookieStore) {
+            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        }
+
+        revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
+
+        const { authCreate } = await worker(revokeAuthTokenConfig)
+        console.log(authCreate);
+
+        return//Remove
+        createAccesssTokenWorkIndex++
+        if (createAccesssTokenWorkIndex === usernames.length) {
+            return
+        }
+        createAccesssToken()
     }
 
     const revokeAuthTokenConfig: WorkerConfig = {
@@ -195,7 +217,7 @@ async function auth() {
 
 
     let revokeWorkIndex = 0
-    async function revokeAuthToken() {
+    async function revokeAccesssToken() {
         const username = "verdictmedia_1_instagram" //usernames[revokeWorkIndex]
 
         if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
@@ -210,8 +232,6 @@ async function auth() {
 
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-        console.log(cookie);
-
         const { authRevoke } = await worker(revokeAuthTokenConfig)
         console.log(authRevoke);
 
@@ -220,14 +240,15 @@ async function auth() {
         if (revokeWorkIndex === usernames.length) {
             return
         }
-        revokeAuthToken()
+        revokeAccesssToken()
     }
 
     await runGetAuthUrl()
     await runGetAuthSessionUrl()
     await runGetAuthToken()
 
-    await revokeAuthToken()
+    // await revokeAccesssToken()
+    await createAccesssToken()
 
 }
 export default auth
