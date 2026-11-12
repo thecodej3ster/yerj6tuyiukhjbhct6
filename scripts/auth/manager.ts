@@ -28,6 +28,9 @@ async function auth() {
         cookies.map(cookie => {
             const cookieParts = cookie.split(";")
             const parsedCokie = cookieParts[0].replace("=", ';').split(";")
+            if (cookieStore[username] === undefined) {
+                cookieStore[username] = {}
+            }
             cookieStore[username][parsedCokie[0]] = parsedCokie[1]
         })
     }
@@ -66,7 +69,6 @@ async function auth() {
 
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthUrlConfig.resolverArgs.username = username
-        console.log(getAuthUrlConfig);
         
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         if (!authUrl.toLowerCase().startsWith("http")) {
@@ -110,14 +112,12 @@ async function auth() {
 
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthSessionUrlConfig.resolverArgs.username = username
-
-        console.log(getAuthSessionUrlWorkIndex);
         
-        // if (getAuthSessionUrlConfig.urls.authSessionUrl) {
-        //     const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
+        if (getAuthSessionUrlConfig.urls.authSessionUrl) {
+            const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
 
-        //     authSessionUrls[username] = authSessionUrl
-        // }
+            authSessionUrls[username] = authSessionUrl
+        }
 
 
         getAuthSessionUrlWorkIndex++
@@ -258,12 +258,11 @@ async function auth() {
     }
 
     await runGetAuthUrl()
-    // console.log(cookieStore);
-
-    // await runGetAuthSessionUrl()
-    // console.log(cookieStore);
-    // await runGetAuthToken()
-    // console.log(cookieStore);
+    console.log(cookieStore);
+    await runGetAuthSessionUrl()
+    console.log(cookieStore);
+    await runGetAuthToken()
+    console.log(cookieStore);
 
 
     // await revokeAccesssToken()
