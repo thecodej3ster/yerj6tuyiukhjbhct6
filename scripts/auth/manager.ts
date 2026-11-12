@@ -61,7 +61,7 @@ async function auth() {
 
     let getAuthUrlWorkIndex = 0
     const runGetAuthUrl = async () => {
-        const username = usernames[getAuthUrlWorkIndex]
+        const username = 'verdictmedia_1_instagram'// usernames[getAuthUrlWorkIndex]
 
         if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
         let cookie = auths.manager[username] + ";"
@@ -102,7 +102,7 @@ return
 
     let getAuthSessionUrlWorkIndex = 0
     const runGetAuthSessionUrl = async () => {
-        const username = usernames[getAuthSessionUrlWorkIndex]
+        const username = 'verdictmedia_1_instagram'// usernames[getAuthSessionUrlWorkIndex]
 
 
         if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
@@ -147,7 +147,7 @@ return
 
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
-        const username = usernames[getAuthTokenWorkIndex]
+        const username = 'verdictmedia_1_instagram'//usernames[getAuthTokenWorkIndex]
         console.log(authSessionUrls);
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
