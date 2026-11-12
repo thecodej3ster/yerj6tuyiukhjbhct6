@@ -25,6 +25,8 @@ async function auth() {
     const cookieStore: Record<string, string> = {}
 
     const setCookie = (cookies: string[]) => {
+        console.log(cookies);
+        
         cookies.map(cookie => {
             const cookieParts =  cookie.split(";")
             const cookieString = cookieParts[0].replace("=",';').split(";")
