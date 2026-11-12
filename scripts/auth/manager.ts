@@ -185,6 +185,7 @@ async function auth() {
         const { authCreate } = await worker(createAccesssTokenConfig) as {
             authCreate: { data?: { generatePersonalAccessToken?: { accessToken?: string } } }
         }
+        console.log(authCreate);
 
         const accessToken = authCreate?.data?.generatePersonalAccessToken?.accessToken
 
@@ -194,7 +195,6 @@ async function auth() {
 
         tokens[username] = accessToken
         await save({ name: 'CREDS', value:JSON.stringify(tokens)})
-        console.log(authCreate);
 
         return//Remove
         createAccesssTokenWorkIndex++
