@@ -43,6 +43,16 @@ async function auth() {
         return headers.location
     }
 
+    async function hydrateCookieStore() {
+        for (const username in auths.manager) {
+            const [name, value] = auths.manager[username].split('=')
+            cookieStore[username] = {}
+            cookieStore[username][name] = value
+
+
+        }
+    }
+
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
             authUrl: 'https://callbacks.buffer.com/auth/oidc/authorize'
@@ -61,7 +71,8 @@ async function auth() {
         const username = usernames[getAuthUrlWorkIndex]
 
         if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
-        let cookie = auths.manager[username] + ";"
+        let cookie = ""
+
 
         for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[username][cookieName]};`
@@ -104,7 +115,7 @@ async function auth() {
 
         getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
 
-        let cookie = auths.manager[username] + ";"
+        let cookie = ""
 
         for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[username][cookieName]};`
@@ -147,7 +158,7 @@ async function auth() {
 
         getAuthTokenConfig.urls.authToken = authSessionUrls[username]
 
-        let cookie = auths.manager[username] + ";"
+        let cookie = ""
 
         for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[username][cookieName]};`
@@ -190,7 +201,7 @@ async function auth() {
 
         if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
 
-        let cookie = auths.manager[username] + ";"
+        let cookie = ""
 
         for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[username][cookieName]};`
@@ -239,7 +250,7 @@ async function auth() {
 
         revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
 
-        let cookie = auths.manager[username] + ";"
+        let cookie = ""
 
         for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[username][cookieName]};`
@@ -256,6 +267,8 @@ async function auth() {
         }
         revokeAccesssToken()
     }
+
+    hydrateCookieStore()
 
     await runGetAuthUrl()
     console.log(cookieStore);
