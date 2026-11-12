@@ -66,6 +66,8 @@ async function auth() {
 
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthUrlConfig.resolverArgs.username = username
+        console.log(getAuthUrlConfig);
+        
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         if (!authUrl.toLowerCase().startsWith("http")) {
             throw new Error("Invalid Url Recived");
@@ -109,11 +111,13 @@ async function auth() {
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthSessionUrlConfig.resolverArgs.username = username
 
-        if (getAuthSessionUrlConfig.urls.authSessionUrl) {
-            const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
+        console.log(getAuthSessionUrlWorkIndex);
+        
+        // if (getAuthSessionUrlConfig.urls.authSessionUrl) {
+        //     const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
 
-            authSessionUrls[username] = authSessionUrl
-        }
+        //     authSessionUrls[username] = authSessionUrl
+        // }
 
 
         getAuthSessionUrlWorkIndex++
@@ -254,12 +258,12 @@ async function auth() {
     }
 
     await runGetAuthUrl()
-    console.log(cookieStore);
+    // console.log(cookieStore);
 
-    await runGetAuthSessionUrl()
-    console.log(cookieStore);
-    await runGetAuthToken()
-    console.log(cookieStore);
+    // await runGetAuthSessionUrl()
+    // console.log(cookieStore);
+    // await runGetAuthToken()
+    // console.log(cookieStore);
 
 
     // await revokeAccesssToken()
