@@ -183,18 +183,18 @@ async function auth() {
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
         const { authCreate } = await worker(createAccesssTokenConfig) as {
-            authCreate: { data?: { generatePersonalAccessToken?: { personalAccessToken?: string } } }
+            authCreate: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
         }
         console.log(authCreate);
 
-        const accessToken = authCreate?.data?.generatePersonalAccessToken?.personalAccessToken
+        const accessToken = authCreate?.data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
 
         if (!accessToken) {
             throw new Error("UNEXPECTED VALUE PASSED AS ACCESS TOKEN");
         }
 
         tokens[username] = accessToken
-        await save({ name: 'CREDS', value:JSON.stringify(tokens)})
+        await save({ name: 'CREDS', value: JSON.stringify(tokens) })
 
         return//Remove
         createAccesssTokenWorkIndex++
@@ -242,14 +242,14 @@ async function auth() {
         }
         revokeAccesssToken()
     }
-console.log(tokens);
+    console.log(tokens);
 
-    // await runGetAuthUrl()
-    // await runGetAuthSessionUrl()
-    // await runGetAuthToken()
+    await runGetAuthUrl()
+    await runGetAuthSessionUrl()
+    await runGetAuthToken()
 
     // await revokeAccesssToken()
-    // await createAccesssToken()
+    await createAccesssToken()
 
 }
 export default auth
