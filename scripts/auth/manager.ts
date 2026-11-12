@@ -298,7 +298,7 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
                 delay += 5000
-                await step()
+                await processPipeline(steps)
                 resolve()
             }, delay);
         })
