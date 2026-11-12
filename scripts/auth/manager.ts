@@ -40,6 +40,8 @@ async function auth() {
         if (username) {
             setCookie(username, cookies)
         }
+        console.log(headers.location);
+        
         return headers.location
     }
 
