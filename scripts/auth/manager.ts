@@ -142,7 +142,6 @@ async function auth() {
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
         const username = usernames[getAuthTokenWorkIndex]
-        console.log(authSessionUrls);
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
@@ -167,6 +166,7 @@ async function auth() {
         if (getAuthTokenWorkIndex === usernames.length) {
             return
         }
+        console.log(authSessionUrls);
         runGetAuthToken()
     }
 
@@ -288,7 +288,7 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
 
         await processPipeline(steps)
         console.log(cookieStore);
-        
+
     } catch (error) {
         if (delay > 30000) {
             throw new Error("Could Not Complete Pipeline Processign");
