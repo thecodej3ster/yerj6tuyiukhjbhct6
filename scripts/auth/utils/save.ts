@@ -4,8 +4,7 @@ import sodium from "libsodium-wrappers"
 async function save({ value, name }: { value: string, name: string }) {
     const octokit = new Octokit({ auth: process.env.G_Key });
 
-    const owner = process.env.GITHUB_REPOSITORY_OWNER!
-    const repo = process.env.GITHUB_REPOSITORY!
+    const [owner, repo] = process.env.GITHUB_REPOSITORY!.split('/');
 
     const { data: publicKey } = await octokit.actions.getRepoPublicKey({ owner, repo });
 
