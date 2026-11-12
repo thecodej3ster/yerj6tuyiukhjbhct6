@@ -22,21 +22,23 @@ const authSessionUrls: Record<string, string> = {}
 
 async function auth() {
 
-    const cookieStore: Record<string, string> = {}
+    const cookieStore: Record<string, Record<string, string>> = {}
 
-    const setCookie = (cookies: string[]) => {
+    const setCookie = (username: string, cookies: string[]) => {
         cookies.map(cookie => {
             const cookieParts = cookie.split(";")
             const parsedCokie = cookieParts[0].replace("=", ';').split(";")
-            cookieStore[parsedCokie[0]] = parsedCokie[1]
+            cookieStore[username][parsedCokie[0]] = parsedCokie[1]
         })
     }
 
-    const getCookie = async ({ headers }: ResolverArgs) => {
+    const saveCookie = async ({ headers, username }: ResolverArgs & { username?: string }) => {
         const cookies = headers["set-cookie"] as string[]
-        setCookie(cookies)
+        if (username) {
+            setCookie(username, cookies)
+        }
         console.log(cookies);
-        
+
         return headers.location
     }
 
@@ -49,22 +51,23 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getCookie
+        resolverAction: saveCookie,
+        resolverArgs: {}
     }
 
     let getAuthUrlWorkIndex = 0
     const runGetAuthUrl = async () => {
         const username = usernames[getAuthUrlWorkIndex]
 
-        if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.requestConfig.headers === undefined) return
+        if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
         let cookie = auths.manager[username] + ";"
 
-        for (const cookieName in cookieStore) {
+        for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[cookieName]};`
         }
 
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
-
+        getAuthUrlConfig.resolverArgs.username = username
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         if (!authUrl.toLowerCase().startsWith("http")) {
             throw new Error("Invalid Url Recived");
@@ -86,7 +89,8 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getCookie
+        resolverAction: saveCookie,
+        resolverArgs: {}
     }
 
     let getAuthSessionUrlWorkIndex = 0
@@ -94,7 +98,7 @@ async function auth() {
         const username = usernames[getAuthSessionUrlWorkIndex]
 
 
-        if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
+        if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
 
         getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
 
@@ -105,9 +109,11 @@ async function auth() {
         }
 
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
+        getAuthSessionUrlConfig.resolverArgs.username = username
 
         if (getAuthSessionUrlConfig.urls.authSessionUrl) {
             const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
+
             authSessionUrls[username] = authSessionUrl
         }
 
@@ -127,7 +133,8 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getCookie
+        resolverAction: saveCookie,
+        resolverArgs: {}
     }
 
     let getAuthTokenWorkIndex = 0
@@ -135,7 +142,7 @@ async function auth() {
         const username = usernames[getAuthTokenWorkIndex]
         console.log(username.toUpperCase());
 
-        if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
+        if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
         getAuthTokenConfig.urls.authToken = authSessionUrls[username]
 
@@ -146,7 +153,7 @@ async function auth() {
         }
 
         getAuthTokenConfig.requestConfig.headers.Cookie = cookie
-
+        getAuthTokenConfig.resolverArgs.username = username
 
         if (getAuthTokenConfig.urls.authToken) {
             await worker(getAuthTokenConfig) as { authToken: string }
