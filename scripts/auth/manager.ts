@@ -163,32 +163,23 @@ async function auth() {
     }
 
 
-    await runGetAuthUrl()
-    console.log(cookieStore);
 
-    await runGetAuthSessionUrl()
-    console.log(cookieStore);
 
-    await runGetAuthToken()
-}
-
-async function generate() {
-    const config: WorkerConfig = {
-        urls: {
-            authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
-        },
-        requestConfig: {
-            headers: commonHeaders,
-            method: "POST",
-            responseType: "json",
-            body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
+    async function create() {
+        const config: WorkerConfig = {
+            urls: {
+                authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
+            },
+            requestConfig: {
+                headers: commonHeaders,
+                method: "POST",
+                responseType: "json",
+                body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
+            }
         }
     }
-}
-
-async function revoke() {
-
-    const config: WorkerConfig = {
+  
+    const revokeAuthTokenConfig: WorkerConfig = {
         urls: {
             authRevoke: 'https://graph.buffer.com/?_o=revokePersonalAccessToken',
         },
@@ -200,25 +191,41 @@ async function revoke() {
     }
 
 
-    for (let i = 0; i < usernames.length; i++) {
-        const username = usernames[i];
-        if (username !== "verdictmedia_1_instagram") {
-            continue
-        }
-        if (config.requestConfig) {
-            config.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
-            if (config.requestConfig.headers) {
-                config.requestConfig.headers["Cookie"] = auths["manager"][username]
-            }
+    let revokeWorkIndex = 0
+    async function revokeAuthToken() {
+        const username = "verdictmedia_1_instagram" //usernames[revokeWorkIndex]
+
+        if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
+
+        revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
+
+        let cookie = auths.manager[username] + ";"
+
+        for (const cookieName in cookieStore) {
+            cookie += `${cookieName}=${cookieStore[cookieName]};`
         }
 
-        const { authRevoke } = await worker(config)
-        console.log(config);
+        revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-        console.log(authRevoke)
+        const { authRevoke } = await worker(revokeAuthTokenConfig)
+        console.log(authRevoke);
+
+        return//Remove
+        revokeWorkIndex++
+        if (revokeWorkIndex === usernames.length) {
+            return
+        }
+        revokeAuthToken()
     }
+
+        await runGetAuthUrl()
+    console.log(cookieStore);
+
+    await runGetAuthSessionUrl()
+    console.log(cookieStore);
+
+    await runGetAuthToken()
+    await revokeAuthToken()
+
 }
-
-
-
 export default auth
