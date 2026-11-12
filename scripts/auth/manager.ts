@@ -127,6 +127,8 @@ async function auth() {
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
         const username = usernames[getAuthTokenWorkIndex]
+        console.log(username.toUpperCase());
+        
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
@@ -245,8 +247,8 @@ async function auth() {
     await runGetAuthSessionUrl()
     await runGetAuthToken()
 
-    await revokeAccesssToken()
-    await createAccesssToken()
+    // await revokeAccesssToken()
+    // await createAccesssToken()
 
 }
 export default auth
