@@ -52,7 +52,7 @@ async function auth() {
 
     let getAuthUrlWorkIndex = 0
     const runGetAuthUrl = async () => {
-        const username = "verdictmedia_1_instagram" //usernames[getAuthUrlWorkIndex]
+        const username = usernames[getAuthUrlWorkIndex]
 
         if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.requestConfig.headers === undefined) return
         let cookie = auths.manager[username] + ";"
@@ -66,7 +66,7 @@ async function auth() {
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         authUrls[username] = authUrl
 
-        return//Remove
+        
         getAuthUrlWorkIndex++
         if (getAuthUrlWorkIndex === usernames.length) {
             return
@@ -86,7 +86,7 @@ async function auth() {
 
     let getAuthSessionUrlWorkIndex = 0
     const runGetAuthSessionUrl = async () => {
-        const username = "verdictmedia_1_instagram" //usernames[getAuthSessionUrlWorkIndex]
+        const username = usernames[getAuthSessionUrlWorkIndex]
 
         if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
 
@@ -105,7 +105,7 @@ async function auth() {
             authSessionUrls[username] = authSessionUrl
         }
 
-        return//Remove
+        
         getAuthSessionUrlWorkIndex++
         if (getAuthSessionUrlWorkIndex === usernames.length) {
             return
@@ -126,7 +126,7 @@ async function auth() {
 
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
-        const username = "verdictmedia_1_instagram" //usernames[getAuthTokenWorkIndex]
+        const username = usernames[getAuthTokenWorkIndex]
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
@@ -146,7 +146,7 @@ async function auth() {
 
         }
 
-        return//Remove
+        
         getAuthTokenWorkIndex++
         if (getAuthTokenWorkIndex === usernames.length) {
             return
@@ -170,7 +170,7 @@ async function auth() {
 
     let createAccesssTokenWorkIndex = 0
     async function createAccesssToken() {
-        const username = "verdictmedia_1_instagram" //usernames[createAccesssTokenWorkIndex]
+        const username = usernames[createAccesssTokenWorkIndex]
 
         if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
 
@@ -196,7 +196,6 @@ async function auth() {
         tokens[username] = accessToken
         await save({ name: 'CREDS', value: JSON.stringify(tokens) })
 
-        return//Remove
         createAccesssTokenWorkIndex++
         if (createAccesssTokenWorkIndex === usernames.length) {
             return
@@ -218,7 +217,7 @@ async function auth() {
 
     let revokeWorkIndex = 0
     async function revokeAccesssToken() {
-        const username = "verdictmedia_1_instagram" //usernames[revokeWorkIndex]
+        const username = usernames[revokeWorkIndex]
 
         if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
 
@@ -235,21 +234,19 @@ async function auth() {
         const { authRevoke } = await worker(revokeAuthTokenConfig)
         console.log(authRevoke);
 
-        return//Remove
         revokeWorkIndex++
         if (revokeWorkIndex === usernames.length) {
             return
         }
         revokeAccesssToken()
     }
-    console.log(tokens);
 
     await runGetAuthUrl()
     await runGetAuthSessionUrl()
     await runGetAuthToken()
 
     await revokeAccesssToken()
-    // await createAccesssToken()
+    await createAccesssToken()
 
 }
 export default auth

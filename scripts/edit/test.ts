@@ -3138,23 +3138,31 @@ const g = [
 
 
 
-console.log(JSON.stringify({
-  _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
-  opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-  'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-  verdictmedia_1_instagram: 'PPmu7xpw8p3cHJo2GZ3vPzb_7exarayPIl_gDHGrRQr',
-  'pulsepointmedia.1_youtube': 'PPmu7xpw8p3cHJo2GZ3vPzb_7exarayPIl_gDHGrRQr',
-  Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
-  'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
-}))
+// console.log(JSON.stringify({
+//   _pulsepointmedia_instagram: '7ilOLRznoe7StLL7F3lxI_zSn60rLuW1hzjGXv_XPnq',
+//   opinionspace_1_youtube: 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+//   'verdictmedia.1_youtube': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
+//   verdictmedia_1_instagram: 'PPmu7xpw8p3cHJo2GZ3vPzb_7exarayPIl_gDHGrRQr',
+//   'pulsepointmedia.1_youtube': 'PPmu7xpw8p3cHJo2GZ3vPzb_7exarayPIl_gDHGrRQr',
+//   Civicpulseconner_instagram: 'uCcCP3O5TDzxYS7HUWavhxMbdZEABnIN2u8pvCEnjf8',
+//   'polispace.1_youtube': 'g9zYfCSh9FDM4O9hJ1eV4aBEMjk1xQY4tcl2CAib3_S'
+// }))
 
-// 'thecharliekirk.daily_instagram': 'koYfNj5pVOG38uYp5Q6d29DByTLdaSIUNlQSVFiMXwY',
-// thedebatebrief_instagram: 'uXHLmgmzBpDXFC_7hcf3pkyvgVTRyJSNAqq9uydsRwl',
-// thecharliekirkdaily_instagram: 'j-H5QncIYslhYiyhUgzlK0DxaISDXZ4Avfx0fV--Q-_',
+
 
 
 console.log(JSON.stringify({
-  manager: {
-    verdictmedia_1_instagram: '_oidc_session=eFaKo-5RIVNJ1yPllGG6O3NUu0hA_0DnCXxFLCY9Zza',
+  manager:
+  {
+    'thecharliekirk.daily_instagram': 'oidcsession=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
+    thedebatebrief_instagram: 'oidcsession=X58PeENAwEEScAPwv3mb6eerkhrAgSk_q_SRjmUQyzq',
+    thecharliekirkdaily_instagram: 'oidcsession=toLCKMftYuIlOI2dJ5KCrBSiPQCNWjV_T-PVQ0Com0N',
+    _pulsepointmedia_instagram: 'oidcsession=HzO33BSEAbjRSWUgOdNzIMVf6Owx9dHnk5ubrrK702Q',
+    opinionspace_1_youtube: 'oidcsession=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
+    'verdictmedia.1_youtube': 'oidcsession=sCWDNE9rvxakCRvAUx3dqkNyhcrDwQtv0VMyACUlC2Q',
+    verdictmedia_1_instagram: 'oidcsession=WMw_5nqJhAFYXslG3EZHj6mu3EyXbrvcJ2-OLcNQDvJ',
+    'pulsepointmedia.1_youtube': 'oidcsession=WMw_5nqJhAFYXslG3EZHj6mu3EyXbrvcJ2-OLcNQDvJ',
+    Civicpulseconner_instagram: 'oidcsession=5gy5tf6zAMM5cPp7SFRI9l928Yt4OygzZHnFCc85gvF',
+    'polispace.1_youtube': 'oidcsession=8rms5pZJPwM8_tzpSTz6AVK0ldQjhXPS2lJcHON5w6e'
   }
 }))
