@@ -150,7 +150,7 @@ async function auth() {
 
 
         if (getAuthTokenConfig.urls.authToken) {
-            const { authToken } = await worker(getAuthTokenConfig) as { authToken: string }
+            await worker(getAuthTokenConfig) as { authToken: string }
 
         }
 
@@ -207,8 +207,10 @@ async function auth() {
 
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-        const { authRevoke } = await worker(revokeAuthTokenConfig)
-        console.log(authRevoke);
+        console.log(cookie);
+        
+        // const { authRevoke } = await worker(revokeAuthTokenConfig)
+        // console.log(authRevoke);
 
         return//Remove
         revokeWorkIndex++
