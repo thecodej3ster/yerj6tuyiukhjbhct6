@@ -31,20 +31,22 @@ async function auth() {
         })
     }
 
-    const getAuthUrl = async ({ headers }: ResolverArgs) => {
+    const getCookie = async ({ headers }: ResolverArgs) => {
         const cookies = headers["set-cookie"] as string[]
         setCookie(cookies)
         return headers.location
     }
-    const getAuthSessionUrl = async ({ headers }: ResolverArgs) => {
-        const cookies = headers["set-cookie"] as string[]
-        setCookie(cookies)
-        return headers.location
-    }
+    // const getAuthSessionUrl = async ({ headers }: ResolverArgs) => {
+    //     const cookies = headers["set-cookie"] as string[]
+    //     setCookie(cookies)
+    //     return headers.location
+    // }
 
-    const getAuthToken = async ({ headers }: ResolverArgs) => {
-        console.log(headers);
-    }
+    // const getAuthToken = async ({ headers }: ResolverArgs) => {
+    //     const cookies = headers["set-cookie"] as string[]
+    //     setCookie(cookies)
+    //     return headers.location
+    // }
 
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
@@ -55,7 +57,7 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getAuthUrl
+        resolverAction: getCookie
     }
 
     let getAuthUrlWorkIndex = 0
@@ -89,7 +91,7 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getAuthSessionUrl
+        resolverAction: getCookie
     }
 
     let getAuthSessionUrlWorkIndex = 0
@@ -129,7 +131,7 @@ async function auth() {
             maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         },
-        resolverAction: getAuthToken
+        resolverAction: getCookie
     }
 
     let getAuthTokenWorkIndex = 0
@@ -223,7 +225,7 @@ async function auth() {
     await runGetAuthUrl()
     await runGetAuthSessionUrl()
     await runGetAuthToken()
-    
+
     await revokeAuthToken()
 
 }
