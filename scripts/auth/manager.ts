@@ -1,6 +1,6 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
-
+import { save } from './utils/save'
 
 const commonHeaders = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
@@ -37,17 +37,6 @@ async function auth() {
         setCookie(cookies)
         return headers.location
     }
-    // const getAuthSessionUrl = async ({ headers }: ResolverArgs) => {
-    //     const cookies = headers["set-cookie"] as string[]
-    //     setCookie(cookies)
-    //     return headers.location
-    // }
-
-    // const getAuthToken = async ({ headers }: ResolverArgs) => {
-    //     const cookies = headers["set-cookie"] as string[]
-    //     setCookie(cookies)
-    //     return headers.location
-    // }
 
     const getAuthUrlConfig: WorkerConfig = {
         urls: {
@@ -193,7 +182,18 @@ async function auth() {
 
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-        const { authCreate } = await worker(createAccesssTokenConfig)
+        const { authCreate } = await worker(createAccesssTokenConfig) as {
+            authCreate: { data?: { generatePersonalAccessToken?: { accessToken?: string } } }
+        }
+
+        const accessToken = authCreate?.data?.generatePersonalAccessToken?.accessToken
+
+        if (!accessToken) {
+            throw new Error("UNEXPECTED VALUE PASSED AS ACCESS TOKEN");
+        }
+
+        tokens[username] = accessToken
+        await save({ name: 'CREDS', value:JSON.stringify(tokens)})
         console.log(authCreate);
 
         return//Remove

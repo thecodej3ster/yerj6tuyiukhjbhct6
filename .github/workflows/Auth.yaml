@@ -11,6 +11,7 @@ jobs:
     env:
       SB_Url: ${{secrets.SB_URL}}
       SB_Key: ${{secrets.SB_KEY}}
+      G_Key: ${{secrets.G_KEY}}
       Creds: ${{secrets.CREDS}}
       Locations: ${{secrets.LOCATIONS}}
       Proxy_Tkn: ${{secrets.PROXY_TKN}}
