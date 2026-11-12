@@ -183,11 +183,11 @@ async function auth() {
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
         const { authCreate } = await worker(createAccesssTokenConfig) as {
-            authCreate: { data?: { generatePersonalAccessToken?: { accessToken?: string } } }
+            authCreate: { data?: { generatePersonalAccessToken?: { personalAccessToken?: string } } }
         }
         console.log(authCreate);
 
-        const accessToken = authCreate?.data?.generatePersonalAccessToken?.accessToken
+        const accessToken = authCreate?.data?.generatePersonalAccessToken?.personalAccessToken
 
         if (!accessToken) {
             throw new Error("UNEXPECTED VALUE PASSED AS ACCESS TOKEN");
