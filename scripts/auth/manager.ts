@@ -142,7 +142,8 @@ async function auth() {
     let getAuthTokenWorkIndex = 0
     const runGetAuthToken = async () => {
         const username = usernames[getAuthTokenWorkIndex]
-        console.log(username.toUpperCase());
+        console.log(authSessionUrls);
+        return
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
