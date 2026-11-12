@@ -167,7 +167,7 @@ async function auth() {
 
 
 
-    const config: WorkerConfig = {
+    const createAccesssTokenConfig: WorkerConfig = {
         urls: {
             authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
         },
@@ -193,7 +193,7 @@ async function auth() {
 
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-        const { authCreate } = await worker(revokeAuthTokenConfig)
+        const { authCreate } = await worker(createAccesssTokenConfig)
         console.log(authCreate);
 
         return//Remove
