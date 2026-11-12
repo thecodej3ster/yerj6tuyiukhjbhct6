@@ -69,7 +69,7 @@ async function auth() {
 
         getAuthUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthUrlConfig.resolverArgs.username = username
-        
+
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         if (!authUrl.toLowerCase().startsWith("http")) {
             throw new Error("Invalid Url Recived");
@@ -112,7 +112,7 @@ async function auth() {
 
         getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
         getAuthSessionUrlConfig.resolverArgs.username = username
-        
+
         if (getAuthSessionUrlConfig.urls.authSessionUrl) {
             const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
 
@@ -257,16 +257,51 @@ async function auth() {
         revokeAccesssToken()
     }
 
-    await runGetAuthUrl()
-    console.log(cookieStore);
-    await runGetAuthSessionUrl()
-    console.log(cookieStore);
-    await runGetAuthToken()
-    console.log(cookieStore);
+    // await runGetAuthUrl()
+    // console.log(cookieStore);
+    // await runGetAuthSessionUrl()
+    // console.log(cookieStore);
+    // await runGetAuthToken()
+    // console.log(cookieStore);
 
-
+    await processPipeline([
+        runGetAuthUrl,
+        runGetAuthSessionUrl,
+        runGetAuthToken
+    ])
     // await revokeAccesssToken()
     // await createAccesssToken()
 
 }
+
+let index = 0
+let delay = 5000
+async function processPipeline(steps: (() => Promise<void>)[]) {
+    const step = steps[index]
+
+    try {
+        await step()
+        index++
+        if (index === steps.length) {
+            return
+        }
+
+        await processPipeline(steps)
+        console.log(cookieStore);
+        
+    } catch (error) {
+        if (delay > 30000) {
+            throw new Error("Could Not Complete Pipeline Processign");
+        }
+
+        await new Promise<void>((resolve) => {
+            setTimeout(async () => {
+                delay += 5000
+                await step()
+                resolve()
+            }, delay);
+        })
+    }
+}
+
 export default auth
