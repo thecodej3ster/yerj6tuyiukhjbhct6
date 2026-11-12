@@ -22,9 +22,26 @@ const authSessionUrls: Record<string, string> = {}
 
 async function auth() {
 
+    const cookieStore: Record<string, string> = {}
 
-    const getAuthUrl = async ({ headers }: ResolverArgs) => headers.location
-    const getAuthSessionUrl = async ({ headers }: ResolverArgs) => headers.location
+    const setCookie = (cookies: string[]) => {
+        cookies.map(cookie => {
+            const parsedCokie = cookie.split("=")
+            cookieStore[parsedCokie[0]] = parsedCokie[1]
+        })
+    }
+
+    const getAuthUrl = async ({ headers }: ResolverArgs) => {
+        const cookies = headers["set-cookie"] as string[]
+        setCookie(cookies)
+        return headers.location
+    }
+    const getAuthSessionUrl = async ({ headers }: ResolverArgs) => {
+        const cookies = headers["set-cookie"] as string[]
+        setCookie(cookies)
+        return headers.location
+    }
+
     const getAuthToken = async ({ headers }: ResolverArgs) => {
         console.log(headers);
     }
@@ -46,8 +63,13 @@ async function auth() {
         const username = "verdictmedia_1_instagram" //usernames[getAuthUrlWorkIndex]
 
         if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.requestConfig.headers === undefined) return
+        let cookie = auths.manager[username] + ";"
 
-        getAuthUrlConfig.requestConfig.headers.Cookie = auths.manager[username]
+        for (const cookieName in cookieStore) {
+            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        }
+
+        getAuthUrlConfig.requestConfig.headers.Cookie = cookie
 
         const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
         authUrls[username] = authUrl
@@ -76,8 +98,15 @@ async function auth() {
 
         if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
 
-        getAuthSessionUrlConfig.requestConfig.headers.Cookie = auths.manager[username]
         getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
+
+        let cookie = auths.manager[username] + ";"
+
+        for (const cookieName in cookieStore) {
+            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        }
+
+        getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
 
         if (getAuthSessionUrlConfig.urls.authSessionUrl) {
             const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
@@ -109,8 +138,16 @@ async function auth() {
 
         if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
-        getAuthTokenConfig.requestConfig.headers.Cookie = auths.manager[username]
         getAuthTokenConfig.urls.authToken = authSessionUrls[username]
+
+        let cookie = auths.manager[username] + ";"
+
+        for (const cookieName in cookieStore) {
+            cookie += `${cookieName}=${cookieStore[cookieName]};`
+        }
+
+        getAuthTokenConfig.requestConfig.headers.Cookie = cookie
+
 
         if (getAuthTokenConfig.urls.authToken) {
             const { authToken } = await worker(getAuthTokenConfig) as { authToken: string }
@@ -127,7 +164,11 @@ async function auth() {
 
 
     await runGetAuthUrl()
+    console.log(cookieStore);
+
     await runGetAuthSessionUrl()
+    console.log(cookieStore);
+
     await runGetAuthToken()
 }
 
