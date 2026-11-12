@@ -242,12 +242,13 @@ async function auth() {
         }
         revokeAccesssToken()
     }
+console.log(tokens);
 
-    await runGetAuthUrl()
-    await runGetAuthSessionUrl()
-    await runGetAuthToken()
+    // await runGetAuthUrl()
+    // await runGetAuthSessionUrl()
+    // await runGetAuthToken()
 
-    await revokeAccesssToken()
+    // await revokeAccesssToken()
     // await createAccesssToken()
 
 }
