@@ -178,7 +178,7 @@ async function auth() {
             }
         }
     }
-  
+
     const revokeAuthTokenConfig: WorkerConfig = {
         urls: {
             authRevoke: 'https://graph.buffer.com/?_o=revokePersonalAccessToken',
@@ -208,7 +208,7 @@ async function auth() {
         revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
         console.log(cookie);
-        
+
         // const { authRevoke } = await worker(revokeAuthTokenConfig)
         // console.log(authRevoke);
 
@@ -220,13 +220,10 @@ async function auth() {
         revokeAuthToken()
     }
 
-        await runGetAuthUrl()
-    console.log(cookieStore);
-
+    await runGetAuthUrl()
     await runGetAuthSessionUrl()
-    console.log(cookieStore);
-
     await runGetAuthToken()
+    
     await revokeAuthToken()
 
 }
