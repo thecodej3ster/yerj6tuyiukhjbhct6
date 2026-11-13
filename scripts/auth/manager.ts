@@ -2,6 +2,7 @@ import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { save } from './utils/save'
 import { PipelineConfig, PipelineSteps, processPipeline } from "../utils/processor"
+import { log } from 'util'
 
 const commonHeaders = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
@@ -117,7 +118,7 @@ async function auth() {
             }
             await runGetAuthUrl()
         } catch (error) {
-            console.log(error);
+            console.log("RETRYING");
             
             delay += 5000
             if (delay === 30000) {
@@ -176,6 +177,8 @@ async function auth() {
             }
             await runGetAuthSessionUrl()
         } catch (error) {
+            console.log("RETRYING");
+            
             delay += 5000
             if (delay === 30000) {
                 throw error
