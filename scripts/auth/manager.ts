@@ -1,6 +1,7 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { save } from './utils/save'
+import { PipelineConfig, PipelineSteps, processPipeline } from "../utils/processor"
 
 const commonHeaders = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
@@ -19,7 +20,7 @@ const auths = JSON.parse(process.env.Auths!)
 const authUrls: Record<string, string> = {}
 const authSessionUrls: Record<string, string> = {}
 const authGroups: Record<string, string[]> = {}
-
+let delay = 5000
 function sortAuth() {
     for (const username in auths.manager) {
         const token: string = auths.manager[username]
@@ -84,32 +85,45 @@ async function auth() {
     }
 
     let getAuthUrlWorkIndex = 0
+    delay = 0
     const runGetAuthUrl = async () => {
-        const username = usernames[getAuthUrlWorkIndex]
+        try {
+            const username = usernames[getAuthUrlWorkIndex]
 
-        if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
-        let cookie = ""
+            if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
+            let cookie = ""
 
 
-        for (const cookieName in cookieStore[username]) {
-            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+            for (const cookieName in cookieStore[username]) {
+                cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+            }
+
+            getAuthUrlConfig.requestConfig.headers.Cookie = cookie
+            getAuthUrlConfig.resolverArgs.username = username
+
+            const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
+            if (!authUrl.toLowerCase().startsWith("http")) {
+                throw new Error("Invalid Url Recived");
+            }
+            authUrls[username] = authUrl
+            getAuthUrlWorkIndex++
+            delay = 0
+            if (getAuthUrlWorkIndex === usernames.length) {
+                return
+            }
+            await runGetAuthUrl()
+        } catch (error) {
+            delay += 5000
+            if (delay === 30000) {
+                throw error
+            }
+            await new Promise<void>((resolve) => {
+                setTimeout(async () => {
+                    await runGetAuthUrl()
+                    resolve()
+                }, delay);
+            })
         }
-
-        getAuthUrlConfig.requestConfig.headers.Cookie = cookie
-        getAuthUrlConfig.resolverArgs.username = username
-
-        const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
-        if (!authUrl.toLowerCase().startsWith("http")) {
-            throw new Error("Invalid Url Recived");
-        }
-        authUrls[username] = authUrl
-
-
-        getAuthUrlWorkIndex++
-        if (getAuthUrlWorkIndex === usernames.length) {
-            return
-        }
-        runGetAuthUrl()
     }
 
     const getAuthSessionUrlConfig: WorkerConfig = {
@@ -124,35 +138,51 @@ async function auth() {
     }
 
     let getAuthSessionUrlWorkIndex = 0
+    delay = 0
     const runGetAuthSessionUrl = async () => {
-        const username = usernames[getAuthSessionUrlWorkIndex]
+        try {
 
+            const username = usernames[getAuthSessionUrlWorkIndex]
 
-        if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
+            if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
 
-        getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
+            getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
 
-        let cookie = ""
+            let cookie = ""
 
-        for (const cookieName in cookieStore[username]) {
-            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+            for (const cookieName in cookieStore[username]) {
+                cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+            }
+
+            getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
+            getAuthSessionUrlConfig.resolverArgs.username = username
+
+            if (getAuthSessionUrlConfig.urls.authSessionUrl) {
+                const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
+
+                authSessionUrls[username] = authSessionUrl
+            }
+
+            getAuthSessionUrlWorkIndex++
+            delay = 0
+            if (getAuthSessionUrlWorkIndex === usernames.length) {
+                return
+            }
+            await runGetAuthSessionUrl()
+        } catch (error) {
+            delay += 5000
+            if (delay === 30000) {
+                throw error
+            }
+
+            await new Promise<void>((resolve) => {
+                setTimeout(async () => {
+                    await runGetAuthSessionUrl()
+                    resolve()
+                }, delay);
+            })
         }
 
-        getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
-        getAuthSessionUrlConfig.resolverArgs.username = username
-
-        if (getAuthSessionUrlConfig.urls.authSessionUrl) {
-            const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
-
-            authSessionUrls[username] = authSessionUrl
-        }
-
-
-        getAuthSessionUrlWorkIndex++
-        if (getAuthSessionUrlWorkIndex === usernames.length) {
-            return
-        }
-        runGetAuthSessionUrl()
     }
 
 
@@ -168,34 +198,46 @@ async function auth() {
     }
 
     let getAuthTokenWorkIndex = 0
+    delay = 0
     const runGetAuthToken = async () => {
-        const username = usernames[getAuthTokenWorkIndex]
+        try {
+            const username = usernames[getAuthTokenWorkIndex]
 
-        if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
+            if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
-        getAuthTokenConfig.urls.authToken = authSessionUrls[username]
+            getAuthTokenConfig.urls.authToken = authSessionUrls[username]
 
-        let cookie = ""
+            let cookie = ""
 
-        for (const cookieName in cookieStore[username]) {
-            cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+            for (const cookieName in cookieStore[username]) {
+                cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+            }
+
+            getAuthTokenConfig.requestConfig.headers.Cookie = cookie
+            getAuthTokenConfig.resolverArgs.username = username
+
+            if (getAuthTokenConfig.urls.authToken) {
+                await worker(getAuthTokenConfig) as { authToken: string }
+
+            }
+
+            getAuthTokenWorkIndex++
+            delay = 0
+            if (getAuthTokenWorkIndex === usernames.length) {
+                return
+            }
+
+            await runGetAuthToken()
+        } catch (error) {
+            delay += 5000
+            await new Promise<void>((resolve) => {
+                setTimeout(async () => {
+                    await runGetAuthToken()
+                    resolve()
+                }, delay);
+            })
         }
 
-        getAuthTokenConfig.requestConfig.headers.Cookie = cookie
-        getAuthTokenConfig.resolverArgs.username = username
-
-        if (getAuthTokenConfig.urls.authToken) {
-            await worker(getAuthTokenConfig) as { authToken: string }
-
-        }
-
-
-        getAuthTokenWorkIndex++
-        if (getAuthTokenWorkIndex === usernames.length) {
-            return
-        }
-        console.log(authSessionUrls);
-        runGetAuthToken()
     }
 
 
@@ -288,55 +330,70 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
 
-    // await runGetAuthUrl()
-    // console.log(cookieStore);
-    // await runGetAuthSessionUrl()
-    // console.log(cookieStore);
-    // await runGetAuthToken()
-    // console.log(cookieStore);
-    let index = 0
-    let retryCount = 5000
-    await processPipeline([
-        runGetAuthUrl,
-        runGetAuthSessionUrl,
-        // runGetAuthToken
-    ])
+    await runGetAuthUrl()
+    console.log(cookieStore);
+    await runGetAuthSessionUrl()
+    console.log(cookieStore);
+    await runGetAuthToken()
+    console.log(cookieStore);
+
+
+
+    // let index = 0
+    // let retryCount = 5000
+    // await processPipeline([
+    //     runGetAuthUrl,
+    //     runGetAuthSessionUrl,
+    //     // runGetAuthToken
+    // ])
     // await revokeAccesssToken()
     // await createAccesssToken()
 
 
 
-    async function processPipeline(steps: (() => Promise<void>)[]) {
-        const step = steps[index]
+    // async function processPipeline(steps: (() => Promise<void>)[]) {
+    //     const step = steps[index]
 
-        try {
-            await step()
-            index++
-            console.log(cookieStore);
+    //     try {
+    //         await step()
+    //         index++
+    //         console.log(cookieStore);
 
-            if (index === steps.length) {
-                return
-            }
-            await processPipeline(steps)
+    //         if (index === steps.length) {
+    //             return
+    //         }
+    //         await processPipeline(steps)
 
-        } catch (error) {
+    // } catch (error) {
 
-            console.log('CAUGHT');
-            console.log(error);
+    //     console.log('CAUGHT');
+    //     console.log(error);
 
 
-            // retryCount++
-            // if (retryCount === 5) {
-            throw new Error("Could Not Complete Pipeline Processign");
-            // }
+    // retryCount++
+    // if (retryCount === 5) {
+    // throw new Error("Could Not Complete Pipeline Processign");
+    // }
 
-            // await new Promise<void>((resolve) => {
-            //     setTimeout(async () => {
-            //         await processPipeline(steps)
-            //         resolve()
-            //     }, 5000);
-            // })
-        }
-    }
+    // await new Promise<void>((resolve) => {
+    //     setTimeout(async () => {
+    //         await processPipeline(steps)
+    //         resolve()
+    //     }, 5000);
+    // })
+    // }
 }
+
+// const authSteps: PipelineSteps = {
+//     getAuthUrl: runGetAuthUrl,
+//     getAuthSessionUrl: runGetAuthSessionUrl
+// }
+
+// await processPipeline()
+// }
+
+
+
+
+const authConfig: PipelineConfig = {}
 export default auth
