@@ -142,6 +142,7 @@ async function runGetAuthUrl() {
         await runGetAuthUrl()
     } catch (error) {
         console.log("RETRYING");
+        console.log(error);
 
         delay += 5000
         if (delay === 30000) {
@@ -180,7 +181,6 @@ const runGetAuthSessionUrl = async () => {
 
         if (getAuthSessionUrlConfig.urls.authSessionUrl) {
             const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
-
             authSessionUrls[username] = authSessionUrl
         }
 
@@ -192,6 +192,7 @@ const runGetAuthSessionUrl = async () => {
         await runGetAuthSessionUrl()
     } catch (error) {
         console.log("RETRYING");
+        console.log(error);
 
         delay += 5000
         if (delay === 30000) {
@@ -252,6 +253,8 @@ const runGetAuthToken = async () => {
 
         await runGetAuthToken()
     } catch (error) {
+        console.log('RETRYING');
+        console.log(error);
         delay += 5000
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
