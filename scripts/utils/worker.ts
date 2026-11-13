@@ -100,7 +100,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
 
 
-        await Promise.all(initialWorkers)
+        try {
+            await Promise.all(initialWorkers)
+
+        } catch (error) {  }
         if (failedWorks.length) {
             //  failedWorks.map(key => {
             //     console.log(result[key]);
@@ -111,9 +114,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         // if (failedWorks.length && !isRetry) {
         //     console.log('RETRYING ...');
 
-            // failedWorks.map(key => {
-            //     newWork[key] = works[key]
-            // })
+        // failedWorks.map(key => {
+        //     newWork[key] = works[key]
+        // })
         //     isRetry = true
         //     await processWorkers(newWork)
         // }
