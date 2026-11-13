@@ -308,7 +308,7 @@ async function auth() {
 }
 
 let index = 0
-let delay = 5000
+let retryCount = 5000
 async function processPipeline(steps: (() => Promise<void>)[]) {
     const step = steps[index]
 
@@ -320,20 +320,20 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
         if (index === steps.length) {
             return
         }
-        delay = 5000
         await processPipeline(steps)
 
     } catch (error) {
-        if (delay > 30000) {
+
+        retryCount++
+        if (retryCount === 5) {
             throw new Error("Could Not Complete Pipeline Processign");
         }
 
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
-                delay += 5000
                 await processPipeline(steps)
                 resolve()
-            }, delay);
+            }, 5000);
         })
     }
 }
