@@ -50,7 +50,7 @@ async function auth() {
 
     const saveCookie = async ({ headers, username, response }: ResolverArgs & { username?: string }) => {
         console.log(headers);
-        
+
         const data = response as string
         const cookies = headers["set-cookie"] as string[]
         if (!cookies) {
@@ -305,41 +305,40 @@ async function auth() {
     // await revokeAccesssToken()
     // await createAccesssToken()
 
-}
 
-let index = 0
-let retryCount = 5000
-async function processPipeline(steps: (() => Promise<void>)[]) {
-    const step = steps[index]
+    let index = 0
+    let retryCount = 5000
+    async function processPipeline(steps: (() => Promise<void>)[]) {
+        const step = steps[index]
 
-    try {
-        await step()
-        index++
-        console.log(cookieStore);
+        try {
+            await step()
+            index++
+            console.log(cookieStore);
 
-        if (index === steps.length) {
-            return
-        }
-        await processPipeline(steps)
+            if (index === steps.length) {
+                return
+            }
+            await processPipeline(steps)
 
-    } catch (error) {
+        } catch (error) {
 
-        console.log('CAUGHT');
-        console.log(error);
-        
-        
-        // retryCount++
-        // if (retryCount === 5) {
+            console.log('CAUGHT');
+            console.log(error);
+
+
+            // retryCount++
+            // if (retryCount === 5) {
             throw new Error("Could Not Complete Pipeline Processign");
-        // }
+            // }
 
-        // await new Promise<void>((resolve) => {
-        //     setTimeout(async () => {
-        //         await processPipeline(steps)
-        //         resolve()
-        //     }, 5000);
-        // })
+            // await new Promise<void>((resolve) => {
+            //     setTimeout(async () => {
+            //         await processPipeline(steps)
+            //         resolve()
+            //     }, 5000);
+            // })
+        }
     }
 }
-
 export default auth
