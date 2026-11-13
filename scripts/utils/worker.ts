@@ -70,6 +70,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             result[key] = await response.data
         } catch (error) {
             // failedWorks.push(key)
+            console.log('hello');
+            
             throw new Error(`Error: ${(error as Error).message}`);
             // result[key] = workerResponse;
         }

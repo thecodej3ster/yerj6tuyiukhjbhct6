@@ -79,7 +79,7 @@ async function auth() {
         requestConfig: {
             headers: {},
             maxRedirects: 0,
-            validateStatus: (status) => status < 400 && status > 199
+            validateStatus: (status) => status < 400 && status > 199,
         },
         resolverAction: saveCookie,
         resolverArgs: {}
