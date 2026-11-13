@@ -49,8 +49,6 @@ async function auth() {
     }
 
     const saveCookie = async ({ headers, username, response }: ResolverArgs & { username?: string }) => {
-        console.log(headers);
-
         const data = response as string
         const cookies = headers["set-cookie"] as string[]
         if (!cookies) {
