@@ -104,11 +104,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             await Promise.all(initialWorkers)
 
         } catch (error) {  }
+
         if (failedWorks.length) {
             //  failedWorks.map(key => {
             //     console.log(result[key]);
             // })
-            throw new Error("Some Works Were Unable To Process");
+            // throw new Error("Some Works Were Unable To Process");
         }
         // const newWork: Record<string, string> = {}
         // if (failedWorks.length && !isRetry) {
