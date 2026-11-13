@@ -34,7 +34,7 @@ function sortAuth() {
 async function auth() {
 
     const cookieStore: Record<string, Record<string, string>> = {}
-    const usernames = Object.keys(cookieStore)
+    let usernames:string[] = []
 
     const setCookie = (username: string, cookies: string[]) => {
         cookies.map(cookie => {
@@ -62,6 +62,7 @@ async function auth() {
             cookieStore[username] = {}
             cookieStore[username][name] = value
         }
+        usernames = Object.keys(cookieStore)
     }
 
     const getAuthUrlConfig: WorkerConfig = {
