@@ -291,8 +291,8 @@ async function auth() {
     hydrateCookieStore()
 
     await runGetAuthUrl()
-    console.log(cookieStore);
-    // await runGetAuthSessionUrl()
+    // console.log(cookieStore);
+    await runGetAuthSessionUrl()
     // console.log(cookieStore);
     // await runGetAuthToken()
     // console.log(cookieStore);
