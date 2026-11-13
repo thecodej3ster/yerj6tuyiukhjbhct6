@@ -318,7 +318,7 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
 
         await processPipeline(steps)
         console.log(cookieStore);
-
+        delay = 5000
     } catch (error) {
         if (delay > 30000) {
             throw new Error("Could Not Complete Pipeline Processign");
