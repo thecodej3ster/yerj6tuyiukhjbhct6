@@ -296,7 +296,8 @@ async function auth() {
     // console.log(cookieStore);
     // await runGetAuthToken()
     // console.log(cookieStore);
-
+    let index = 0
+    let retryCount = 5000
     await processPipeline([
         runGetAuthUrl,
         runGetAuthSessionUrl,
@@ -306,8 +307,7 @@ async function auth() {
     // await createAccesssToken()
 
 
-    let index = 0
-    let retryCount = 5000
+
     async function processPipeline(steps: (() => Promise<void>)[]) {
         const step = steps[index]
 
