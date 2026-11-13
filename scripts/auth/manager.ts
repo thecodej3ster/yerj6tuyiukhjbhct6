@@ -19,6 +19,18 @@ const auths = JSON.parse(process.env.Auths!)
 const usernames = Object.keys(tokens)
 const authUrls: Record<string, string> = {}
 const authSessionUrls: Record<string, string> = {}
+const authGroups: Record<string, string[]> = {}
+
+function sortAuth() {
+    for (const username in auths.manager) {
+        const token: string = auths.manager[username]
+
+        if (!authGroups[token]) {
+            authGroups[token] = []
+        }
+        authGroups[token].push(username)
+    }
+}
 
 async function auth() {
 
@@ -44,12 +56,11 @@ async function auth() {
     }
 
     async function hydrateCookieStore() {
-        for (const username in auths.manager) {
-            const [name, value] = auths.manager[username].split('=')
+        for (const auth in authGroups) {
+            const username = authGroups[auth][0]
+            const [name, value] = auth.split('=')
             cookieStore[username] = {}
             cookieStore[username][name] = value
-
-
         }
     }
 
@@ -269,7 +280,11 @@ async function auth() {
     }
 
     hydrateCookieStore()
-
+    sortAuth()
+    console.log(authGroups);
+    console.log(cookieStore);
+    
+    
     // await runGetAuthUrl()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
@@ -277,11 +292,11 @@ async function auth() {
     // await runGetAuthToken()
     // console.log(cookieStore);
 
-    await processPipeline([
-        runGetAuthUrl,
-        runGetAuthSessionUrl,
-        runGetAuthToken
-    ])
+    // await processPipeline([
+    //     runGetAuthUrl,
+    //     runGetAuthSessionUrl,
+    //     runGetAuthToken
+    // ])
     // await revokeAccesssToken()
     // await createAccesssToken()
 
