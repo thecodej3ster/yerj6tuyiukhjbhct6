@@ -60,6 +60,18 @@ const getAuthSessionUrlConfig: WorkerConfig = {
     resolverArgs: {}
 }
 
+const getAuthTokenConfig: WorkerConfig = {
+    urls: {},
+    requestConfig: {
+        headers: {},
+        maxRedirects: 0,
+        validateStatus: (status) => status < 400 && status > 199
+    },
+    resolverAction: saveCookie,
+    resolverArgs: {}
+}
+
+
 function sortAuth() {
     for (const username in auths.manager) {
         const token: string = auths.manager[username]
@@ -113,14 +125,12 @@ async function hydrateCookieStore() {
 
 
 let getAuthUrlWorkIndex = 0
-delay = 0
 async function runGetAuthUrl() {
     try {
         const username = usernames[getAuthUrlWorkIndex]
 
         if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
         let cookie = ""
-
 
         for (const cookieName in cookieStore[username]) {
             cookie += `${cookieName}=${cookieStore[username][cookieName]};`
@@ -136,9 +146,11 @@ async function runGetAuthUrl() {
         authUrls[username] = authUrl
         getAuthUrlWorkIndex++
         delay = 0
+
         if (getAuthUrlWorkIndex === usernames.length) {
             return
         }
+
         await runGetAuthUrl()
     } catch (error) {
         console.log("RETRYING");
@@ -148,6 +160,9 @@ async function runGetAuthUrl() {
         if (delay === 30000) {
             throw error
         }
+
+        console.log("HERE");
+        
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
                 console.log('WAIT');
@@ -162,7 +177,6 @@ async function runGetAuthUrl() {
 
 
 let getAuthSessionUrlWorkIndex = 0
-delay = 0
 const runGetAuthSessionUrl = async () => {
     try {
 
@@ -200,6 +214,7 @@ const runGetAuthSessionUrl = async () => {
         if (delay === 30000) {
             throw error
         }
+        console.log("HERE");
 
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
@@ -214,19 +229,7 @@ const runGetAuthSessionUrl = async () => {
 }
 
 
-const getAuthTokenConfig: WorkerConfig = {
-    urls: {},
-    requestConfig: {
-        headers: {},
-        maxRedirects: 0,
-        validateStatus: (status) => status < 400 && status > 199
-    },
-    resolverAction: saveCookie,
-    resolverArgs: {}
-}
-
 let getAuthTokenWorkIndex = 0
-delay = 0
 const runGetAuthToken = async () => {
     try {
         const username = usernames[getAuthTokenWorkIndex]
@@ -259,7 +262,13 @@ const runGetAuthToken = async () => {
     } catch (error) {
         console.log('RETRYING');
         console.log(error);
+
         delay += 5000
+        if (delay === 30000) {
+            throw error
+        }
+        console.log("HERE");
+
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
                 console.log('WAIT');
