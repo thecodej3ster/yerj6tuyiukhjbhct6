@@ -173,6 +173,9 @@ async function runGetAuthUrl() {
         console.log("HERE");
 
         await new Promise<void>((resolve) => {
+            console.log('IN');
+            console.log(`DELAY IS ${delay}`);
+            
             setTimeout(async () => {
                 console.log('WAIT');
 
@@ -226,6 +229,8 @@ const runGetAuthSessionUrl = async () => {
         console.log("HERE");
 
         await new Promise<void>((resolve) => {
+                        console.log('IN');
+            console.log(`DELAY IS ${delay}`);
             setTimeout(async () => {
                 console.log('WAIT');
 
@@ -279,6 +284,8 @@ const runGetAuthToken = async () => {
         console.log("HERE");
 
         await new Promise<void>((resolve) => {
+                        console.log('IN');
+            console.log(`DELAY IS ${delay}`);
             setTimeout(async () => {
                 console.log('WAIT');
 
