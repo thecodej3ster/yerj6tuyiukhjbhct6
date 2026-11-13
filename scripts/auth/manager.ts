@@ -297,8 +297,8 @@ async function auth() {
 
     await processPipeline([
         runGetAuthUrl,
-        runGetAuthSessionUrl,
-        runGetAuthToken
+        // runGetAuthSessionUrl,
+        // runGetAuthToken
     ])
     // await revokeAccesssToken()
     // await createAccesssToken()
