@@ -102,9 +102,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         await Promise.all(initialWorkers)
         if (failedWorks.length) {
-             failedWorks.map(key => {
-                console.log(result[key]);
-            })
+            //  failedWorks.map(key => {
+            //     console.log(result[key]);
+            // })
             throw new Error("Some Works Were Unable To Process");
         }
         // const newWork: Record<string, string> = {}
@@ -118,6 +118,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         //     await processWorkers(newWork)
         // }
     }
+
 
     await processWorkers(urls)
 

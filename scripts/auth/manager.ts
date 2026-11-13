@@ -117,6 +117,8 @@ async function auth() {
             }
             await runGetAuthUrl()
         } catch (error) {
+            console.log(error);
+            
             delay += 5000
             if (delay === 30000) {
                 throw error
