@@ -313,11 +313,12 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
     try {
         await step()
         index++
+        console.log(cookieStore);
+
         if (index === steps.length) {
             return
         }
         delay = 5000
-        console.log(cookieStore);
         await processPipeline(steps)
 
     } catch (error) {
