@@ -186,6 +186,7 @@ async function auth() {
 
             await new Promise<void>((resolve) => {
                 setTimeout(async () => {
+                    await runGetAuthUrl()
                     await runGetAuthSessionUrl()
                     resolve()
                 }, delay);
@@ -241,6 +242,7 @@ async function auth() {
             delay += 5000
             await new Promise<void>((resolve) => {
                 setTimeout(async () => {
+                    await runGetAuthSessionUrl()
                     await runGetAuthToken()
                     resolve()
                 }, delay);
