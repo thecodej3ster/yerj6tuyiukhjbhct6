@@ -20,7 +20,7 @@ const auths = JSON.parse(process.env.Auths!)
 const authUrls: Record<string, string> = {}
 const authSessionUrls: Record<string, string> = {}
 const authGroups: Record<string, string[]> = {}
-let delay = 5000
+let delay = 0
 function sortAuth() {
     for (const username in auths.manager) {
         const token: string = auths.manager[username]
@@ -346,8 +346,8 @@ async function auth() {
     //     runGetAuthSessionUrl,
     //     // runGetAuthToken
     // ])
-    // await revokeAccesssToken()
-    // await createAccesssToken()
+    await revokeAccesssToken()
+    await createAccesssToken()
 
 
 
