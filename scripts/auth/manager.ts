@@ -1,6 +1,7 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { save } from './utils/save'
+import { access } from 'fs'
 
 
 let keys = process.env.Creds!
@@ -71,6 +72,15 @@ const getAuthTokenConfig: WorkerConfig = {
     resolverArgs: {}
 }
 
+const getAccessTokensConfig: WorkerConfig = {
+    urls: { accessTokens: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' },
+    requestConfig: {
+        headers: commonHeaders,
+        method: "POST",
+        responseType: "json",
+        body: '{"operationName":"getPersonalAccessTokens","variables":{},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"query getPersonalAccessTokens {\n  personalAccessTokens {\n    accessTokens {\n      accessToken\n      clientId\n      name\n      generatedAt\n      expiresAt\n      scopes\n      __typename\n    }\n    maxTokens\n    __typename\n  }\n}"}'
+    }
+}
 
 function sortAuth() {
     for (const username in auths.manager) {
@@ -119,7 +129,6 @@ async function hydrateCookieStore() {
         cookieStore[username] = {}
         cookieStore[username][name] = value
     }
-    usernames = Object.keys(cookieStore)
 }
 
 
@@ -162,7 +171,7 @@ async function runGetAuthUrl() {
         }
 
         console.log("HERE");
-        
+
         await new Promise<void>((resolve) => {
             setTimeout(async () => {
                 console.log('WAIT');
@@ -332,12 +341,13 @@ async function createAccesssToken() {
 
 
 let revokeWorkIndex = 0
-async function revokeAccesssToken() {
+async function revokeAccesssToken(accessToken = "") {
     const username = usernames[revokeWorkIndex]
 
     if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
 
-    revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${tokens[username]}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
+    const token = accessToken ? accessToken : tokens[username]
+    revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${token}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
 
     let cookie = ""
 
@@ -350,6 +360,9 @@ async function revokeAccesssToken() {
     const { authRevoke } = await worker(revokeAuthTokenConfig)
     console.log(authRevoke);
 
+    if (accessToken) {
+        return
+    }
     revokeWorkIndex++
     if (revokeWorkIndex === usernames.length) {
         return
@@ -357,19 +370,62 @@ async function revokeAccesssToken() {
     await revokeAccesssToken()
 }
 
+
+async function getAccessTokens(username: string) {
+    if (!getAccessTokensConfig.requestConfig || getAccessTokensConfig.requestConfig.headers === undefined) return
+
+    let cookie = ""
+
+    for (const cookieName in cookieStore[username]) {
+        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+    }
+
+    getAccessTokensConfig.requestConfig.headers.Cookie = cookie
+
+    const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } } } }
+
+    const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
+    if (!personalAccessTokens || !personalAccessTokens.length) {
+        console.log(accessTokens);
+        throw new Error("No Access Token Was Found");
+    }
+    console.log(personalAccessTokens);
+
+    return personalAccessTokens
+}
+
+let revokeAllAccessTokensWorkIndex = 0
+
+async function revokeAllAccessTokens() {
+    const accessTokens = await getAccessTokens(usernames[revokeAllAccessTokensWorkIndex]) as { accessToken?: string }[]
+
+    for (let i = 0; i < accessTokens.length; i++) {
+        const { accessToken } = accessTokens[i];
+        await revokeAccesssToken(accessToken)
+    }
+
+    revokeAllAccessTokensWorkIndex++
+    if (revokeAllAccessTokensWorkIndex === usernames.length) {
+        return
+    }
+    await revokeAllAccessTokens()
+}
+
 async function auth() {
     sortAuth()
     hydrateCookieStore()
+    usernames = Object.keys(cookieStore)
     await runGetAuthUrl()
     console.log(cookieStore);
     await runGetAuthSessionUrl()
     console.log(cookieStore);
     await runGetAuthToken()
     console.log(cookieStore);
-    await revokeAccesssToken()
-    await createAccesssToken()
-    console.log(JSON.parse(keys));
-    await save({ name: 'CREDS', value: keys })
+    // await revokeAccesssToken()
+    // await createAccesssToken()
+    // console.log(JSON.parse(keys));
+    // await save({ name: 'CREDS', value: keys })
+    await revokeAllAccessTokens()
 }
 
 
