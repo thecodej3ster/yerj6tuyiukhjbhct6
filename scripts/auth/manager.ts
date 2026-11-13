@@ -14,7 +14,7 @@ const commonHeaders = {
     "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
 }
 
-const keys = process.env.Creds!
+let keys = process.env.Creds!
 const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
 const authUrls: Record<string, string> = {}
@@ -279,8 +279,7 @@ async function auth() {
             throw new Error("UNEXPECTED VALUE PASSED AS ACCESS TOKEN");
         }
 
-        tokens[username] = accessToken
-        await save({ name: 'CREDS', value: JSON.stringify(tokens) })
+        keys = keys.replaceAll(tokens[username], accessToken)
 
         createAccesssTokenWorkIndex++
         if (createAccesssTokenWorkIndex === usernames.length) {
@@ -348,7 +347,8 @@ async function auth() {
     // ])
     await revokeAccesssToken()
     await createAccesssToken()
-
+    console.log(JSON.parse(keys));
+    await save({ name: 'CREDS', value: keys })
 
 
     // async function processPipeline(steps: (() => Promise<void>)[]) {
