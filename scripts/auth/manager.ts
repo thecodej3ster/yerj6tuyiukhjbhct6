@@ -53,6 +53,10 @@ async function auth() {
         const data = response as string
         const cookies = headers["set-cookie"] as string[]
         if (!cookies) {
+            const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
+            if (foundRedirect) {
+                return foundRedirect[0]
+            }
             throw new Error("No Cookie WAs Found");
         }
         if (username) {
