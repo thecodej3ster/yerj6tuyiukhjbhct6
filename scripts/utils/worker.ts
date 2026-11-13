@@ -37,9 +37,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
             data: requestConfig?.body || null,
-            // timeout: 300  'content-type': 'text/html; charset=utf-8',
-339
-00,
+            // timeout: 30000,
             method: "GET",
             responseEncoding: "UTF-8",
             responseType: "text",
