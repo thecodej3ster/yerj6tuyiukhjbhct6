@@ -37,6 +37,10 @@ async function auth() {
     let usernames: string[] = []
 
     const setCookie = (username: string, cookies: string[]) => {
+        if (!cookies) {
+            throw new Error("No Cookie WAs Found");
+        }
+        
         cookies.map(cookie => {
             const cookieParts = cookie.split(";")
             const parsedCokie = cookieParts[0].replace("=", ';').split(";")
