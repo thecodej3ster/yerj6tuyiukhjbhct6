@@ -34,7 +34,7 @@ function sortAuth() {
 async function auth() {
 
     const cookieStore: Record<string, Record<string, string>> = {}
-    let usernames:string[] = []
+    let usernames: string[] = []
 
     const setCookie = (username: string, cookies: string[]) => {
         cookies.map(cookie => {
@@ -47,7 +47,7 @@ async function auth() {
         })
     }
 
-    const saveCookie = async ({ headers, username,response }: ResolverArgs & { username?: string }) => {
+    const saveCookie = async ({ headers, username, response }: ResolverArgs & { username?: string }) => {
         const data = response as string
         if (data.toLowerCase().startsWith("error:")) {
             throw new Error(response);
@@ -315,10 +315,10 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
         if (index === steps.length) {
             return
         }
-
-        await processPipeline(steps)
-        console.log(cookieStore);
         delay = 5000
+        console.log(cookieStore);
+        await processPipeline(steps)
+
     } catch (error) {
         if (delay > 30000) {
             throw new Error("Could Not Complete Pipeline Processign");
