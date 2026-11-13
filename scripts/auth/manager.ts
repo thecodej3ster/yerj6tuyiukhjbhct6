@@ -324,17 +324,19 @@ async function processPipeline(steps: (() => Promise<void>)[]) {
 
     } catch (error) {
 
-        retryCount++
-        if (retryCount === 5) {
-            throw new Error("Could Not Complete Pipeline Processign");
-        }
+        console.log('CAUGHT');
+        
+        // retryCount++
+        // if (retryCount === 5) {
+        //     throw new Error("Could Not Complete Pipeline Processign");
+        // }
 
-        await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-                await processPipeline(steps)
-                resolve()
-            }, 5000);
-        })
+        // await new Promise<void>((resolve) => {
+        //     setTimeout(async () => {
+        //         await processPipeline(steps)
+        //         resolve()
+        //     }, 5000);
+        // })
     }
 }
 
