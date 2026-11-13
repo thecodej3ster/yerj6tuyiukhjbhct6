@@ -16,7 +16,6 @@ const commonHeaders = {
 const keys = process.env.Creds!
 const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
-const usernames = Object.keys(tokens)
 const authUrls: Record<string, string> = {}
 const authSessionUrls: Record<string, string> = {}
 const authGroups: Record<string, string[]> = {}
@@ -35,6 +34,7 @@ function sortAuth() {
 async function auth() {
 
     const cookieStore: Record<string, Record<string, string>> = {}
+    const usernames = Object.keys(cookieStore)
 
     const setCookie = (username: string, cookies: string[]) => {
         cookies.map(cookie => {
