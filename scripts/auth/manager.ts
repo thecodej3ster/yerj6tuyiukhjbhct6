@@ -282,16 +282,12 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
 
-    console.log(authGroups);
+    await runGetAuthUrl()
     console.log(cookieStore);
-
-
-    // await runGetAuthUrl()
-    // console.log(cookieStore);
-    // await runGetAuthSessionUrl()
-    // console.log(cookieStore);
-    // await runGetAuthToken()
-    // console.log(cookieStore);
+    await runGetAuthSessionUrl()
+    console.log(cookieStore);
+    await runGetAuthToken()
+    console.log(cookieStore);
 
     // await processPipeline([
     //     runGetAuthUrl,
