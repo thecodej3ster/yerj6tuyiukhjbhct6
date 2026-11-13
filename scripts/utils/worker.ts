@@ -124,7 +124,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
 
-    await processWorkers(urls)
+    try {
+            await processWorkers(urls)
+
+    } catch (error) {
+        
+    }
 
     return result;
 }
