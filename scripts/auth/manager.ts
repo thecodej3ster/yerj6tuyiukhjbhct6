@@ -279,12 +279,13 @@ async function auth() {
         revokeAccesssToken()
     }
 
-    hydrateCookieStore()
     sortAuth()
+    hydrateCookieStore()
+
     console.log(authGroups);
     console.log(cookieStore);
-    
-    
+
+
     // await runGetAuthUrl()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
