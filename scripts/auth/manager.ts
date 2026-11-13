@@ -37,10 +37,7 @@ async function auth() {
     let usernames: string[] = []
 
     const setCookie = (username: string, cookies: string[]) => {
-        if (!cookies) {
-            throw new Error("No Cookie WAs Found");
-        }
-        
+
         cookies.map(cookie => {
             const cookieParts = cookie.split(";")
             const parsedCokie = cookieParts[0].replace("=", ';').split(";")
@@ -53,10 +50,10 @@ async function auth() {
 
     const saveCookie = async ({ headers, username, response }: ResolverArgs & { username?: string }) => {
         const data = response as string
-        if (data.toLowerCase().startsWith("error:")) {
-            throw new Error(response);
-        }
         const cookies = headers["set-cookie"] as string[]
+        if (!cookies) {
+            throw new Error("No Cookie WAs Found");
+        }
         if (username) {
             setCookie(username, cookies)
         }
