@@ -296,7 +296,7 @@ async function auth() {
         if (createAccesssTokenWorkIndex === usernames.length) {
             return
         }
-        createAccesssToken()
+        await createAccesssToken()
     }
 
     const revokeAuthTokenConfig: WorkerConfig = {
@@ -334,7 +334,7 @@ async function auth() {
         if (revokeWorkIndex === usernames.length) {
             return
         }
-        revokeAccesssToken()
+        await revokeAccesssToken()
     }
 
     sortAuth()
