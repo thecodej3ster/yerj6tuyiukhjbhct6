@@ -69,9 +69,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             let response = await axios(selectedRequestConfig)
             result[key] = await response.data
         } catch (error) {
-            failedWorks.push(key)
-            console.log(`Error: ${(error as Error).message}`);
-            result[key] = workerResponse;
+            // failedWorks.push(key)
+            throw new Error(`Error: ${(error as Error).message}`);
+            // result[key] = workerResponse;
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
@@ -102,16 +102,16 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
 
         await Promise.all(initialWorkers)
-        const newWork: Record<string, string> = {}
-        if (failedWorks.length && !isRetry) {
-            console.log('RETRYING ...');
+        // const newWork: Record<string, string> = {}
+        // if (failedWorks.length && !isRetry) {
+        //     console.log('RETRYING ...');
 
-            failedWorks.map(key => {
-                newWork[key] = works[key]
-            })
-            isRetry = true
-            await processWorkers(newWork)
-        }
+        //     failedWorks.map(key => {
+        //         newWork[key] = works[key]
+        //     })
+        //     isRetry = true
+        //     await processWorkers(newWork)
+        // }
     }
 
     await processWorkers(urls)

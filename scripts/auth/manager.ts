@@ -47,7 +47,11 @@ async function auth() {
         })
     }
 
-    const saveCookie = async ({ headers, username }: ResolverArgs & { username?: string }) => {
+    const saveCookie = async ({ headers, username,response }: ResolverArgs & { username?: string }) => {
+        const data = response as string
+        if (data.toLowerCase().startsWith("error:")) {
+            throw new Error(response);
+        }
         const cookies = headers["set-cookie"] as string[]
         if (username) {
             setCookie(username, cookies)
