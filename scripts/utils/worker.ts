@@ -1,7 +1,6 @@
 import axios, { AxiosResponse, RawAxiosRequestConfig, AxiosResponseTransformer, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
-import { lockInternals } from "@supabase/supabase-js";
 
 
 const workerLimit = 5
@@ -80,14 +79,18 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             if (nextKey) {
                 const nextUrl = urls[nextKey];
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                try {
                 await fetchData(nextUrl, nextKey);
+                } catch (error) {
+                    console.log("ME");
+                    console.log(error);
+                    
+                }
             }
         }
     };
 
     async function processWorkers(works: Record<string, string>) {
-                try {
-
         // FIX 4: Concurrency Limit and Execution Wrapper
         const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
         const initialWorkers: Promise<void>[] = [];
@@ -103,13 +106,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
 
 
+        try {
             await Promise.all(initialWorkers)
 
-        } catch (error) { 
-            console.log("HI");
-            console.log(error);
-            
-         }
+        } catch (error) {  }
 
         if (failedWorks.length) {
             //  failedWorks.map(key => {
