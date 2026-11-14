@@ -108,6 +108,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             await Promise.all(initialWorkers)
         } catch (error) {
+            console.log('REQUEST FAILED RETRYING ...');
             const failedUrls: Record<string, string> = {}
 
             if (delay === 30000) {
@@ -122,7 +123,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 setTimeout(async () => {
                     try {
                         const response = await worker({
-                            urls: urls,
+                            urls: failedUrls,
                             direct: direct,
                             resolverAction: resolverAction,
                             resolverArgs: resolverArgs,
