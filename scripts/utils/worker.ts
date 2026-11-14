@@ -17,13 +17,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
-    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
+    const handleResolver: AxiosResponseTransformer =  (response: AxiosResponse, headers: AxiosResponseHeaders) => {
         workerResponse = response
         if (resolverAction) {
             if (resolverArgs) {
-                return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+                return  resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             } else {
-                return await resolverAction({ response: response, headers: headers })
+                return  resolverAction({ response: response, headers: headers })
             }
         }
         return response;
@@ -71,6 +71,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         } catch (error) {
             failedWorks.push(key)
             result[key] = workerResponse;
+            console.log('CAUGHTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
+            
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
