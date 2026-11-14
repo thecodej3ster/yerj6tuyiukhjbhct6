@@ -399,7 +399,7 @@ async function getAccessTokens(username: string) {
             return []
         }
     }
-    console.log(personalAccessTokens);
+    console.log(accessTokens);
     throw new Error("No Access Token Was Found");
 }
 
