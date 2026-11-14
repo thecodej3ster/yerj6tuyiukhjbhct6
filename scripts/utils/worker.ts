@@ -117,6 +117,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 throw error
             }
 
+            console.log(failedWorks);
+            
             failedWorks.map(key => {
                 failedUrls[key] = urls[key]
             })
