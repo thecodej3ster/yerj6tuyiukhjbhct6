@@ -72,7 +72,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             failedWorks.push(key)
             result[key] = workerResponse;
             console.log('CAUGHTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
-            
+
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
@@ -87,29 +87,30 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     };
 
     async function processWorkers(works: Record<string, string>) {
-        // FIX 4: Concurrency Limit and Execution Wrapper
-        const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
-        const initialWorkers: Promise<void>[] = [];
-
-        for (let i = 0; i < concurrencyLimit; i++) {
-            const key = unFinishedWork.shift();
-
-            if (key) {
-                initialWorkers.push(fetchData(works[key], key));
-            }
-            console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-
-        }
-
-
         try {
+
+            // FIX 4: Concurrency Limit and Execution Wrapper
+            const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
+            const initialWorkers: Promise<void>[] = [];
+
+            for (let i = 0; i < concurrencyLimit; i++) {
+                const key = unFinishedWork.shift();
+
+                if (key) {
+                    initialWorkers.push(fetchData(works[key], key));
+                }
+                console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+
+            }
+
+
             await Promise.all(initialWorkers)
         } catch (error) {
             // if (failedWorks.length) {
-                //  failedWorks.map(key => {
-                //     console.log(result[key]);
-                // })
-                // throw new Error("Some Works Were Unable To Process");
+            //  failedWorks.map(key => {
+            //     console.log(result[key]);
+            // })
+            // throw new Error("Some Works Were Unable To Process");
             // }
             console.log('ALREADDY BROKEN ')
 
@@ -135,7 +136,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
 
     // try {
-        await processWorkers(urls)
+    await processWorkers(urls)
 
     // } catch (error) {
 
