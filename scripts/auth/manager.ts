@@ -389,7 +389,7 @@ async function getAccessTokens(username: string) {
 
     getAccessTokensConfig.requestConfig.headers.Cookie = cookie
 
-    const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } } } }
+    const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
 
     const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
     if (personalAccessTokens) {
@@ -399,7 +399,7 @@ async function getAccessTokens(username: string) {
             return []
         }
     }
-    console.log(accessTokens);
+    console.log(accessTokens?.error);
     throw new Error("No Access Token Was Found");
 }
 
