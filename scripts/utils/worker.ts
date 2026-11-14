@@ -126,6 +126,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             const response = await new Promise<Record<string, string>>((resolve, reject) => {
                 setTimeout(async () => {
                     try {
+                        console.log("hi");
+                        
                         const response = await worker({
                             urls: failedUrls,
                             direct: direct,
