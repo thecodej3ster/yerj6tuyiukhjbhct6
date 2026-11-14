@@ -17,13 +17,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
-    const handleResolver: AxiosResponseTransformer =  (response: AxiosResponse, headers: AxiosResponseHeaders) => {
+    const handleResolver: AxiosResponseTransformer = (response: AxiosResponse, headers: AxiosResponseHeaders) => {
         workerResponse = response
         if (resolverAction) {
             if (resolverArgs) {
-                return  resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+                return resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             } else {
-                return  resolverAction({ response: response, headers: headers })
+                return resolverAction({ response: response, headers: headers })
             }
         }
         return response;
@@ -71,8 +71,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         } catch (error) {
             failedWorks.push(key)
             result[key] = workerResponse;
-            console.log('CAUGHTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
-            
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
@@ -81,13 +79,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             if (nextKey) {
                 const nextUrl = urls[nextKey];
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                try {
                 await fetchData(nextUrl, nextKey);
-                } catch (error) {
-                    console.log("ME");
-                    console.log(error);
-                    
-                }
             }
         }
     };
@@ -110,18 +102,23 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         try {
             await Promise.all(initialWorkers)
-
         } catch (error) {
-            console.log('ALREADDY BROKEN ');
-            
-          }
+            // if (failedWorks.length) {
+                //  failedWorks.map(key => {
+                //     console.log(result[key]);
+                // })
+                // throw new Error("Some Works Were Unable To Process");
+            // }
+            console.log('ALREADDY BROKEN ')
 
-        if (failedWorks.length) {
-            //  failedWorks.map(key => {
-            //     console.log(result[key]);
-            // })
-            // throw new Error("Some Works Were Unable To Process");
         }
+
+        // if (failedWorks.length) {
+        //     //  failedWorks.map(key => {
+        //     //     console.log(result[key]);
+        //     // })
+        //     // throw new Error("Some Works Were Unable To Process");
+        // }
         // const newWork: Record<string, string> = {}
         // if (failedWorks.length && !isRetry) {
         //     console.log('RETRYING ...');
@@ -135,12 +132,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
 
-    try {
-            await processWorkers(urls)
+    // try {
+        await processWorkers(urls)
 
-    } catch (error) {
-        
-    }
+    // } catch (error) {
+
+    // }
 
     return result;
 }
