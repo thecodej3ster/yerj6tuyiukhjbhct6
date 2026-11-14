@@ -125,7 +125,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
                 console.log('INSIDE PROMISE');
-                
+                                console.log(`Delay Is ${delay}`);
+
                 setTimeout(async () => {
                                     console.log('INSIDE TIMEOUT');
 
@@ -147,6 +148,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     }
 
                 }, delay);
+                
             })
 
             for (const key in response) {
