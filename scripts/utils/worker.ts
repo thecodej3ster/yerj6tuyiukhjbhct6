@@ -117,11 +117,11 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 throw error
             }
 
-            console.log(failedWorks);
             
             failedWorks.map(key => {
                 failedUrls[key] = urls[key]
             })
+            console.log(failedUrls);
 
             const response = await new Promise<Record<string, string>>((resolve, reject) => {
                 setTimeout(async () => {
