@@ -123,8 +123,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             })
             console.log(failedUrls);
 
-            const response = await new Promise<Record<string, string>>((resolve, reject) => {
+            const response = await new Promise<Record<string, any>>((resolve, reject) => {
+                console.log('INSIDE PROMISE');
+                
                 setTimeout(async () => {
+                                    console.log('INSIDE TIMEOUT');
+
                     try {
                         console.log("hi");
                         
