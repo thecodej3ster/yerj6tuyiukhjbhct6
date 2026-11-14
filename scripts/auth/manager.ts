@@ -77,7 +77,7 @@ const getAccessTokensConfig: WorkerConfig = {
     requestConfig: {
         headers: commonHeaders,
         method: "POST",
-        responseType: "json",
+        // responseType: "json",
         body: '{"operationName":"getPersonalAccessTokens","variables":{},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"query getPersonalAccessTokens {\n  personalAccessTokens {\n    accessTokens {\n      accessToken\n      clientId\n      name\n      generatedAt\n      expiresAt\n      scopes\n      __typename\n    }\n    maxTokens\n    __typename\n  }\n}"}'
     }
 }
