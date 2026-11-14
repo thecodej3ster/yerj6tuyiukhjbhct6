@@ -71,6 +71,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         } catch (error) {
             failedWorks.push(key)
             result[key] = workerResponse;
+            console.log('CAUGHTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
+            
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
