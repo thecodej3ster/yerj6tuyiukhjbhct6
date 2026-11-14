@@ -17,13 +17,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
-    const handleResolver: AxiosResponseTransformer = (response: AxiosResponse, headers: AxiosResponseHeaders) => {
+    const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
         workerResponse = response
         if (resolverAction) {
             if (resolverArgs) {
-                return resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+                return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             } else {
-                return resolverAction({ response: response, headers: headers })
+                return await resolverAction({ response: response, headers: headers })
             }
         }
         return response;
