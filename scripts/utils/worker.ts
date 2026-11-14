@@ -30,7 +30,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
     const failedWorks: string[] = []
-    let isRetry = false
+    let delay = 5000
 
     const fetchData = async (url: string, key: string): Promise<void> => {
 
@@ -68,13 +68,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         try {
             let response = await axios(selectedRequestConfig)
             result[key] = await response.data
+            delay = 5000
         } catch (error) {
-                        console.log('CAUGHTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
-
             failedWorks.push(key)
             result[key] = workerResponse;
+            delay += 5000
             throw error
-
         }
 
         // FIX 3: Process the next item in the queue recursively matching your original architecture 
@@ -89,6 +88,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     };
 
     async function processWorkers(works: Record<string, string>) {
+
         try {
 
             // FIX 4: Concurrency Limit and Execution Wrapper
@@ -108,34 +108,57 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             await Promise.all(initialWorkers)
         } catch (error) {
-            if (failedWorks.length) {
-             failedWorks.map(key => {
-                console.log(result[key]);
-                
-            })
-            // throw new Error("Some Works Were Unable To Process");
+            const failedUrls: Record<string, string> = {}
+
+            if (delay === 30000) {
+                throw error
             }
-            console.log('ALREADDY BROKEN ')
 
+            failedWorks.map(key => {
+                failedUrls[key] = urls[key]
+            })
+
+            const response = await new Promise<Record<string, string>>((resolve, reject) => {
+                setTimeout(async () => {
+                    try {
+                        const response = await worker({
+                            urls: urls,
+                            direct: direct,
+                            resolverAction: resolverAction,
+                            resolverArgs: resolverArgs,
+                            requestConfig: requestConfig
+                        })
+                        resolve(response)
+                    } catch (error) {
+                        reject(error)
+                    }
+
+                }, delay);
+            })
+
+            for (const key in response) {
+                result[key] = response[key]
+            }
         }
-
-        // if (failedWorks.length) {
-        //     //  failedWorks.map(key => {
-        //     //     console.log(result[key]);
-        //     // })
-        //     // throw new Error("Some Works Were Unable To Process");
-        // }
-        // const newWork: Record<string, string> = {}
-        // if (failedWorks.length && !isRetry) {
-        //     console.log('RETRYING ...');
-
-        // failedWorks.map(key => {
-        //     newWork[key] = works[key]
-        // })
-        //     isRetry = true
-        //     await processWorkers(newWork)
-        // }
     }
+
+    // if (failedWorks.length) {
+    //     //  failedWorks.map(key => {
+    //     //     console.log(result[key]);
+    //     // })
+    //     // throw new Error("Some Works Were Unable To Process");
+    // }
+    // const newWork: Record<string, string> = {}
+    // if (failedWorks.length && !isRetry) {
+    //     console.log('RETRYING ...');
+
+    // failedWorks.map(key => {
+    //     newWork[key] = works[key]
+    // })
+    //     isRetry = true
+    //     await processWorkers(newWork)
+    // }
+    // }
 
 
     // try {
