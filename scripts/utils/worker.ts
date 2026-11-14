@@ -112,6 +112,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             const failedUrls: Record<string, string> = {}
 
             if (delay === 30000) {
+                console.log('delay Gone');
+                
                 throw error
             }
 
