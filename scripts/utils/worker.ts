@@ -109,7 +109,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         try {
             await Promise.all(initialWorkers)
 
-        } catch (error) {  }
+        } catch (error) {
+            console.log('ALREADDY BROKEN ');
+            
+          }
 
         if (failedWorks.length) {
             //  failedWorks.map(key => {

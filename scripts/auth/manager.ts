@@ -175,7 +175,7 @@ async function runGetAuthUrl() {
         await new Promise<void>((resolve) => {
             console.log('IN');
             console.log(`DELAY IS ${delay}`);
-            
+
             setTimeout(async () => {
                 console.log('WAIT');
 
@@ -229,7 +229,7 @@ const runGetAuthSessionUrl = async () => {
         console.log("HERE");
 
         await new Promise<void>((resolve) => {
-                        console.log('IN');
+            console.log('IN');
             console.log(`DELAY IS ${delay}`);
             setTimeout(async () => {
                 console.log('WAIT');
@@ -284,7 +284,7 @@ const runGetAuthToken = async () => {
         console.log("HERE");
 
         await new Promise<void>((resolve) => {
-                        console.log('IN');
+            console.log('IN');
             console.log(`DELAY IS ${delay}`);
             setTimeout(async () => {
                 console.log('WAIT');
@@ -392,13 +392,15 @@ async function getAccessTokens(username: string) {
     const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } } } }
 
     const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
-    if (!personalAccessTokens || !personalAccessTokens.length) {
-        console.log(accessTokens);
-        throw new Error("No Access Token Was Found");
+    if (personalAccessTokens) {
+        if (personalAccessTokens.length) {
+            return personalAccessTokens
+        } else {
+            return []
+        }
     }
     console.log(personalAccessTokens);
-
-    return personalAccessTokens
+    throw new Error("No Access Token Was Found");
 }
 
 let revokeAllAccessTokensWorkIndex = 0
