@@ -338,7 +338,7 @@ async function getAccessTokens(username: string) {
 
     const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
 
-    const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
+    const personalAccessTokens = accessTokens?.data?.personalAccessTokens?.accessTokens
     if (personalAccessTokens) {
         if (personalAccessTokens.length) {
             return personalAccessTokens
