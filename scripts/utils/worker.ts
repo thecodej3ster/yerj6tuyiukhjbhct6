@@ -30,7 +30,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
     const failedWorks: string[] = []
-    let delay = 5000
+    let delay = 0
 
     const fetchData = async (url: string, key: string): Promise<void> => {
 
@@ -67,7 +67,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
         try {
             let response = await axios(selectedRequestConfig)
+            console.log('AM GOOD 1');
+
             result[key] = await response.data
+
+            console.log('AM GOOD 2');
+
             delay = 5000
 
             // FIX 3: Process the next item in the queue recursively matching your original architecture 
@@ -106,12 +111,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
 
             }
-try {
+            try {
                 await Promise.all(initialWorkers)
 
-} catch (error) {
-    
-}
+            } catch (error) {
+
+            }
 
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
