@@ -107,12 +107,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             }
 
-            try {
+            // try {
                 await Promise.all(initialWorkers)
 
-            } catch (error) {
+            // } catch (error) {
 
-            }
+            // }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...');
             const failedUrls: Record<string, string> = {}
