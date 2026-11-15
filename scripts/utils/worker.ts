@@ -106,8 +106,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
 
             }
+try {
+                await Promise.all(initialWorkers)
 
-            await Promise.all(initialWorkers)
+} catch (error) {
+    
+}
 
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
