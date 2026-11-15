@@ -123,9 +123,14 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             })
 
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
+                console.log('INSIDE PROMISE');
+                console.log(`Delay Is ${delay}`);
+
                 setTimeout(async () => {
                     console.log('INSIDE TIMEOUT');
                     try {
+                        console.log("hi");
+
                         const response = await worker({
                             urls: failedUrls,
                             direct: direct,
@@ -136,6 +141,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         resolve(response)
                     } catch (error) {
                         console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
+
                         reject(error)
                     }
 
