@@ -35,7 +35,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     reject(error)
                 }
             })
-            return 
+            // return 
         }
         // return response;
 
