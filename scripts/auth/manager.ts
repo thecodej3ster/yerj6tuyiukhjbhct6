@@ -346,8 +346,12 @@ async function getAccessTokens(username: string) {
             return []
         }
     }
-    console.log(accessTokens?.error);
-    throw new Error("No Access Token Was Found");
+
+    if (accessTokens?.error) {
+        throw accessTokens?.error
+    }
+    console.log(accessTokens);
+    
 }
 
 let revokeAllAccessTokensWorkIndex = 0
