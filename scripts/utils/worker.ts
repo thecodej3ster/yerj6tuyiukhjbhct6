@@ -72,7 +72,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
 
         return new Promise<void>((resolve, reject) => {
-            try {
+            // try {
                 axios(selectedRequestConfig)
                     .then(response => response.data)
                     .then(data => {
@@ -102,12 +102,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 //     }
                 // }
                 resolve()
-            } catch (error) {
-                failedWorks.push(key)
-                // result[key] = error
-                delay += 5000
-                reject(error)
-            }
+            // } catch (error) {
+            //     failedWorks.push(key)
+            //     // result[key] = error
+            //     delay += 5000
+            //     reject(error)
+            // }
         })
     };
 
