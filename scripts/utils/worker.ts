@@ -86,6 +86,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
                     if (resolverAction) {
+                        resolverArgs = resolverArgs || {}
                         return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
                 })
