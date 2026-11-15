@@ -22,19 +22,20 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         // workerResponse = response
         if (resolverAction) {
             resolverArgs = resolverArgs || {}
+            return resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             //     if (resolverArgs) {
             //         return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
             //     } else {
             //         return await resolverAction({ response: response, headers: headers })
             //     }
-            return new Promise<any>(async (resolve, reject) => {
-                try {
-                    const resolverResponse = await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
-                    resolve(resolverResponse)
-                } catch (error) {
-                    reject(error)
-                }
-            })
+            // return new Promise<any>(async (resolve, reject) => {
+            //     try {
+            //         const resolverResponse = await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+            //         resolve(resolverResponse)
+            //     } catch (error) {
+            //         reject(error)
+            //     }
+            // })
             // return 
         }
         // return response;
