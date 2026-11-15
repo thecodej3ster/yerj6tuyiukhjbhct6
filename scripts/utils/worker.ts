@@ -169,13 +169,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             }
 
-            try {
+            // try {
                 await Promise.all(workers)
 
-            } catch (error) {
-                console.log('YEAAAAAAAAAAAAAAAAAAA');
+            // } catch (error) {
+            //     console.log('YEAAAAAAAAAAAAAAAAAAA');
 
-            }
+            // }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
 
