@@ -6,10 +6,10 @@ import { error } from "node:console";
 
 const workerLimit = 5
 // let workerResponse: AxiosResponse<any, any, {}, any>
-
+const result: Record<string, any> = {};
+let unFinishedWork: string[] = []
+let isInit = true
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
-    const result: Record<string, any> = {};
-    const unFinishedWork = Object.keys(urls);
     const workers: Promise<void>[] = [];
 
     const incomingHeaders = requestConfig?.headers
@@ -162,6 +162,11 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             //     console.log('YEAAAAAAAAAAAAAAAAAAA');
 
             // }
+
+            if (isInit) {
+                unFinishedWork = Object.keys(urls);
+                isInit = false
+            }
 
             const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
 
