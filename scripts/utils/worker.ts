@@ -5,7 +5,7 @@ import { error } from "node:console";
 
 
 const workerLimit = 5
-
+const workers: Promise<void>[] = [];
 // let workerResponse: AxiosResponse<any, any, {}, any>
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
@@ -73,35 +73,45 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         return new Promise<void>((resolve, reject) => {
             // try {
-                axios(selectedRequestConfig)
-                    .then(response => response.data)
-                    .then(data => {
-                        result[key] = data
-                        delay = 5000
-                        resolve()
-                    })
-                    .catch(error => {
-                        reject(error)
-                    })
-                // let response = await axios(selectedRequestConfig)
-                // console.log('AM GOOD 1');
+            axios(selectedRequestConfig)
+                .then(response => response.data)
+                .then(data => {
+                    result[key] = data
+                    delay = 5000
 
-                // result[key] = await response.data
+                    if (unFinishedWork.length > 0) {
+                        const nextKey = unFinishedWork.shift()
+                        if (nextKey) {
+                            const nextUrl = urls[nextKey];
+                            console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                            workers.push(fetchData(nextUrl, nextKey))
+                            // await fetchData(nextUrl, nextKey);
+                        }
+                    }
+                    resolve()
+                })
+                .catch(error => {
+                    reject(error)
+                })
+            // let response = await axios(selectedRequestConfig)
+            // console.log('AM GOOD 1');
 
-                // console.log('AM GOOD 2');
+            // result[key] = await response.data
 
-                // delay = 5000
+            // console.log('AM GOOD 2');
 
-                // // FIX 3: Process the next item in the queue recursively matching your original architecture 
-                // if (unFinishedWork.length > 0) {
-                //     const nextKey = unFinishedWork.shift()
-                //     if (nextKey) {
-                //         const nextUrl = urls[nextKey];
-                //         console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                //         await fetchData(nextUrl, nextKey);
-                //     }
-                // }
-                resolve()
+            // delay = 5000
+
+            // // FIX 3: Process the next item in the queue recursively matching your original architecture 
+            // if (unFinishedWork.length > 0) {
+            //     const nextKey = unFinishedWork.shift()
+            //     if (nextKey) {
+            //         const nextUrl = urls[nextKey];
+            //         console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+            //         await fetchData(nextUrl, nextKey);
+            //     }
+            // }
+            // resolve()
             // } catch (error) {
             //     failedWorks.push(key)
             //     // result[key] = error
@@ -116,26 +126,48 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         try {
 
             // FIX 4: Concurrency Limit and Execution Wrapper
+            // const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
+
+            // const initialWorkers: Promise<void>[] = [];
+
+            // for (let i = 0; i < concurrencyLimit; i++) {
+            //     const key = unFinishedWork.shift();
+
+            //     if (key) {
+            //         initialWorkers.push(fetchData(works[key], key));
+            //     }
+            //     console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+
+            // }
+
+            // try {
+            //     await Promise.all(initialWorkers)
+
+            // } catch (error) {
+            //     console.log('YEAAAAAAAAAAAAAAAAAAA');
+
+            // }
+
             const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
-            const initialWorkers: Promise<void>[] = [];
+
 
             for (let i = 0; i < concurrencyLimit; i++) {
                 const key = unFinishedWork.shift();
 
                 if (key) {
-                    initialWorkers.push(fetchData(works[key], key));
+                    workers.push(fetchData(works[key], key));
                 }
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
 
             }
+
             try {
-                await Promise.all(initialWorkers)
+                await Promise.all(workers)
 
             } catch (error) {
                 console.log('YEAAAAAAAAAAAAAAAAAAA');
 
             }
-
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
 
