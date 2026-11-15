@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, RawAxiosRequestConfig, AxiosResponseTransformer, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
+import { error } from "node:console";
 
 
 const workerLimit = 5
@@ -70,26 +71,36 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             try {
-                let response = await axios(selectedRequestConfig)
-                console.log('AM GOOD 1');
+                axios(selectedRequestConfig)
+                    .then(response => response.data)
+                    .then(data => {
+                        result[key] = data
+                        delay = 5000
+                        resolve()
+                    })
+                    .catch(error => {
+                        reject(error)
+                    })
+                // let response = await axios(selectedRequestConfig)
+                // console.log('AM GOOD 1');
 
-                result[key] = await response.data
+                // result[key] = await response.data
 
-                console.log('AM GOOD 2');
+                // console.log('AM GOOD 2');
 
-                delay = 5000
+                // delay = 5000
 
-                // FIX 3: Process the next item in the queue recursively matching your original architecture 
-                if (unFinishedWork.length > 0) {
-                    const nextKey = unFinishedWork.shift()
-                    if (nextKey) {
-                        const nextUrl = urls[nextKey];
-                        console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                        await fetchData(nextUrl, nextKey);
-                    }
-                }
+                // // FIX 3: Process the next item in the queue recursively matching your original architecture 
+                // if (unFinishedWork.length > 0) {
+                //     const nextKey = unFinishedWork.shift()
+                //     if (nextKey) {
+                //         const nextUrl = urls[nextKey];
+                //         console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                //         await fetchData(nextUrl, nextKey);
+                //     }
+                // }
                 resolve()
             } catch (error) {
                 failedWorks.push(key)
@@ -122,7 +133,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             } catch (error) {
                 console.log('YEAAAAAAAAAAAAAAAAAAA');
-                
+
             }
 
         } catch (error) {
