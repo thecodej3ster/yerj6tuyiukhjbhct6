@@ -5,7 +5,7 @@ import { WorkerConfig } from "./types";
 
 const workerLimit = 5
 
-let workerResponse: AxiosResponse<any, any, {}, any>
+// let workerResponse: AxiosResponse<any, any, {}, any>
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const result: Record<string, any> = {};
@@ -18,7 +18,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         : {};
 
     const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
-        workerResponse = response
+        // workerResponse = response
         if (resolverAction) {
             if (resolverArgs) {
                 return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
@@ -71,7 +71,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             delay = 5000
         } catch (error) {
             failedWorks.push(key)
-            result[key] = workerResponse;
+            result[key] = await error
             delay += 5000
             throw error
         }
@@ -127,27 +127,27 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log('INSIDE PROMISE');
                 console.log(`Delay Is ${delay}`);
 
-                setTimeout( () => {
-                    console.log('INSIDE TIMEOUT');
-                    resolve({})
-                    // try {
-                    //     console.log("hi");
+                // setTimeout( () => {
+                //     console.log('INSIDE TIMEOUT');
+                //     resolve({})
+                //     // try {
+                //     //     console.log("hi");
 
-                    //     const response = await worker({
-                    //         urls: failedUrls,
-                    //         direct: direct,
-                    //         resolverAction: resolverAction,
-                    //         resolverArgs: resolverArgs,
-                    //         requestConfig: requestConfig
-                    //     })
-                    //     resolve(response)
-                    // } catch (error) {
-                    //     console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
+                //     //     const response = await worker({
+                //     //         urls: failedUrls,
+                //     //         direct: direct,
+                //     //         resolverAction: resolverAction,
+                //     //         resolverArgs: resolverArgs,
+                //     //         requestConfig: requestConfig
+                //     //     })
+                //     //     resolve(response)
+                //     // } catch (error) {
+                //     //     console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
 
-                    //     reject(error)
-                    // }
+                //     //     reject(error)
+                //     // }
 
-                }, 0);
+                // }, 0);
 
             })
 
