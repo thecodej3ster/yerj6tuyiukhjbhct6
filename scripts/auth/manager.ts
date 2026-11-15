@@ -389,7 +389,7 @@ async function auth() {
     // await revokeAllAccessTokens()
 
     const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
-    const { t } = await worker(config)
+    const  t  = await worker(config)
     console.log(t);
 }
 
