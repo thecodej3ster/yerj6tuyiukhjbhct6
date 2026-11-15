@@ -71,7 +71,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             delay = 5000
         } catch (error) {
             failedWorks.push(key)
-            result[key] = await error
+            // result[key] = error
             delay += 5000
             throw error
         }
@@ -105,8 +105,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             }
 
+            try {
+                await Promise.all(initialWorkers)
 
-            await Promise.all(initialWorkers)
+            } catch (error) {
+
+            }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...');
             const failedUrls: Record<string, string> = {}
@@ -127,33 +131,33 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log('INSIDE PROMISE');
                 console.log(`Delay Is ${delay}`);
 
-                // setTimeout( () => {
-                //     console.log('INSIDE TIMEOUT');
-                //     resolve({})
-                //     // try {
-                //     //     console.log("hi");
+                setTimeout( () => {
+                    console.log('INSIDE TIMEOUT');
+                    resolve({})
+                    // try {
+                    //     console.log("hi");
 
-                //     //     const response = await worker({
-                //     //         urls: failedUrls,
-                //     //         direct: direct,
-                //     //         resolverAction: resolverAction,
-                //     //         resolverArgs: resolverArgs,
-                //     //         requestConfig: requestConfig
-                //     //     })
-                //     //     resolve(response)
-                //     // } catch (error) {
-                //     //     console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
+                    //     const response = await worker({
+                    //         urls: failedUrls,
+                    //         direct: direct,
+                    //         resolverAction: resolverAction,
+                    //         resolverArgs: resolverArgs,
+                    //         requestConfig: requestConfig
+                    //     })
+                    //     resolve(response)
+                    // } catch (error) {
+                    //     console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
 
-                //     //     reject(error)
-                //     // }
+                    //     reject(error)
+                    // }
 
-                // }, 0);
+                }, 0);
 
             })
 
-            for (const key in response) {
-                result[key] = response[key]
-            }
+            // for (const key in response) {
+            //     result[key] = response[key]
+            // }
         }
     }
 
