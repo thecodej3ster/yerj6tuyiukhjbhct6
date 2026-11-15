@@ -1,16 +1,18 @@
-import axios, { AxiosResponseHeaders, RawAxiosRequestConfig } from "axios";
+import axios, { AxiosResponse, RawAxiosRequestConfig, AxiosResponseTransformer, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
+import { error } from "node:console";
 
-const workerLimit = 5;
-let isInit = true
+
+const workerLimit = 5
+// let workerResponse: AxiosResponse<any, any, {}, any>
+const result: Record<string, any> = {};
 let unFinishedWork: string[] = []
-
+let isInit = true
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
-    const result: Record<string, any> = {};
     const workers: Promise<void>[] = [];
-    const failedWorks: string[] = [];
-    let delay = 5000;
+    const failedWorks: string[] = []
+    let delay = 5000
 
     const incomingHeaders = requestConfig?.headers
         ? (requestConfig.headers instanceof Headers
@@ -19,14 +21,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         : {};
 
     const fetchData = (url: string, key: string): Promise<void> => {
+
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
             data: requestConfig?.body || null,
             method: "GET",
             responseEncoding: "UTF-8",
             responseType: "text",
-            // transformResponse is left to defaults; resolverAction is handled in the promise chain below
-            ...requestConfig,
             headers: {
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
@@ -45,55 +46,48 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         };
 
         if (!direct) {
-            selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true });
+            selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
         return new Promise<void>((resolve, reject) => {
             axios(selectedRequestConfig)
-                .then(async response => {
-console.log(response);
-
-                    // Execute and await resolverAction here so errors propagate correctly
+                .then(response => {
+                    const headers = response.headers as AxiosResponseHeaders
                     if (resolverAction) {
-                        const currentArgs = resolverArgs || {};
-                        return await resolverAction({
-                            ...currentArgs,
-                            response: response,
-                            headers: response.headers as AxiosResponseHeaders
-                        });
+                        resolverArgs = resolverArgs || {}
+                        return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
-                    return response.data;
                 })
                 .then(data => {
-                    result[key] = data;
-                    delay = 5000;
+                    result[key] = data
+                    delay = 5000
 
-                    if (unFinishedWork.length > 0) {
-                        const nextKey = unFinishedWork.shift();
+                    if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
+                        const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
                             console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                            workers.push(fetchData(nextUrl, nextKey));
+                            workers.push(fetchData(nextUrl, nextKey))
                         }
                     }
-                    resolve();
+                    resolve()
                 })
                 .catch(error => {
-                    // Track failed works for the retry mechanism
-                    failedWorks.push(key);
-                    reject(error);
-                });
-        });
+                    reject(error)
+                })
+        })
     };
 
     async function processWorkers(works: Record<string, string>) {
+
         try {
-            const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
 
             if (isInit) {
                 unFinishedWork = Object.keys(urls);
                 isInit = false
             }
+
+            const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
 
             for (let i = 0; i < concurrencyLimit; i++) {
                 const key = unFinishedWork.shift();
@@ -102,21 +96,23 @@ console.log(response);
                     workers.push(fetchData(works[key], key));
                 }
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+
             }
 
-            await Promise.all(workers);
-        } catch (error) {
-            console.log('REQUEST FAILED RETRYING ...');
+            await Promise.all(workers)
 
-            const failedUrls: Record<string, string> = {};
+        } catch (error) {
+            console.log('REQUEST FAILED RETRYING ...')
+
+            const failedUrls: Record<string, string> = {}
 
             if (delay === 30000) {
-                throw error;
+                throw error
             }
 
-            failedWorks.forEach(key => {
-                failedUrls[key] = urls[key];
-            });
+            failedWorks.map(key => {
+                failedUrls[key] = urls[key]
+            })
 
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
                 console.log('INSIDE PROMISE');
@@ -125,28 +121,32 @@ console.log(response);
                 setTimeout(async () => {
                     console.log('INSIDE TIMEOUT');
                     try {
-                        const res = await worker({
+                        console.log("hi");
+
+                        const response = await worker({
                             urls: failedUrls,
                             direct: direct,
                             resolverAction: resolverAction,
                             resolverArgs: resolverArgs,
                             requestConfig: requestConfig
-                        });
-                        resolve(res);
-                    } catch (err) {
+                        })
+                        resolve(response)
+                    } catch (error) {
                         console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
-                        reject(err);
+                        reject(error)
                     }
+
                 }, delay);
-            });
+
+            })
 
             for (const key in response) {
-                result[key] = response[key];
+                result[key] = response[key]
             }
         }
     }
 
-    await processWorkers(urls);
+    await processWorkers(urls)
 
     return result;
 }
