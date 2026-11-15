@@ -55,10 +55,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             method: "GET",
             responseEncoding: "UTF-8",
             responseType: "text",
-            transformResponse: ([] as AxiosResponseTransformer[])
-                .concat(axios.defaults.transformResponse || [])
-                .concat([handleResolver]).filter(Boolean),
-            ...requestConfig,
+            // transformResponse: ([] as AxiosResponseTransformer[])
+            //     .concat(axios.defaults.transformResponse || [])
+            //     .concat([handleResolver]).filter(Boolean),
+            // ...requestConfig,
             headers: {
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
@@ -83,7 +83,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         return new Promise<void>((resolve, reject) => {
             // try {
             axios(selectedRequestConfig)
-                .then(response => response.data)
+                .then(response => {
+                    const headers = response.headers as AxiosResponseHeaders
+                    if (resolverAction) {
+                        return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
+                    }
+                })
                 .then(data => {
                     result[key] = data
                     delay = 5000
