@@ -5,12 +5,12 @@ import { error } from "node:console";
 
 
 const workerLimit = 5
-const workers: Promise<void>[] = [];
 // let workerResponse: AxiosResponse<any, any, {}, any>
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const result: Record<string, any> = {};
     const unFinishedWork = Object.keys(urls);
+    const workers: Promise<void>[] = [];
 
     const incomingHeaders = requestConfig?.headers
         ? (requestConfig.headers instanceof Headers
@@ -27,7 +27,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             //     } else {
             //         return await resolverAction({ response: response, headers: headers })
             //     }
-            return new Promise<any>(async(resolve, reject) => {
+            return new Promise<any>(async (resolve, reject) => {
                 try {
                     const resolverResponse = await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
                     resolve(resolverResponse)
@@ -42,7 +42,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
     const failedWorks: string[] = []
-    let delay = 0
+    let delay = 5000
 
     const fetchData = (url: string, key: string): Promise<void> => {
 
@@ -170,7 +170,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             }
 
             // try {
-                await Promise.all(workers)
+            await Promise.all(workers)
 
             // } catch (error) {
             //     console.log('YEAAAAAAAAAAAAAAAAAAA');
