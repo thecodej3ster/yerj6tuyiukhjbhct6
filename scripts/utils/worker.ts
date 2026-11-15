@@ -27,7 +27,15 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             //     } else {
             //         return await resolverAction({ response: response, headers: headers })
             //     }
-            return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+            return new Promise<any>(async(resolve, reject) => {
+                try {
+                    const resolverResponse = await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+                    resolve(resolverResponse)
+                } catch (error) {
+                    reject(error)
+                }
+            })
+            return 
         }
         // return response;
 
