@@ -127,7 +127,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log('INSIDE PROMISE');
                 console.log(`Delay Is ${delay}`);
 
-                setTimeout(async () => {
+                setTimeout( () => {
                     console.log('INSIDE TIMEOUT');
                     resolve({})
                     // try {
