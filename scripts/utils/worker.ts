@@ -51,6 +51,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         return new Promise<void>((resolve, reject) => {
             axios(selectedRequestConfig)
                 .then(async response => {
+console.log(response);
 
                     // Execute and await resolverAction here so errors propagate correctly
                     if (resolverAction) {
@@ -93,7 +94,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 unFinishedWork = Object.keys(urls);
                 isInit = false
             }
-            
+
             for (let i = 0; i < concurrencyLimit; i++) {
                 const key = unFinishedWork.shift();
 
