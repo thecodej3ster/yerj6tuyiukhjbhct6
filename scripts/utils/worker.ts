@@ -113,11 +113,11 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             if (delay === 30000) {
                 console.log('delay Gone');
-                
+
                 throw error
             }
 
-            
+
             failedWorks.map(key => {
                 failedUrls[key] = urls[key]
             })
@@ -125,30 +125,30 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
                 console.log('INSIDE PROMISE');
-                                console.log(`Delay Is ${delay}`);
+                console.log(`Delay Is ${delay}`);
 
                 setTimeout(async () => {
-                                    console.log('INSIDE TIMEOUT');
+                    console.log('INSIDE TIMEOUT');
+                    resolve({})
+                    // try {
+                    //     console.log("hi");
 
-                    try {
-                        console.log("hi");
-                        
-                        const response = await worker({
-                            urls: failedUrls,
-                            direct: direct,
-                            resolverAction: resolverAction,
-                            resolverArgs: resolverArgs,
-                            requestConfig: requestConfig
-                        })
-                        resolve(response)
-                    } catch (error) {
-                        console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
-                        
-                        reject(error)
-                    }
+                    //     const response = await worker({
+                    //         urls: failedUrls,
+                    //         direct: direct,
+                    //         resolverAction: resolverAction,
+                    //         resolverArgs: resolverArgs,
+                    //         requestConfig: requestConfig
+                    //     })
+                    //     resolve(response)
+                    // } catch (error) {
+                    //     console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
+
+                    //     reject(error)
+                    // }
 
                 }, delay);
-                
+
             })
 
             for (const key in response) {
