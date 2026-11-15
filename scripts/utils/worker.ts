@@ -20,19 +20,23 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     const handleResolver: AxiosResponseTransformer = async (response: AxiosResponse, headers: AxiosResponseHeaders) => {
         // workerResponse = response
         if (resolverAction) {
-            if (resolverArgs) {
-                return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
-            } else {
-                return await resolverAction({ response: response, headers: headers })
-            }
+            resolverArgs = resolverArgs || {}
+            //     if (resolverArgs) {
+            //         return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
+            //     } else {
+            //         return await resolverAction({ response: response, headers: headers })
+            //     }
+            return await resolverAction({ ...resolverArgs, ...{ response: response, headers: headers } })
         }
-        return response;
+        // return response;
+
     }
 
     const failedWorks: string[] = []
     let delay = 0
 
-    const fetchData = async (url: string, key: string): Promise<void> => {
+    const fetchData = (url: string, key: string): Promise<void> => {
+
 
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
@@ -65,33 +69,35 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         if (!direct) {
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
-        try {
-            let response = await axios(selectedRequestConfig)
-            console.log('AM GOOD 1');
 
-            result[key] = await response.data
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                let response = await axios(selectedRequestConfig)
+                console.log('AM GOOD 1');
 
-            console.log('AM GOOD 2');
+                result[key] = await response.data
 
-            delay = 5000
+                console.log('AM GOOD 2');
 
-            // FIX 3: Process the next item in the queue recursively matching your original architecture 
-            if (unFinishedWork.length > 0) {
-                const nextKey = unFinishedWork.shift()
-                if (nextKey) {
-                    const nextUrl = urls[nextKey];
-                    console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                    await fetchData(nextUrl, nextKey);
+                delay = 5000
+
+                // FIX 3: Process the next item in the queue recursively matching your original architecture 
+                if (unFinishedWork.length > 0) {
+                    const nextKey = unFinishedWork.shift()
+                    if (nextKey) {
+                        const nextUrl = urls[nextKey];
+                        console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                        await fetchData(nextUrl, nextKey);
+                    }
                 }
+                resolve()
+            } catch (error) {
+                failedWorks.push(key)
+                // result[key] = error
+                delay += 5000
+                reject(error)
             }
-        } catch (error) {
-            failedWorks.push(key)
-            // result[key] = error
-            delay += 5000
-            throw error
-        }
-
-
+        })
     };
 
     async function processWorkers(works: Record<string, string>) {
@@ -115,7 +121,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 await Promise.all(initialWorkers)
 
             } catch (error) {
-
+                console.log('YEAAAAAAAAAAAAAAAAAAA');
+                
             }
 
         } catch (error) {
