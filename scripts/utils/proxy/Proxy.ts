@@ -86,6 +86,8 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
 
                 socket.on("error", (error) => {
                     socket.destroy();
+                    console.log(error);
+                    
                     reject(error);
                 })
             });

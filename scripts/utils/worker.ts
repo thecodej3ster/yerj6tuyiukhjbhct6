@@ -51,7 +51,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         return new Promise<void>((resolve, reject) => {
             axios(selectedRequestConfig)
-                .then(response => {
+                .then(response => {                    
                     const headers = response.headers as AxiosResponseHeaders
                     if (resolverAction) {
                         resolverArgs = resolverArgs || {}
