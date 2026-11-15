@@ -69,6 +69,16 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             let response = await axios(selectedRequestConfig)
             result[key] = await response.data
             delay = 5000
+
+            // FIX 3: Process the next item in the queue recursively matching your original architecture 
+            if (unFinishedWork.length > 0) {
+                const nextKey = unFinishedWork.shift()
+                if (nextKey) {
+                    const nextUrl = urls[nextKey];
+                    console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                    await fetchData(nextUrl, nextKey);
+                }
+            }
         } catch (error) {
             failedWorks.push(key)
             // result[key] = error
@@ -76,15 +86,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             throw error
         }
 
-        // FIX 3: Process the next item in the queue recursively matching your original architecture 
-        if (unFinishedWork.length > 0) {
-            const nextKey = unFinishedWork.shift()
-            if (nextKey) {
-                const nextUrl = urls[nextKey];
-                console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                await fetchData(nextUrl, nextKey);
-            }
-        }
+
     };
 
     async function processWorkers(works: Record<string, string>) {
@@ -131,7 +133,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log('INSIDE PROMISE');
                 console.log(`Delay Is ${delay}`);
 
-                setTimeout( () => {
+                setTimeout(() => {
                     console.log('INSIDE TIMEOUT');
                     resolve({})
                     // try {
