@@ -107,7 +107,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             }
 
+            console.log('waiting');
+            
             await Promise.all(workers)
+console.log('done WAITING');
 
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
