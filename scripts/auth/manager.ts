@@ -373,25 +373,21 @@ async function revokeAllAccessTokens() {
 }
 
 async function auth() {
-    // sortAuth()
-    // hydrateCookieStore()
-    // usernames = Object.keys(cookieStore)
-    // await runGetAuthUrl()
-    // console.log(cookieStore);
-    // await runGetAuthSessionUrl()
-    // console.log(cookieStore);
-    // await runGetAuthToken()
-    // console.log(cookieStore);
+    sortAuth()
+    hydrateCookieStore()
+    usernames = Object.keys(cookieStore)
+    await runGetAuthUrl()
+    console.log(cookieStore);
+    await runGetAuthSessionUrl()
+    console.log(cookieStore);
+    await runGetAuthToken()
+    console.log(cookieStore);
     // await revokeAccesssToken()
     // await createAccesssToken()
     // console.log(JSON.parse(keys));
     // await save({ name: 'CREDS', value: keys })
-    // await revokeAllAccessTokens()
+    await revokeAllAccessTokens()
 
-
-    const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
-    const { t } = await worker(config)
-    console.log(t);
 }
 
 
