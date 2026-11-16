@@ -46,6 +46,7 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
         .single<{ data: string }>()
 
     if (error) {
+        console.log(error);
         throw error
     }
     const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
