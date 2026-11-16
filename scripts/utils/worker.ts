@@ -116,6 +116,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
 
+            console.log(error);
+            
             const failedUrls: Record<string, string> = {}
 
             if (delay === 30000) {
