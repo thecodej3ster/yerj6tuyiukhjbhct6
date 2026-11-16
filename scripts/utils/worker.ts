@@ -20,7 +20,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         : {};
 
     const fetchData = (url: string, key: string): Promise<void> => {
-
+        console.log('FETCHING DATA');
+        
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
             data: requestConfig?.body || null,
