@@ -148,34 +148,35 @@ async function runGetAuthUrl() {
     getAuthUrlConfig.resolverArgs.username = username
 
     const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
+console.log(authUrl);
 
-    try {
+    // try {
 
-        if (!authUrl.toLowerCase().startsWith("http")) {
-            throw new Error("Invalid Url Recived");
-        }
-        authUrls[username] = authUrl
-        getAuthUrlWorkIndex++
-        delay = 0
+    //     if (!authUrl.toLowerCase().startsWith("http")) {
+    //         throw new Error("Invalid Url Recived");
+    //     }
+    //     authUrls[username] = authUrl
+    //     getAuthUrlWorkIndex++
+    //     delay = 0
 
-        if (getAuthUrlWorkIndex === usernames.length) {
-            return
-        }
+    //     if (getAuthUrlWorkIndex === usernames.length) {
+    //         return
+    //     }
 
-        await runGetAuthUrl()
-    } catch (error) {
-        delay += 5000
-        if (delay === 30000) {
-            throw error
-        }
+    //     await runGetAuthUrl()
+    // } catch (error) {
+    //     delay += 5000
+    //     if (delay === 30000) {
+    //         throw error
+    //     }
 
-        await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-                await runGetAuthUrl()
-                resolve()
-            }, delay);
-        })
-    }
+    //     await new Promise<void>((resolve) => {
+    //         setTimeout(async () => {
+    //             await runGetAuthUrl()
+    //             resolve()
+    //         }, delay);
+    //     })
+    // }
 }
 
 

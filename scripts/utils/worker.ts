@@ -47,13 +47,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         if (!direct) {
             console.log('ITS ME');
-            
+
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
         return new Promise<void>((resolve, reject) => {
             console.log("AM STILL FETCHING");
-            
+
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
@@ -62,10 +62,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
                     console.log(response.headers);
-                    
+
                     return response.data
                 })
-                .then(data => {                    
+                .then(data => {
                     result[key] = data
                     delay = 5000
 
@@ -108,9 +108,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             }
 
             console.log('waiting');
-            
+
             await Promise.all(workers)
-console.log('done WAITING');
+            console.log('done WAITING');
 
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
