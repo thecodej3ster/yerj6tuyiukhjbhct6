@@ -376,7 +376,7 @@ async function auth() {
     // sortAuth()
     // hydrateCookieStore()
     // usernames = Object.keys(cookieStore)
-    // await runGetAuthUrl()
+    await runGetAuthUrl()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
     // console.log(cookieStore);
@@ -389,9 +389,9 @@ async function auth() {
     // await revokeAllAccessTokens()
 
 
-    const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip",tm: "https://httpbin.org/ip",tw: "https://httpbin.org/ip" }, direct: false }
-    const  t  = await worker(config)
-    console.log(t);
+    // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip",tm: "https://httpbin.org/ip",tw: "https://httpbin.org/ip" }, direct: false }
+    // const  t  = await worker(config)
+    // console.log(t);
 }
 
 
