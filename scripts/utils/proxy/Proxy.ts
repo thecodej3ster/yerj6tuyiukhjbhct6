@@ -70,7 +70,7 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
     const testServer = async () => {
         try {
             return await new Promise<tls.TLSSocket>((resolve, reject) => {
-                const socket = tls.connect({ host: server.host, port: 443, servername: server.host });
+                const socket = tls.connect({ host: "us-newjersey.http-proxy.privateinternetbrowsing.com", port: 443, servername: "us-newjersey.http-proxy.privateinternetbrowsing.com" });
                 socket.setTimeout(6000);
 
                 socket.on("secureConnect", () => {
@@ -104,7 +104,7 @@ function buildConnectRequst({ authHeader, targetHost, targetPort }: { authHeader
     return `CONNECT ${targetHost}:${targetPort} HTTP/1.1\r\n` +
         `Host: ${targetHost}:${targetPort}\r\n` +
         `Proxy-Connection: Keep-Alive\r\n` +
-        authHeader +
+        `Proxy-Authorization: Basic cDY2MDA3NTI6aEtyeXg0ZkE5bw==\r\n` +
         `\r\n`;
 }
 

@@ -351,7 +351,7 @@ async function getAccessTokens(username: string) {
         throw accessTokens?.error
     }
     console.log(accessTokens);
-    
+
 }
 
 let revokeAllAccessTokensWorkIndex = 0
@@ -387,6 +387,11 @@ async function auth() {
     // console.log(JSON.parse(keys));
     // await save({ name: 'CREDS', value: keys })
     // await revokeAllAccessTokens()
+
+
+    const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip" }, direct: false }
+    const { t } = await worker(config)
+    console.log(t);
 }
 
 
