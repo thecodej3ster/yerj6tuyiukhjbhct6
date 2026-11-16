@@ -136,6 +136,8 @@ async function hydrateCookieStore() {
 let getAuthUrlWorkIndex = 0
 async function runGetAuthUrl() {
     const username = usernames[getAuthUrlWorkIndex]
+    console.log(username);
+    
 
     if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
     let cookie = ""
@@ -149,6 +151,7 @@ async function runGetAuthUrl() {
 
     const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
 console.log(authUrl);
+console.log(getAuthUrlConfig);
 
     // try {
 
