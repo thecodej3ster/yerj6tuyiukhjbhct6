@@ -373,9 +373,9 @@ async function revokeAllAccessTokens() {
 }
 
 async function auth() {
-    // sortAuth()
-    // hydrateCookieStore()
-    // usernames = Object.keys(cookieStore)
+    sortAuth()
+    hydrateCookieStore()
+    usernames = Object.keys(cookieStore)
     await runGetAuthUrl()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()

@@ -61,6 +61,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         resolverArgs = resolverArgs || {}
                         return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
+                    console.log(response.headers);
+                    
                     return response.data
                 })
                 .then(data => {                    
