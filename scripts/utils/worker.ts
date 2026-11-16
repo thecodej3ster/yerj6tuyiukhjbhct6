@@ -57,11 +57,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
+                                        console.log(response);
+
                     if (resolverAction) {
                         resolverArgs = resolverArgs || {}
                         return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
-                    console.log(response.headers);
 
                     return response.data
                 })
