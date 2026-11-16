@@ -19,6 +19,7 @@ interface ServerCred {
 let selectedServer: ServerCred
 
 
+let provider = 'pv-xxx'
 
 let lastUsed = -1
 export function selectKey(list: { keys: string[] }) {
@@ -40,7 +41,7 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
 
     const { data: lists, error } = await db.from('serverlists')
         .select("*")
-        .eq("id", 'tv-xxx')
+        .eq("id", provider)
         .limit(1)
         .single<{ data: string }>()
 
@@ -70,7 +71,7 @@ async function getProxySocket(): Promise<tls.TLSSocket> {
     const testServer = async () => {
         try {
             return await new Promise<tls.TLSSocket>((resolve, reject) => {
-                const socket = tls.connect({ host: "us-newjersey.http-proxy.privateinternetbrowsing.com", port: 443, servername: "us-newjersey.http-proxy.privateinternetbrowsing.com" });
+                const socket = tls.connect({ host: server.host, port: 443, servername: server.host });
                 socket.setTimeout(6000);
 
                 socket.on("secureConnect", () => {
@@ -104,7 +105,7 @@ function buildConnectRequst({ authHeader, targetHost, targetPort }: { authHeader
     return `CONNECT ${targetHost}:${targetPort} HTTP/1.1\r\n` +
         `Host: ${targetHost}:${targetPort}\r\n` +
         `Proxy-Connection: Keep-Alive\r\n` +
-        `Proxy-Authorization: Basic cDY2MDA3NTI6aEtyeXg0ZkE5bw==\r\n` +
+        authHeader +
         `\r\n`;
 }
 
@@ -154,11 +155,14 @@ export class ProxyAgent extends HttpsAgent {
 
                         case connectResponse.startsWith("HTTP/1.0 407") && !retried:
                         case connectResponse.startsWith("HTTP/1.1 407") && !retried:
+                            if (provider !== 'tv-xxx') {
+                                break
+                            }
                             await setProxyCreds()
 
                             const { data: lists, error } = await db.from('serverlists')
                                 .select("*")
-                                .eq("id", 'tv-xxx')
+                                .eq("id", provider)
                                 .limit(1)
                                 .single<{ data: string }>()
 

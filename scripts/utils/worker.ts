@@ -1,7 +1,6 @@
 import axios, { AxiosResponse, RawAxiosRequestConfig, AxiosResponseTransformer, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
-import { error } from "node:console";
 
 
 const workerLimit = 5
