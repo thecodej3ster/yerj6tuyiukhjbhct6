@@ -125,6 +125,8 @@ export class ProxyAgent extends HttpsAgent {
         let connectResponse = "";
         const hanleRequest = async () => {
             let proxySocket = await getProxySocket()
+            console.log('PASSING');
+            
             const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
             const targetHost = connectionOpts.host;
             const targetPort = connectionOpts.port || 443;

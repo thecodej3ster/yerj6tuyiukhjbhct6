@@ -46,6 +46,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         };
 
         if (!direct) {
+            console.log('ITS ME');
+            
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
