@@ -21,7 +21,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
     const fetchData = (url: string, key: string): Promise<void> => {
         console.log('FETCHING DATA');
-        
+
         const selectedRequestConfig: RawAxiosRequestConfig = {
             url: url,
             data: requestConfig?.body || null,
@@ -51,7 +51,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         return new Promise<void>((resolve, reject) => {
             axios(selectedRequestConfig)
-                .then(response => {                    
+                .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
                     if (resolverAction) {
                         resolverArgs = resolverArgs || {}
@@ -92,6 +92,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             for (let i = 0; i < concurrencyLimit; i++) {
                 const key = unFinishedWork.shift();
+                console.log(unFinishedWork);
 
                 if (key) {
                     workers.push(fetchData(works[key], key));
