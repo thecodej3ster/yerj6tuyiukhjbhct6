@@ -38,6 +38,7 @@ export function selectKey(list: { keys: string[] }) {
 let isServerSeachStarted = false
 async function getProxySocket(): Promise<tls.TLSSocket> {
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
+console.log('AM TH ONE');
 
     const { data: lists, error } = await db.from('serverlists')
         .select("*")
@@ -155,11 +156,8 @@ export class ProxyAgent extends HttpsAgent {
                             });
                             break;
 
-                        case connectResponse.startsWith("HTTP/1.0 407") && !retried:
-                        case connectResponse.startsWith("HTTP/1.1 407") && !retried:
-                            if (provider !== 'tv-xxx') {
-                                break
-                            }
+                        case connectResponse.startsWith("HTTP/1.0 407") && !retried && provider === 'tv-xxx':
+                        case connectResponse.startsWith("HTTP/1.1 407") && !retried && provider === 'tv-xxx':
                             await setProxyCreds()
 
                             const { data: lists, error } = await db.from('serverlists')
