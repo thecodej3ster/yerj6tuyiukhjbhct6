@@ -38,7 +38,7 @@ export function selectKey(list: { keys: string[] }) {
 let isServerSeachStarted = false
 async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selectedServer?: ServerCred }> {
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
-    console.log('AM TH ONE');
+
     const connectInfo: { proxySocket?: tls.TLSSocket, selectedServer?: ServerCred } = {}
 
     const { data: lists, error } = await db.from('serverlists')
@@ -48,8 +48,6 @@ async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selected
         .single<{ data: string }>()
 
     if (error) {
-        console.log(error);
-
         throw error
     }
     const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
@@ -92,8 +90,6 @@ async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selected
 
                 socket.on("error", (error) => {
                     socket.destroy();
-                    console.log(error);
-
                     reject(error);
                 })
             });
@@ -130,11 +126,10 @@ export class ProxyAgent extends HttpsAgent {
 
         const connectionOpts = options as ConnectionOptions;
         let connectResponse = "";
-        console.log('CONNE............');
 
         const hanleRequest = async () => {
             let { proxySocket, selectedServer } = await getProxySocket()
-            console.log('PASSING');
+
             const authHeader = `Proxy-Authorization: Basic ${selectedServer?.auth}\r\n`
             const targetHost = connectionOpts.host;
             const targetPort = connectionOpts.port || 443;
@@ -197,9 +192,7 @@ export class ProxyAgent extends HttpsAgent {
                             retried = true
                             break;
                         default:
-                            proxySocket?.off("data", onData);
-                            console.log('FAILING');
-                            
+                            proxySocket?.off("data", onData);                            
                             if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
 
                     }

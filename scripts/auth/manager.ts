@@ -31,31 +31,11 @@ const getAuthUrlConfig: WorkerConfig = {
         authUrl: 'https://callbacks.buffer.com/auth/oidc/authorize'
     },
     requestConfig: {
-        "headers": {
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            "accept-language": "en-US,en;q=0.9",
-            "cache-control": "no-cache",
-            "pragma": "no-cache",
-            "priority": "u=0, i",
-            "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Linux\"",
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "same-site",
-            "sec-fetch-user": "?1",
-            "sec-gpc": "1",
-            "upgrade-insecure-requests": "1",
-            "Referer": "https://publish.buffer.com/"
-        },
+        headers: {},
         maxRedirects: 0,
-        validateStatus: (status) => {
-            console.log(`STATUS IS ${status}`);
-            
-            return status < 400 && status > 199
-        },
+        validateStatus: (status) => status < 400 && status > 199,
     },
-    // resolverAction: saveCookie,
+    resolverAction: saveCookie,
     resolverArgs: {}
 }
 
@@ -155,9 +135,7 @@ async function hydrateCookieStore() {
 
 let getAuthUrlWorkIndex = 0
 async function runGetAuthUrl() {
-    const username = 'Civicpulseconner_instagram'//usernames[getAuthUrlWorkIndex]
-    console.log(username);
-
+    const username = usernames[getAuthUrlWorkIndex]
 
     if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
     let cookie = ""
@@ -170,36 +148,35 @@ async function runGetAuthUrl() {
     getAuthUrlConfig.resolverArgs.username = username
 
     const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
-    // console.log(authUrl);
-    console.log(getAuthUrlConfig);
+    console.log(authUrl);
 
-    // try {
+    try {
 
-    //     if (!authUrl.toLowerCase().startsWith("http")) {
-    //         throw new Error("Invalid Url Recived");
-    //     }
-    //     authUrls[username] = authUrl
-    //     getAuthUrlWorkIndex++
-    //     delay = 0
+        if (!authUrl.toLowerCase().startsWith("http")) {
+            throw new Error("Invalid Url Recived");
+        }
+        authUrls[username] = authUrl
+        getAuthUrlWorkIndex++
+        delay = 0
 
-    //     if (getAuthUrlWorkIndex === usernames.length) {
-    //         return
-    //     }
+        if (getAuthUrlWorkIndex === usernames.length) {
+            return
+        }
 
-    //     await runGetAuthUrl()
-    // } catch (error) {
-    //     delay += 5000
-    //     if (delay === 30000) {
-    //         throw error
-    //     }
+        await runGetAuthUrl()
+    } catch (error) {
+        delay += 5000
+        if (delay === 30000) {
+            throw error
+        }
 
-    //     await new Promise<void>((resolve) => {
-    //         setTimeout(async () => {
-    //             await runGetAuthUrl()
-    //             resolve()
-    //         }, delay);
-    //     })
-    // }
+        await new Promise<void>((resolve) => {
+            setTimeout(async () => {
+                await runGetAuthUrl()
+                resolve()
+            }, delay);
+        })
+    }
 }
 
 
@@ -401,16 +378,16 @@ async function auth() {
     hydrateCookieStore()
     usernames = Object.keys(cookieStore)
     await runGetAuthUrl()
-    // console.log(cookieStore);
-    // await runGetAuthSessionUrl()
-    // console.log(cookieStore);
-    // await runGetAuthToken()
-    // console.log(cookieStore);
+    console.log(cookieStore);
+    await runGetAuthSessionUrl()
+    console.log(cookieStore);
+    await runGetAuthToken()
+    console.log(cookieStore);
     // await revokeAccesssToken()
     // await createAccesssToken()
     // console.log(JSON.parse(keys));
     // await save({ name: 'CREDS', value: keys })
-    // await revokeAllAccessTokens()
+    await revokeAllAccessTokens()
 
 
     // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip",tm: "https://httpbin.org/ip",tw: "https://httpbin.org/ip" }, direct: false }

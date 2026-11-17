@@ -20,7 +20,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         : {};
 
     const fetchData = (url: string, key: string): Promise<void> => {
-        console.log('FETCHING DATA');
 
         const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
             url: url,
@@ -50,18 +49,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             delete selectedRequestConfig.body
         }
         if (!direct) {
-            console.log('ITS ME');
-
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
         return new Promise<void>((resolve, reject) => {
-            console.log("AM STILL FETCHING");
-
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
-                    console.log(response);
 
                     if (resolverAction) {
                         resolverArgs = resolverArgs || {}
@@ -103,7 +97,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             for (let i = 0; i < concurrencyLimit; i++) {
                 const key = unFinishedWork.shift();
-                console.log(unFinishedWork);
 
                 if (key) {
                     workers.push(fetchData(works[key], key));
@@ -112,15 +105,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             }
 
-            console.log('waiting');
-
             await Promise.all(workers)
-            console.log('done WAITING');
-
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
-
-            console.log(error);
 
             const failedUrls: Record<string, string> = {}
 
@@ -133,14 +120,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             })
 
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
-                console.log('INSIDE PROMISE');
-                console.log(`Delay Is ${delay}`);
-
                 setTimeout(async () => {
-                    console.log('INSIDE TIMEOUT');
                     try {
-                        console.log("hi");
-
                         const response = await worker({
                             urls: failedUrls,
                             direct: direct,
@@ -150,7 +131,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         })
                         resolve(response)
                     } catch (error) {
-                        console.log('OOOOOOOOOOOOPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS');
                         reject(error)
                     }
 
