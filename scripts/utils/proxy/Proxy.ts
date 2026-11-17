@@ -16,7 +16,7 @@ interface ServerCred {
     auth: string
 }
 
-let selectedServer: ServerCred
+// let selectedServer: ServerCred
 
 
 let provider = 'pv-xxx'
@@ -36,9 +36,10 @@ export function selectKey(list: { keys: string[] }) {
  * Robust helper to locate an operational TLS proxy endpoint.
  */
 let isServerSeachStarted = false
-async function getProxySocket(): Promise<tls.TLSSocket> {
+async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selectedServer?: ServerCred }> {
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
-console.log('AM TH ONE');
+    console.log('AM TH ONE');
+    const connectInfo: { proxySocket?: tls.TLSSocket, selectedServer?: ServerCred } = {}
 
     const { data: lists, error } = await db.from('serverlists')
         .select("*")
@@ -48,13 +49,13 @@ console.log('AM TH ONE');
 
     if (error) {
         console.log(error);
-        
+
         throw error
     }
     const serverList: { servers: ServerCred[] } = JSON.parse(lists.data)
     const start = Math.floor(Math.random() * (serverList.servers.length - 1))
     let server = serverList.servers[start]
-    
+
     function rotate(list: ServerCred[], currentElement: ServerCred) {
         const currentIndex = list.indexOf(currentElement)
 
@@ -79,7 +80,8 @@ console.log('AM TH ONE');
 
                 socket.on("secureConnect", () => {
                     socket.setTimeout(0);
-                    selectedServer = server
+                    connectInfo.selectedServer = server
+                    // selectedServer = server
                     resolve(socket);
                 })
 
@@ -91,7 +93,7 @@ console.log('AM TH ONE');
                 socket.on("error", (error) => {
                     socket.destroy();
                     console.log(error);
-                    
+
                     reject(error);
                 })
             });
@@ -101,7 +103,11 @@ console.log('AM TH ONE');
         }
     }
 
-    return await testServer()
+    const socket = await testServer()
+    connectInfo.proxySocket = socket
+ 
+    
+    return connectInfo
 }
 
 function buildConnectRequst({ authHeader, targetHost, targetPort }: { authHeader: string, targetHost: string, targetPort: number }) {
@@ -121,20 +127,22 @@ export class ProxyAgent extends HttpsAgent {
 
     // Overriding the class method instead of passing it as a constructor option
     override createConnection(options: any, callback?: (err: Error | null, socket?: any) => void): any {
+
         const connectionOpts = options as ConnectionOptions;
         let connectResponse = "";
+        console.log('CONNE............');
+
         const hanleRequest = async () => {
-            let proxySocket = await getProxySocket()
+            let { proxySocket, selectedServer } = await getProxySocket()
             console.log('PASSING');
-            
-            const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
+            const authHeader = `Proxy-Authorization: Basic ${selectedServer?.auth}\r\n`
             const targetHost = connectionOpts.host;
             const targetPort = connectionOpts.port || 443;
 
             // Build the HTTP CONNECT request injection string
             const connectRequest = buildConnectRequst({ authHeader: authHeader, targetHost: targetHost, targetPort: targetPort })
 
-            proxySocket.write(connectRequest);
+            proxySocket?.write(connectRequest);
 
             const onData = async (chunk: Buffer) => {
                 connectResponse += chunk.toString("utf8");
@@ -143,7 +151,7 @@ export class ProxyAgent extends HttpsAgent {
                     switch (true) {
                         case connectResponse.startsWith("HTTP/1.1 200"):
                         case connectResponse.startsWith("HTTP/1.0 200"):
-                            proxySocket.off("data", onData);
+                            proxySocket?.off("data", onData);
                             const secureTargetSocket = tls.connect({
                                 socket: proxySocket,
                                 servername: targetHost
@@ -175,27 +183,27 @@ export class ProxyAgent extends HttpsAgent {
 
                             for (let i = 0; i < serverList.servers.length; i++) {
                                 const server = serverList.servers[i];
-                                if (server.host === selectedServer.host) {
+                                if (server.host === selectedServer?.host) {
                                     selectedServer.auth = server.auth
                                     const authHeader = `Proxy-Authorization: Basic ${selectedServer.auth}\r\n`
                                     const connectRequest = buildConnectRequst({ authHeader: authHeader, targetHost: targetHost, targetPort: targetPort })
-                                    proxySocket.off("data", onData)
+                                    proxySocket?.off("data", onData)
                                     connectResponse = ""
-                                    proxySocket.on("data", onData)
-                                    proxySocket.write(connectRequest)
+                                    proxySocket?.on("data", onData)
+                                    proxySocket?.write(connectRequest)
                                     break
                                 }
                             }
                             retried = true
                             break;
                         default:
-                            proxySocket.off("data", onData);
+                            proxySocket?.off("data", onData);
                             if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
 
                     }
                 }
             };
-            proxySocket.on("data", onData);
+            proxySocket?.on("data", onData);
         }
 
         hanleRequest()
