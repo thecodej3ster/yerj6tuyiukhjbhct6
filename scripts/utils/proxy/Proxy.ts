@@ -198,6 +198,8 @@ export class ProxyAgent extends HttpsAgent {
                             break;
                         default:
                             proxySocket?.off("data", onData);
+                            console.log('FAILING');
+                            
                             if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
 
                     }
