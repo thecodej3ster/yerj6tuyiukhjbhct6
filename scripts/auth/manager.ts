@@ -35,7 +35,7 @@ const getAuthUrlConfig: WorkerConfig = {
         maxRedirects: 0,
         validateStatus: (status) => status < 400 && status > 199,
     },
-    resolverAction: saveCookie,
+    // resolverAction: saveCookie,
     resolverArgs: {}
 }
 
@@ -150,7 +150,7 @@ async function runGetAuthUrl() {
     getAuthUrlConfig.resolverArgs.username = username
 
     const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
-    console.log(authUrl);
+    // console.log(authUrl);
     console.log(getAuthUrlConfig);
 
     // try {
