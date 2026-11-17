@@ -49,7 +49,11 @@ const getAuthUrlConfig: WorkerConfig = {
             "Referer": "https://publish.buffer.com/"
         },
         maxRedirects: 0,
-        validateStatus: (status) => status < 400 && status > 199,
+        validateStatus: (status) => {
+            console.log(`STATUS IS ${status}`);
+            
+            return status < 400 && status > 199
+        },
     },
     // resolverAction: saveCookie,
     resolverArgs: {}
