@@ -22,8 +22,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     const fetchData = (url: string, key: string): Promise<void> => {
         console.log('FETCHING DATA');
 
-        const selectedRequestConfig: RawAxiosRequestConfig = {
+        const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
             url: url,
+            ...requestConfig,
             data: requestConfig?.body || null,
             method: "GET",
             responseEncoding: "UTF-8",
@@ -45,10 +46,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             } as Record<string, string>
         };
 
+        if (selectedRequestConfig.body) {
+            delete selectedRequestConfig.body
+        }
         if (!direct) {
             console.log('ITS ME');
 
-            selectedRequestConfig.httpsAgent =  new ProxyAgent({ keepAlive: true })
+            selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
         return new Promise<void>((resolve, reject) => {
@@ -57,7 +61,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
-                                        console.log(response);
+                    console.log(response);
 
                     if (resolverAction) {
                         resolverArgs = resolverArgs || {}
@@ -117,7 +121,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             console.log('REQUEST FAILED RETRYING ...')
 
             console.log(error);
-            
+
             const failedUrls: Record<string, string> = {}
 
             if (delay === 30000) {
