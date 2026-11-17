@@ -31,7 +31,23 @@ const getAuthUrlConfig: WorkerConfig = {
         authUrl: 'https://callbacks.buffer.com/auth/oidc/authorize'
     },
     requestConfig: {
-        headers: {},
+        "headers": {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "accept-language": "en-US,en;q=0.9",
+            "cache-control": "no-cache",
+            "pragma": "no-cache",
+            "priority": "u=0, i",
+            "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Linux\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "same-site",
+            "sec-fetch-user": "?1",
+            "sec-gpc": "1",
+            "upgrade-insecure-requests": "1",
+            "Referer": "https://publish.buffer.com/"
+        },
         maxRedirects: 0,
         validateStatus: (status) => status < 400 && status > 199,
     },
