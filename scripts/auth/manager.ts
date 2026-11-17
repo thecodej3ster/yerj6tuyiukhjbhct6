@@ -31,7 +31,7 @@ const getAuthUrlConfig: WorkerConfig = {
         authUrl: 'https://callbacks.buffer.com/auth/oidc/authorize'
     },
     requestConfig: {
-        headers: commonHeaders,
+        headers: {},
         maxRedirects: 0,
         validateStatus: (status) => status < 400 && status > 199,
     },
