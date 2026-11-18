@@ -30,7 +30,7 @@ const getAuthUrlConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
         headers: {},
-        maxRedirects: 0,
+        maxRedirects: 3,
         validateStatus: (status) => status < 400 && status > 199,
     },
     resolverAction: saveCookie,
@@ -385,7 +385,7 @@ async function runGetAuthUrl() {
 async function auth() {
     sortAuth()
     hydrateCookieStore()
-    // usernames = Object.keys(cookieStore)
+    usernames = Object.keys(auths)
     await runGetAuthUrl()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()

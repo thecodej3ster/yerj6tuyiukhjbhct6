@@ -56,12 +56,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({})
-        console.log(cookie);
-        
+
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookie
         }
         return new Promise<void>((resolve, reject) => {
+            let isRedirect = false
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
@@ -71,16 +71,26 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
 
-                    const cookies = response.headers["set-cookie"] || null
+                    const cookies = headers["set-cookie"] || null
                     if (cookies) {
-                        const o = cookieStore.set(cookies)
-                        console.log(o);
+                        cookieStore.set(cookies)
+                    }
+
+                    if (headers.location) {
+                        isRedirect = true
+                        return headers.location
                     }
                     return response.data
 
                 })
                 .then(data => {
-                    result[key] = data
+                    if (isRedirect) {
+                        urls[key] = data
+                        unFinishedWork.push(key)
+                    } else {
+                        result[key] = data
+                    }
+                    
                     delay = 5000
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
