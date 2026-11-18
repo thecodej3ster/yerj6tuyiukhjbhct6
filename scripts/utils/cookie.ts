@@ -30,7 +30,7 @@ export class CookieStore {
         this.url = url
         let domainMap = CookieStore.globalStore[this.storeId] || null
         this.domain = this.getRootDomainFromUrl()
-        let pathMap = domainMap[this.domain] || null
+        let pathMap = null
         this.path = this.getDefaultCookiePath()
 
         if (!domainMap) {
@@ -39,12 +39,13 @@ export class CookieStore {
             CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
             console.log(CookieStore.globalStore);
             console.log(domainMap);
-            
+
             domainMap = CookieStore.globalStore[this.storeId]
             pathMap = domainMap[this.domain]
 
         }
-
+        
+        pathMap = domainMap[this.domain]
         if (!pathMap) {
             CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
             pathMap = domainMap[this.domain]
