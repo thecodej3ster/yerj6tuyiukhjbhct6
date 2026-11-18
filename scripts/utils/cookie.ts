@@ -27,19 +27,27 @@ export class CookieStore {
 
     constructor({ storeId, url }: { storeId: string, url: string }) {
         this.storeId = storeId
-        let domainMap = CookieStore.globalStore[this.storeId] || null
-        if (!domainMap) {
-            CookieStore.globalStore[this.storeId] = {}
-            domainMap = CookieStore.globalStore[this.storeId] || null
-        }
         this.url = url
+        let domainMap = CookieStore.globalStore[this.storeId] || null
         this.domain = this.getRootDomainFromUrl()
-        const pathMap = domainMap[this.domain]
+        let pathMap = domainMap[this.domain] || null
         this.path = this.getDefaultCookiePath()
 
-        if (!domainMap || this.domain || pathMap || this.path) {
-            throw new Error("Unable To FInd Cookie");
+        if (!domainMap) {
+            CookieStore.globalStore[this.storeId] = {}
+            CookieStore.globalStore[this.storeId][this.domain] = {}
+            CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
+            domainMap = CookieStore.globalStore[this.storeId]
+            pathMap = domainMap[this.domain]
+
         }
+
+        if (!pathMap) {
+            CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
+            pathMap = domainMap[this.domain]
+
+        }
+
         this.cookies = pathMap[this.path]
     }
 
