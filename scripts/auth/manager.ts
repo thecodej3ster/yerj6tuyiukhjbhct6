@@ -31,7 +31,7 @@ const getAuthUrlConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
         headers: {},
-        maxRedirects: 3,
+        maxRedirects: 2,
         validateStatus: (status) => status < 400 && status > 199,
     },
     resolverAction: saveCookie,

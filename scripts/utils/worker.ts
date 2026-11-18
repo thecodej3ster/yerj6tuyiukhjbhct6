@@ -21,8 +21,18 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
-    const fetchData = (url: string, key: string): Promise<void> => {
+    let redirectCount: Record<string, number> = {}
 
+
+    const fetchData = (url: string, key: string): Promise<void> => {
+        if (!redirectCount[key]) {
+            redirectCount[key] = 0
+        }
+        let maxRedirect = 0
+        if (requestConfig?.maxRedirects) {
+            maxRedirect = requestConfig.maxRedirects
+            delete requestConfig.maxRedirects
+        }
         const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
             url: url,
             ...requestConfig,
@@ -60,26 +70,29 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookie
         }
+
         return new Promise<void>((resolve, reject) => {
             let isRedirect = false
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
 
-                    if (resolverAction) {
-                        resolverArgs = resolverArgs || {}
-                        return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
-                    }
-
                     const cookies = headers["set-cookie"] || null
                     if (cookies) {
                         cookieStore.set(cookies)
                     }
 
-                    if (headers.location) {
+                    if (headers.location && redirectCount[key] < maxRedirect) {
                         isRedirect = true
+                        redirectCount[key]++
                         return headers.location
                     }
+
+                    if (resolverAction) {
+                        resolverArgs = resolverArgs || {}
+                        return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
+                    }
+
                     return response.data
 
                 })
@@ -90,7 +103,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     } else {
                         result[key] = data
                     }
-                    
+
                     delay = 5000
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
