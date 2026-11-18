@@ -159,7 +159,8 @@ async function runGetAuthUrl() {
     const response = await worker(getAuthUrlConfig)
     const authUrl = response[username]
     console.log(authUrl);
-    
+
+    const cookieStore = new CookieStore({ storeId: username, url: getAuthUrlConfig.urls[username] })
     console.log(cookieStore.get({}));
 
     try {
@@ -167,15 +168,15 @@ async function runGetAuthUrl() {
         // if (!authUrl.toLowerCase().startsWith("http")) {
         //     throw new Error("Invalid Url Recived");
         // }
-        authUrls[username] = authUrl
-        getAuthUrlWorkIndex++
-        delay = 0
+        // authUrls[username] = authUrl
+        // getAuthUrlWorkIndex++
+        // delay = 0
 
-        if (getAuthUrlWorkIndex === usernames.length) {
-            return
-        }
+        // if (getAuthUrlWorkIndex === usernames.length) {
+        //     return
+        // }
 
-        await runGetAuthUrl()
+        // await runGetAuthUrl()
     } catch (error) {
         delay += 5000
         if (delay === 30000) {
