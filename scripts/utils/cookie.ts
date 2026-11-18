@@ -172,14 +172,15 @@ export class CookieStore {
         if (!parse) {
             if (!cookieName) {
                 const cookies: string[] = []
-                for (const cookieName in this.cookies) {
-                    const cookie = this.cookies[cookieName]
+                
+                for (const cookieName in CookieStore.globalStore[this.storeId][this.domain][this.path]) {
+                    const cookie = CookieStore.globalStore[this.storeId][this.domain][this.path][cookieName]
                     const cookieString = `${cookieName}=${cookie.value}`
                     cookies.push(cookieString)
                 }
                 return cookies
             } else {
-                const cookie = this.cookies[cookieName] || null
+                const cookie = CookieStore.globalStore[this.storeId][this.domain][this.path][cookieName] || null
                 if (cookie) {
                     const cookieString = `${cookieName}=${cookie.value}`
                     return [cookieString]
@@ -192,9 +193,9 @@ export class CookieStore {
 
         } else {
             if (!cookieName) {
-                return this.cookies
+                return CookieStore.globalStore[this.storeId][this.domain][this.path]
             } else {
-                return this.cookies[cookieName] || null;
+                return CookieStore.globalStore[this.storeId][this.domain][this.path][cookieName] || null;
             }
         }
     }

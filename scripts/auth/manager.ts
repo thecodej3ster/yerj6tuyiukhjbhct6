@@ -161,7 +161,7 @@ async function runGetAuthUrl() {
     console.log(authUrl);
 
     const cookieStore = new CookieStore({ storeId: username, url: getAuthUrlConfig.urls[username] })
-    console.log(cookieStore.get({}));
+    console.log()
 
     try {
 
