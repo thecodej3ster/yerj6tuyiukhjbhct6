@@ -168,6 +168,9 @@ export class CookieStore {
      * Retrieves cookies using the instance's context parameters.
      */
     public get({ cookieName, parse }: { cookieName?: string, parse?: boolean }): CookieDetails | { [cookieName: string]: CookieDetails } | null | string[] {
+console.log(`THIS IS `);
+
+        console.log(CookieStore.globalStore[this.storeId][this.domain][this.path]);
 
         if (!parse) {
             if (!cookieName) {
