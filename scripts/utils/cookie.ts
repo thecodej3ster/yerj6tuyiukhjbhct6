@@ -37,6 +37,9 @@ export class CookieStore {
             CookieStore.globalStore[this.storeId] = {}
             CookieStore.globalStore[this.storeId][this.domain] = {}
             CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
+            console.log(CookieStore.globalStore);
+            console.log(domainMap);
+            
             domainMap = CookieStore.globalStore[this.storeId]
             pathMap = domainMap[this.domain]
 
