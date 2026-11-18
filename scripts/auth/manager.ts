@@ -1,5 +1,6 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
+import { CookieStore } from '../utils/cookie'
 import { save } from './utils/save'
 import { access } from 'fs'
 
@@ -11,7 +12,6 @@ const authUrls: Record<string, string> = {}
 const authSessionUrls: Record<string, string> = {}
 const authGroups: Record<string, string[]> = {}
 let delay = 0
-const cookieStore: Record<string, Record<string, string>> = {}
 let usernames: string[] = []
 
 
@@ -27,9 +27,7 @@ const commonHeaders = {
 }
 
 const getAuthUrlConfig: WorkerConfig = {
-    urls: {
-        authUrl: 'https://callbacks.buffer.com/auth/oidc/authorize'
-    },
+    urls: {},
     requestConfig: {
         headers: {},
         maxRedirects: 0,
@@ -95,29 +93,33 @@ function sortAuth() {
 
 
 
-function setCookie(username: string, cookies: string[]) {
-    cookies.map(cookie => {
-        const cookieParts = cookie.split(";")
-        const parsedCokie = cookieParts[0].replace("=", ';').split(";")
-        if (cookieStore[username] === undefined) {
-            cookieStore[username] = {}
-        }
-        cookieStore[username][parsedCokie[0]] = parsedCokie[1]
-    })
-}
+// function setCookie(username: string, cookies: string[]) {
+//     cookies.map(cookie => {
+//         const cookieParts = cookie.split(";")
+//         const parsedCokie = cookieParts[0].replace("=", ';').split(";")
+//         if (cookieStore[username] === undefined) {
+//             cookieStore[username] = {}
+//         }
+//         cookieStore[username][parsedCokie[0]] = parsedCokie[1]
+//     })
+// }
 
 async function saveCookie({ headers, username, response }: ResolverArgs & { username?: string }) {
     const data = response as string
     const cookies = headers["set-cookie"] as string[]
-    if (!cookies) {
-        const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
-        if (foundRedirect) {
-            return foundRedirect[0]
-        }
-        throw new Error("No Cookie WAs Found");
-    }
-    if (username) {
-        setCookie(username, cookies)
+    const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
+    // if (!cookies) {
+    //     const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
+    //     if (foundRedirect) {
+    //         return foundRedirect[0]
+    //     }
+
+    // }
+    // if (username) {
+    //     setCookie(username, cookies)
+    // }
+    if (!cookies || !foundRedirect) {
+        throw new Error("AuthUrl Not Found");
     }
     return headers.location
 }
@@ -125,9 +127,11 @@ async function saveCookie({ headers, username, response }: ResolverArgs & { user
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
-        const [name, value] = auth.split('=')
-        cookieStore[username] = {}
-        cookieStore[username][name] = value
+        const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
+        cookieStore.set([auth])
+        // const [name, value] = auth.split('=')
+        // cookieStore[username] = {}
+        // cookieStore[username][name] = value
     }
 }
 
@@ -137,17 +141,22 @@ let getAuthUrlWorkIndex = 0
 async function runGetAuthUrl() {
     const username = usernames[getAuthUrlWorkIndex]
 
+    if (getAuthUrlConfig.urls) {
+        getAuthUrlConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
+    }
+
     if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
     let cookie = ""
 
-    for (const cookieName in cookieStore[username]) {
-        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    }
+    // for (const cookieName in cookieStore[username]) {
+    //     cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+    // }
 
-    getAuthUrlConfig.requestConfig.headers.Cookie = cookie
+    // getAuthUrlConfig.requestConfig.headers.Cookie = cookie
     getAuthUrlConfig.resolverArgs.username = username
 
-    const { authUrl } = await worker(getAuthUrlConfig) as { authUrl: string }
+    const response = await worker(getAuthUrlConfig)
+    const authUrl = response[username]
     console.log(authUrl);
 
     try {
@@ -181,213 +190,213 @@ async function runGetAuthUrl() {
 
 
 
-let getAuthSessionUrlWorkIndex = 0
-const runGetAuthSessionUrl = async () => {
+// let getAuthSessionUrlWorkIndex = 0
+// const runGetAuthSessionUrl = async () => {
 
-    const username = usernames[getAuthSessionUrlWorkIndex]
+//     const username = usernames[getAuthSessionUrlWorkIndex]
 
-    if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
+//     if (!getAuthSessionUrlConfig.requestConfig || getAuthSessionUrlConfig.resolverArgs === undefined || getAuthSessionUrlConfig.requestConfig.headers === undefined || getAuthSessionUrlConfig.urls === undefined) return
 
-    getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
+//     getAuthSessionUrlConfig.urls.authSessionUrl = authUrls[username]
 
-    let cookie = ""
+//     let cookie = ""
 
-    for (const cookieName in cookieStore[username]) {
-        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    }
+//     for (const cookieName in cookieStore[username]) {
+//         cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+//     }
 
-    getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
-    getAuthSessionUrlConfig.resolverArgs.username = username
+//     getAuthSessionUrlConfig.requestConfig.headers.Cookie = cookie
+//     getAuthSessionUrlConfig.resolverArgs.username = username
 
-    if (getAuthSessionUrlConfig.urls.authSessionUrl) {
-        const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
-        authSessionUrls[username] = authSessionUrl
-    }
+//     if (getAuthSessionUrlConfig.urls.authSessionUrl) {
+//         const { authSessionUrl } = await worker(getAuthSessionUrlConfig) as { authSessionUrl: string }
+//         authSessionUrls[username] = authSessionUrl
+//     }
 
-    getAuthSessionUrlWorkIndex++
-    delay = 0
-    if (getAuthSessionUrlWorkIndex === usernames.length) {
-        return
-    }
-    await runGetAuthSessionUrl()
+//     getAuthSessionUrlWorkIndex++
+//     delay = 0
+//     if (getAuthSessionUrlWorkIndex === usernames.length) {
+//         return
+//     }
+//     await runGetAuthSessionUrl()
 
-}
-
-
-let getAuthTokenWorkIndex = 0
-const runGetAuthToken = async () => {
-    const username = usernames[getAuthTokenWorkIndex]
-
-    if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
-
-    getAuthTokenConfig.urls.authToken = authSessionUrls[username]
-
-    let cookie = ""
-
-    for (const cookieName in cookieStore[username]) {
-        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    }
-
-    getAuthTokenConfig.requestConfig.headers.Cookie = cookie
-    getAuthTokenConfig.resolverArgs.username = username
-
-    if (getAuthTokenConfig.urls.authToken) {
-        await worker(getAuthTokenConfig) as { authToken: string }
-
-    }
-
-    getAuthTokenWorkIndex++
-    delay = 0
-    if (getAuthTokenWorkIndex === usernames.length) {
-        return
-    }
-
-    await runGetAuthToken()
-}
+// }
 
 
+// let getAuthTokenWorkIndex = 0
+// const runGetAuthToken = async () => {
+//     const username = usernames[getAuthTokenWorkIndex]
 
-const createAccesssTokenConfig: WorkerConfig = {
-    urls: {
-        authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
-    },
-    requestConfig: {
-        headers: commonHeaders,
-        method: "POST",
-        responseType: "json",
-        body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
-    }
-}
+//     if (!getAuthTokenConfig.requestConfig || getAuthTokenConfig.resolverArgs === undefined || getAuthTokenConfig.requestConfig.headers === undefined || getAuthTokenConfig.urls === undefined) return
 
-let createAccesssTokenWorkIndex = 0
-async function createAccesssToken() {
-    const username = usernames[createAccesssTokenWorkIndex]
+//     getAuthTokenConfig.urls.authToken = authSessionUrls[username]
 
-    if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
+//     let cookie = ""
 
-    let cookie = ""
+//     for (const cookieName in cookieStore[username]) {
+//         cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+//     }
 
-    for (const cookieName in cookieStore[username]) {
-        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    }
+//     getAuthTokenConfig.requestConfig.headers.Cookie = cookie
+//     getAuthTokenConfig.resolverArgs.username = username
 
-    revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
+//     if (getAuthTokenConfig.urls.authToken) {
+//         await worker(getAuthTokenConfig) as { authToken: string }
 
-    const { authCreate } = await worker(createAccesssTokenConfig) as {
-        authCreate: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
-    }
-    console.log(authCreate);
+//     }
 
-    const accessToken = authCreate?.data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
+//     getAuthTokenWorkIndex++
+//     delay = 0
+//     if (getAuthTokenWorkIndex === usernames.length) {
+//         return
+//     }
 
-    if (!accessToken) {
-        throw new Error("UNEXPECTED VALUE PASSED AS ACCESS TOKEN");
-    }
-
-    keys = keys.replaceAll(tokens[username], accessToken)
-
-    createAccesssTokenWorkIndex++
-    if (createAccesssTokenWorkIndex === usernames.length) {
-        return
-    }
-    await createAccesssToken()
-}
+//     await runGetAuthToken()
+// }
 
 
 
-let revokeWorkIndex = 0
-async function revokeAccesssToken({ accessToken, user }: { accessToken?: string, user?: string }) {
-    const username = user || usernames[revokeWorkIndex]
+// const createAccesssTokenConfig: WorkerConfig = {
+//     urls: {
+//         authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
+//     },
+//     requestConfig: {
+//         headers: commonHeaders,
+//         method: "POST",
+//         responseType: "json",
+//         body: '{"operationName":"generatePersonalAccessToken","variables":{"input":{"scopes":["account:read","account:write","channels:write","notes:read","notes:write","posts:read","posts:write","ideas:read","ideas:write","snippets:read","snippets:write","insights:read","engagements:read","engagements:write"],"expiresIn":2592000}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation generatePersonalAccessToken($input: GeneratePersonalAccessTokenInput\u0021) {\\n  generatePersonalAccessToken(input: $input) {\\n    ... on GeneratePersonalAccessTokenSuccess {\\n      personalAccessToken {\\n        accessToken\\n        clientId\\n        name\\n        generatedAt\\n        expiresAt\\n        scopes\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}'
+//     }
+// }
 
-    if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
+// let createAccesssTokenWorkIndex = 0
+// async function createAccesssToken() {
+//     const username = usernames[createAccesssTokenWorkIndex]
 
-    const token = accessToken || tokens[username]
-    revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${token}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
+//     if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
 
-    let cookie = ""
+//     let cookie = ""
 
-    for (const cookieName in cookieStore[username]) {
-        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    }
+//     for (const cookieName in cookieStore[username]) {
+//         cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+//     }
 
-    revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
+//     revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-    const { authRevoke } = await worker(revokeAuthTokenConfig)
-    console.log(authRevoke);
+//     const { authCreate } = await worker(createAccesssTokenConfig) as {
+//         authCreate: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
+//     }
+//     console.log(authCreate);
 
-    if (accessToken && user) {
-        return
-    }
-    revokeWorkIndex++
-    if (revokeWorkIndex === usernames.length) {
-        return
-    }
-    await revokeAccesssToken({})
-}
+//     const accessToken = authCreate?.data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
+
+//     if (!accessToken) {
+//         throw new Error("UNEXPECTED VALUE PASSED AS ACCESS TOKEN");
+//     }
+
+//     keys = keys.replaceAll(tokens[username], accessToken)
+
+//     createAccesssTokenWorkIndex++
+//     if (createAccesssTokenWorkIndex === usernames.length) {
+//         return
+//     }
+//     await createAccesssToken()
+// }
 
 
-async function getAccessTokens(username: string) {
-    if (!getAccessTokensConfig.requestConfig || getAccessTokensConfig.requestConfig.headers === undefined) return
 
-    let cookie = ""
+// let revokeWorkIndex = 0
+// async function revokeAccesssToken({ accessToken, user }: { accessToken?: string, user?: string }) {
+//     const username = user || usernames[revokeWorkIndex]
 
-    for (const cookieName in cookieStore[username]) {
-        cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    }
+//     if (!revokeAuthTokenConfig.requestConfig || revokeAuthTokenConfig.requestConfig.headers === undefined) return
 
-    getAccessTokensConfig.requestConfig.headers.Cookie = cookie
+//     const token = accessToken || tokens[username]
+//     revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${token}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
 
-    const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
+//     let cookie = ""
 
-    const personalAccessTokens = accessTokens?.data?.personalAccessTokens?.accessTokens
-    if (personalAccessTokens) {
-        if (personalAccessTokens.length) {
-            return personalAccessTokens
-        } else {
-            return []
-        }
-    }
+//     for (const cookieName in cookieStore[username]) {
+//         cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+//     }
 
-    if (accessTokens?.error) {
-        throw accessTokens?.error
-    }
-    console.log(accessTokens);
+//     revokeAuthTokenConfig.requestConfig.headers.Cookie = cookie
 
-}
+//     const { authRevoke } = await worker(revokeAuthTokenConfig)
+//     console.log(authRevoke);
 
-let revokeAllAccessTokensWorkIndex = 0
+//     if (accessToken && user) {
+//         return
+//     }
+//     revokeWorkIndex++
+//     if (revokeWorkIndex === usernames.length) {
+//         return
+//     }
+//     await revokeAccesssToken({})
+// }
 
-async function revokeAllAccessTokens() {
-    const username = usernames[revokeAllAccessTokensWorkIndex]
-    const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
 
-    for (let i = 0; i < accessTokens.length; i++) {
-        const { accessToken } = accessTokens[i];
-        await revokeAccesssToken({ accessToken: accessToken, user: username })
-    }
+// async function getAccessTokens(username: string) {
+//     if (!getAccessTokensConfig.requestConfig || getAccessTokensConfig.requestConfig.headers === undefined) return
 
-    revokeAllAccessTokensWorkIndex++
-    if (revokeAllAccessTokensWorkIndex === usernames.length) {
-        return
-    }
-    await revokeAllAccessTokens()
-}
+//     let cookie = ""
+
+//     for (const cookieName in cookieStore[username]) {
+//         cookie += `${cookieName}=${cookieStore[username][cookieName]};`
+//     }
+
+//     getAccessTokensConfig.requestConfig.headers.Cookie = cookie
+
+//     const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
+
+//     const personalAccessTokens = accessTokens?.data?.personalAccessTokens?.accessTokens
+//     if (personalAccessTokens) {
+//         if (personalAccessTokens.length) {
+//             return personalAccessTokens
+//         } else {
+//             return []
+//         }
+//     }
+
+//     if (accessTokens?.error) {
+//         throw accessTokens?.error
+//     }
+//     console.log(accessTokens);
+
+// }
+
+// let revokeAllAccessTokensWorkIndex = 0
+
+// async function r'https://publish.buffer.com'evokeAllAccessTokens() {
+//     const username = usernames[revokeAllAccessTokensWorkIndex]
+//     const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
+
+//     for (let i = 0; i < accessTokens.length; i++) {
+//         const { accessToken } = accessTokens[i];
+//         await revokeAccesssToken({ accessToken: accessToken, user: username })
+//     }
+
+//     revokeAllAccessTokensWorkIndex++
+//     if (revokeAllAccessTokensWorkIndex === usernames.length) {
+//         return
+//     }
+//     await revokeAllAccessTokens()
+// }
 
 async function auth() {
     sortAuth()
     hydrateCookieStore()
     usernames = Object.keys(cookieStore)
     await runGetAuthUrl()
-    console.log(cookieStore);
-    await runGetAuthSessionUrl()
-    console.log(cookieStore);
-    await runGetAuthToken()
-    console.log(cookieStore);
+    // console.log(cookieStore);
+    // await runGetAuthSessionUrl()
+    // console.log(cookieStore);
+    // await runGetAuthToken()
+    // console.log(cookieStore);
     // await revokeAccesssToken()
     // await createAccesssToken()
     // console.log(JSON.parse(keys));
     // await save({ name: 'CREDS', value: keys })
-    await revokeAllAccessTokens()
+    // await revokeAllAccessTokens()
 
 
     // const config: WorkerConfig = { urls: { t: "https://httpbin.org/ip",tm: "https://httpbin.org/ip",tw: "https://httpbin.org/ip" }, direct: false }

@@ -1,10 +1,12 @@
 import axios, { AxiosResponse, RawAxiosRequestConfig, AxiosResponseTransformer, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
+import { CookieStore } from "./cookie";
 
-
+// {username:{domain:{}}}
 const workerLimit = 5
 // let workerResponse: AxiosResponse<any, any, {}, any>
+const cookieStore: Record<string, Record<string, Record<string, string>>> = {}
 const result: Record<string, any> = {};
 let unFinishedWork: string[] = []
 let isInit = true
@@ -52,6 +54,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
+        const cookieStore = new CookieStore({ storeId: key, url: url })
+        const cookie = cookieStore.get({})
+        console.log(cookie);
+        
+        if (selectedRequestConfig.headers) {
+            selectedRequestConfig.headers.Cookie = cookie
+        }
         return new Promise<void>((resolve, reject) => {
             axios(selectedRequestConfig)
                 .then(response => {
@@ -62,7 +71,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
                     }
 
+                    const cookies = response.headers["set-cookie"] || null
+                    if (cookies) {
+                        const o = cookieStore.set(cookies)
+                        console.log(o);
+                    }
                     return response.data
+
                 })
                 .then(data => {
                     result[key] = data
