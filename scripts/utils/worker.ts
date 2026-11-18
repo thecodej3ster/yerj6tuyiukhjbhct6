@@ -31,7 +31,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         let maxRedirect = 0
         if (requestConfig?.maxRedirects) {
             maxRedirect = requestConfig.maxRedirects
-            delete requestConfig.maxRedirects
+            requestConfig.maxRedirects = 0
         }
         const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
             url: url,
