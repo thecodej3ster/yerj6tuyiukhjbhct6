@@ -11,6 +11,7 @@ const auths = JSON.parse(process.env.Auths!)
 const authUrls: Record<string, string> = {}
 const authSessionUrls: Record<string, string> = {}
 const authGroups: Record<string, string[]> = {}
+let cookieStore: CookieStore
 let delay = 0
 let usernames: string[] = []
 
@@ -127,7 +128,7 @@ async function saveCookie({ headers, username, response }: ResolverArgs & { user
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
-        const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
+        cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([auth])
         // const [name, value] = auth.split('=')
         // cookieStore[username] = {}
@@ -158,6 +159,8 @@ async function runGetAuthUrl() {
     const response = await worker(getAuthUrlConfig)
     const authUrl = response[username]
     console.log(authUrl);
+    
+    console.log(cookieStore.get({}));
 
     try {
 
