@@ -169,6 +169,7 @@ export class CookieStore {
      */
     public get({ cookieName, parse }: { cookieName?: string, parse?: boolean }): CookieDetails | { [cookieName: string]: CookieDetails } | null | string[] {
 console.log(`THIS IS `);
+console.log(this.url);
 
         console.log(CookieStore.globalStore[this.storeId][this.domain]);
         const cookieDomains = Object.keys(CookieStore.globalStore[this.storeId])
