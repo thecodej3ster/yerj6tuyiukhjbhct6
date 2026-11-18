@@ -164,9 +164,9 @@ async function runGetAuthUrl() {
 
     try {
 
-        if (!authUrl.toLowerCase().startsWith("http")) {
-            throw new Error("Invalid Url Recived");
-        }
+        // if (!authUrl.toLowerCase().startsWith("http")) {
+        //     throw new Error("Invalid Url Recived");
+        // }
         authUrls[username] = authUrl
         getAuthUrlWorkIndex++
         delay = 0

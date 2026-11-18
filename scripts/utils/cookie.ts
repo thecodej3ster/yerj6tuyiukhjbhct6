@@ -44,7 +44,7 @@ export class CookieStore {
             pathMap = domainMap[this.domain]
 
         }
-        
+
         pathMap = domainMap[this.domain]
         if (!pathMap) {
             CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
@@ -157,6 +157,7 @@ export class CookieStore {
                 value,
                 attributes
             }
+            console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath]);
 
         }
 
