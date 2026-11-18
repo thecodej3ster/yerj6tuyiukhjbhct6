@@ -388,7 +388,7 @@ async function runGetAuthUrl() {
 async function auth() {
     sortAuth()
     hydrateCookieStore()
-    usernames = Object.keys(auths)
+    usernames = Object.keys(auths.manager)
     await runGetAuthUrl()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()

@@ -85,6 +85,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     if (headers.location && redirectCount[key] < maxRedirect) {
                         isRedirect = true
                         redirectCount[key]++
+                        console.log(cookieStore.get({}));
                         return headers.location
                     }
 
