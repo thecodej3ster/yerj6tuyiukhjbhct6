@@ -78,6 +78,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     const headers = response.headers as AxiosResponseHeaders
 
                     if (headers["set-cookie"]) {
+                        if (!key) {
+                                                    console.log('KEY UNDEFIND');
+                                                    console.log(url);
+                                                    
+
+                        }
+                        
                         const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
                             cookieStore.set(headers["set-cookie"])
                     }
