@@ -119,34 +119,34 @@ export class CookieStore {
                 throw new Error("Could Not Parse Cookie");
             }
 
-            // const [name, value] = mainPart.split("=")
+            const [name, value] = mainPart.split("=")
 
-            // let explicitDomain: string | null = null;
-            // let cookiePath: string = this.path;
-            // const attributes: Record<string, string | boolean> = {};
+            let explicitDomain: string | null = null;
+            let cookiePath: string = this.path;
+            const attributes: Record<string, string | boolean> = {};
 
-            // for (let i = 1; i < parts.length; i++) {
-            //     const part: string = parts[i].trim();
+            for (let i = 1; i < parts.length; i++) {
+                const part: string = parts[i].trim();
 
 
-            //     if (part.indexOf('=') === -1) {
-            //         const [name, value] = part.split('=')
+                if (part.indexOf('=') === -1) {
+                    const [name, value] = part.split('=')
 
-            //         switch (name.toLowerCase()) {
-            //             case 'domain':
-            //                 explicitDomain = value.startsWith('.') ? value.substring(1) : value
-            //                 break;
+                    switch (name.toLowerCase()) {
+                        case 'domain':
+                            explicitDomain = value.startsWith('.') ? value.substring(1) : value
+                            break;
 
-            //             case 'path':
-            //                 cookiePath = value
-            //                 break;
-            //             default:
-            //                 attributes[name] = value
-            //         }
-            //     } else {
-            //         attributes[part.toLowerCase()] = true;
-            //     }
-            // }
+                        case 'path':
+                            cookiePath = value
+                            break;
+                        default:
+                            attributes[name] = value
+                    }
+                } else {
+                    attributes[part.toLowerCase()] = true;
+                }
+            }
 
             // const finalDomain = explicitDomain || this.domain;
 
