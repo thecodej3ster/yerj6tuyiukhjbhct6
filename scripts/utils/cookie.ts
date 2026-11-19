@@ -150,10 +150,18 @@ export class CookieStore {
 
             const finalDomain = explicitDomain || this.domain;
 
+            console.log({
+                value,
+                attributes
+            });
+            
             CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
                 value,
                 attributes
             }
+
+            console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] );
+            
 
         }
 
