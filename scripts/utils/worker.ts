@@ -113,7 +113,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
                         console.log('Redirecting ... ');
-                        console.log(`COUNT IS ... ${redirectCount}`);
+                        console.log(Object.keys(redirectCount));
+                        
+                        console.log(`COUNT IS ... ${redirectCount[key]}`);
                         
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
