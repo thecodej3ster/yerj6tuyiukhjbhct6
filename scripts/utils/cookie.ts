@@ -115,6 +115,7 @@ export class CookieStore {
             const mainPart: string = parts[0].trim();
 
             if (mainPart.indexOf('=') === -1) {
+                console.log(`THISSSSSSSSSSSS`);
                 throw new Error("Could Not Parse Cookie");
             }
 
