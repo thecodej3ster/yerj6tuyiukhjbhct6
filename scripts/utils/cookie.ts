@@ -155,10 +155,10 @@ export class CookieStore {
             console.log(this.storeId);
             
             
-            // CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
-            //     value,
-            //     attributes
-            // }            
+            CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
+                value,
+                attributes
+            }            
 
         }
         // this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
