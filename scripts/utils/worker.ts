@@ -76,6 +76,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.headers.Cookie = cookieString
         }
 
+        console.log(selectedRequestConfig);
+        
         return new Promise<void>((resolve, reject) => {
             let isRedirect = false
             axios(selectedRequestConfig)
