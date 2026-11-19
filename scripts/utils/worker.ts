@@ -70,7 +70,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({}) as string[]
         const cookieString = cookie.join(';')
-        console.log(cookieString);
+        // console.log(cookieString);
 
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookieString
@@ -88,7 +88,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         cookieStore.set(headers["set-cookie"])
                         // console.log(response);
                         
-                        // console.log(headers["set-cookie"]);
+                        console.log(headers["set-cookie"]);
                         
                     }
 
