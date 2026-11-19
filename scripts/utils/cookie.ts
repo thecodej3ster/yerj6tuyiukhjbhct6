@@ -168,42 +168,87 @@ export class CookieStore {
      * Retrieves cookies using the instance's context parameters.
      */
     public get({ cookieName, parse }: { cookieName?: string, parse?: boolean }): CookieDetails | { [cookieName: string]: CookieDetails } | null | string[] {
-console.log(`THIS IS `);
-;console.log(this.getRootDomainFromUrl());
+        console.log(`THIS IS `);
+        ; console.log(this.getRootDomainFromUrl());
 
-console.log(this.path);
+        console.log(this.path);
 
         console.log(CookieStore.globalStore[this.storeId][this.domain]);
+        const matchedPaths: string[] = []
+        const matchedDomains: string[] = []
         const cookieDomains = Object.keys(CookieStore.globalStore[this.storeId])
+
+        for (let i = 0; i < cookieDomains.length; i++) {
+            const domain = cookieDomains[i]
+            const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
+
+            const pattern = new RegExp(`${domain}.`)
+            if (domain === this.domain || pattern.test(domain)) {
+                for (let j = 0; j < cookiePaths.length; j++) {
+                    const path = cookiePaths[j]
+                    if (path === '/') {
+                        matchedPaths.push(path)
+                        matchedDomains.push(domain)
+                    }
+                }
+            }
+
+
+        }
 
         if (!parse) {
             if (!cookieName) {
                 const cookies: string[] = []
-                
-                for (const cookieName in CookieStore.globalStore[this.storeId][this.domain][this.path]) {
-                    const cookie = CookieStore.globalStore[this.storeId][this.domain][this.path][cookieName]
-                    const cookieString = `${cookieName}=${cookie.value}`
-                    cookies.push(cookieString)
+
+                for (let i = 0; i < matchedDomains.length; i++) {
+                    const domain = matchedDomains[i]
+                    const path = matchedPaths[i]
+
+                    for (const cookieName in CookieStore.globalStore[this.storeId][domain][path]) {
+                        const cookie = CookieStore.globalStore[this.storeId][domain][path][cookieName]
+                        const cookieString = `${cookieName}=${cookie.value}`
+                        cookies.push(cookieString)
+                    }
                 }
+                // for (let j = 0; j < cookieDomains.length; j++) {
+                //     const domain = cookieDomains[j]
+                //     for (const cookieName in CookieStore.globalStore[this.storeId][domain][this.path]) {
+                //         const cookie = CookieStore.globalStore[this.storeId][domain][this.path][cookieName]
+                //         const cookieString = `${cookieName}=${cookie.value}`
+                //         cookies.push(cookieString)
+                //     }
+                // }
+
                 return cookies
             } else {
-                const cookie = CookieStore.globalStore[this.storeId][this.domain][this.path][cookieName] || null
-                if (cookie) {
-                    const cookieString = `${cookieName}=${cookie.value}`
-                    return [cookieString]
-                }
-                else {
-                    return cookie
-                }
+                for (let i = 0; i < matchedDomains.length; i++) {
+                    const domain = matchedDomains[i]
+                    const path = matchedPaths[i]
 
+                    const cookie = CookieStore.globalStore[this.storeId][domain][path][cookieName] || null
+                    if (cookie) {
+                        const cookieString = `${cookieName}=${cookie.value}`
+                        return [cookieString]
+                    }
+                }
+                return null
             }
 
         } else {
-            if (!cookieName) {
-                return CookieStore.globalStore[this.storeId][this.domain][this.path]
-            } else {
-                return CookieStore.globalStore[this.storeId][this.domain][this.path][cookieName] || null;
+            for (let i = 0; i < matchedDomains.length; i++) {
+                const domain = matchedDomains[i]
+                const path = matchedPaths[i]
+
+                if (!cookieName) {
+                    return CookieStore.globalStore[this.storeId][domain][path]
+                } else {
+                    const cookie = CookieStore.globalStore[this.storeId][domain][path][cookieName]
+                    if (cookie) {
+                        return cookie
+                    }
+                }
             }
+            return null
         }
     }
 }
