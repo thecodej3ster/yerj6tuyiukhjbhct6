@@ -57,11 +57,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 ...incomingHeaders,
             } as Record<string, string>,
             validateStatus: (status) => status < 400 && status > 199
-        };
+        }
 
         if (selectedRequestConfig.body) {
             delete selectedRequestConfig.body
         }
+
         if (!direct) {
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
@@ -69,7 +70,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({})
         console.log(cookie);
-
 
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookie
@@ -116,6 +116,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         console.log(Object.keys(redirectCount));
 
                         console.log(`COUNT IS ... ${redirectCount[key]}`);
+                        console.log(data)
 
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
