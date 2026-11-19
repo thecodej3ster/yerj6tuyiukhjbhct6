@@ -342,7 +342,7 @@ async function runGetAuthUrl() {
     const authUrl = response[username]
     console.log(cookieStore.get({}))
 
-    try {
+    // try {
 
         // if (!authUrl.toLowerCase().startsWith("http")) {
         //     throw new Error("Invalid Url Recived");
@@ -356,19 +356,19 @@ async function runGetAuthUrl() {
         // }
 
         // await runGetAuthUrl()
-    } catch (error) {
-        delay += 5000
-        if (delay === 30000) {
-            throw error
-        }
+    // } catch (error) {
+    //     delay += 5000
+    //     if (delay === 30000) {
+    //         throw error
+    //     }
 
-        await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-                await runGetAuthUrl()
-                resolve()
-            }, delay);
-        })
-    }
+    //     await new Promise<void>((resolve) => {
+    //         setTimeout(async () => {
+    //             await runGetAuthUrl()
+    //             resolve()
+    //         }, delay);
+    //     })
+    // }
 }
 
 
