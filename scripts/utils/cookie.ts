@@ -148,12 +148,12 @@ export class CookieStore {
                 }
             }
 
-            // const finalDomain = explicitDomain || this.domain;
+            const finalDomain = explicitDomain || this.domain;
 
-            // console.log({
-            //     value,
-            //     attributes
-            // });
+            console.log({
+                value,
+                attributes
+            });
             
             // CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
             //     value,
