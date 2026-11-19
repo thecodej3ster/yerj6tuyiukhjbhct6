@@ -17,21 +17,21 @@ let usernames: string[] = []
 
 
 const commonHeaders = {
-    "Accept": 'application/graphql-response+json,application/json;q=0.9',
-//     "Content-Type": 'application/json',
+    // "Accept": 'application/graphql-response+json,application/json;q=0.9',
+    //     "Content-Type": 'application/json',
     "Origin": 'https://publish.buffer.com',
     "Referer": 'https://publish.buffer.com/',
-//     "x-buffer-client-id": 'webapp-publishing',
-//     "x-buffer-client-name": 'webapp-publishing',
-//     "x-buffer-client-version": 'b905f56',
-//     "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
+    //     "x-buffer-client-id": 'webapp-publishing',
+    //     "x-buffer-client-name": 'webapp-publishing',
+    //     "x-buffer-client-version": 'b905f56',
+    //     "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
 }
 
 const getAuthUrlConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
-        headers: commonHeaders,
-        maxRedirects: 3
+        headers: { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" },
+        maxRedirects: 2
     }
 }
 
@@ -106,20 +106,20 @@ function sortAuth() {
 //     const data = response as string
 //     const cookies = headers["set-cookie"] as string[]
 //     const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
-    // if (!cookies) {
-    //     const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
-    //     if (foundRedirect) {
-    //         return foundRedirect[0]
-    //     }
+// if (!cookies) {
+//     const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
+//     if (foundRedirect) {
+//         return foundRedirect[0]
+//     }
 
-    // }
-    // if (username) {
-    //     setCookie(username, cookies)
-    // }
-    // if (!cookies || !foundRedirect) {
-    //     throw new Error("AuthUrl Not Found");
-    // }
-    // return headers.location
+// }
+// if (username) {
+//     setCookie(username, cookies)
+// }
+// if (!cookies || !foundRedirect) {
+//     throw new Error("AuthUrl Not Found");
+// }
+// return headers.location
 // }
 
 async function hydrateCookieStore() {
@@ -342,18 +342,18 @@ async function runGetAuthUrl() {
 
     // try {
 
-        // if (!authUrl.toLowerCase().startsWith("http")) {
-        //     throw new Error("Invalid Url Recived");
-        // }
-        // authUrls[username] = authUrl
-        // getAuthUrlWorkIndex++
-        // delay = 0
+    // if (!authUrl.toLowerCase().startsWith("http")) {
+    //     throw new Error("Invalid Url Recived");
+    // }
+    // authUrls[username] = authUrl
+    // getAuthUrlWorkIndex++
+    // delay = 0
 
-        // if (getAuthUrlWorkIndex === usernames.length) {
-        //     return
-        // }
+    // if (getAuthUrlWorkIndex === usernames.length) {
+    //     return
+    // }
 
-        // await runGetAuthUrl()
+    // await runGetAuthUrl()
     // } catch (error) {
     //     delay += 5000
     //     if (delay === 30000) {
