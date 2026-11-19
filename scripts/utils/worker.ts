@@ -78,7 +78,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     const headers = response.headers as AxiosResponseHeaders
 
                     if (headers["set-cookie"]) {
-                        cookieStore.set(headers["set-cookie"])
+                    //     cookieStore.set(headers["set-cookie"])
                     }
 
 
