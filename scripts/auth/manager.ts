@@ -16,21 +16,21 @@ let delay = 0
 let usernames: string[] = []
 
 
-// const commonHeaders = {
-//     "Accept": 'application/graphql-response+json,application/json;q=0.9',
+const commonHeaders = {
+    "Accept": 'application/graphql-response+json,application/json;q=0.9',
 //     "Content-Type": 'application/json',
-//     "Origin": 'https://publish.buffer.com',
-//     "Referer": 'https://publish.buffer.com/',
+    "Origin": 'https://publish.buffer.com',
+    "Referer": 'https://publish.buffer.com/',
 //     "x-buffer-client-id": 'webapp-publishing',
 //     "x-buffer-client-name": 'webapp-publishing',
 //     "x-buffer-client-version": 'b905f56',
 //     "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
-// }
+}
 
 const getAuthUrlConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
-        headers: {},
+        headers: commonHeaders,
         maxRedirects: 3
     }
 }
