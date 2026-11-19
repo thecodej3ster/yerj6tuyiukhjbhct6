@@ -68,6 +68,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({})
+        console.log(cookie);
+        
 
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookie
@@ -85,9 +87,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         cookieStore.set(headers["set-cookie"])
                     }
 
-                    if (headers.location || foundRedirect && redirectCount[key] < maxRedirect) {
-                        console.log(headers);
-                        
+                    if (headers.location || foundRedirect && redirectCount[key] < maxRedirect) {                        
                         isRedirect = true
                         redirectCount[key]++
                         return headers.location || foundRedirect[0]
