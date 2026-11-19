@@ -154,13 +154,22 @@ export class CookieStore {
             console.log(cookiePath);
             console.log(this.storeId);
             console.log(name);
-            
-            
+
+
+
+            if (!CookieStore.globalStore[this.storeId][finalDomain]) {
+                CookieStore.globalStore[this.storeId][finalDomain] = {}
+            }
+
+
+            if (!CookieStore.globalStore[this.storeId][finalDomain][cookiePath]) {
+                CookieStore.globalStore[this.storeId][finalDomain][cookiePath] = {}
+            }
             
             CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
-                // value,
-                // attributes
-            }            
+                value,
+                attributes
+            }
 
         }
         // this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
