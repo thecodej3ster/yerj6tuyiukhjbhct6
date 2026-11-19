@@ -115,7 +115,6 @@ export class CookieStore {
             const mainPart: string = parts[0].trim();
 
             if (mainPart.indexOf('=') === -1) {
-                console.log(`THISSSSSSSSSSSS`);
                 throw new Error("Could Not Parse Cookie");
             }
 
@@ -150,13 +149,6 @@ export class CookieStore {
 
             const finalDomain = explicitDomain || this.domain;
 
-            console.log(finalDomain);
-            console.log(cookiePath);
-            console.log(this.storeId);
-            console.log(name);
-
-
-
             if (!CookieStore.globalStore[this.storeId][finalDomain]) {
                 CookieStore.globalStore[this.storeId][finalDomain] = {}
             }
@@ -181,12 +173,6 @@ export class CookieStore {
      * Retrieves cookies using the instance's context parameters.
      */
     public get({ cookieName, parse }: { cookieName?: string, parse?: boolean }): CookieDetails | { [cookieName: string]: CookieDetails } | null | string[] {
-        console.log(`THIS IS `);
-        ; console.log(this.getRootDomainFromUrl());
-
-        console.log(this.path);
-
-        console.log(CookieStore.globalStore[this.storeId][this.domain]);
         const matchedPaths: string[] = []
         const matchedDomains: string[] = []
         const cookieDomains = Object.keys(CookieStore.globalStore[this.storeId])
@@ -223,15 +209,6 @@ export class CookieStore {
                         cookies.push(cookieString)
                     }
                 }
-                // for (let j = 0; j < cookieDomains.length; j++) {
-                //     const domain = cookieDomains[j]
-                //     for (const cookieName in CookieStore.globalStore[this.storeId][domain][this.path]) {
-                //         const cookie = CookieStore.globalStore[this.storeId][domain][this.path][cookieName]
-                //         const cookieString = `${cookieName}=${cookie.value}`
-                //         cookies.push(cookieString)
-                //     }
-                // }
-
                 return cookies
             } else {
                 for (let i = 0; i < matchedDomains.length; i++) {

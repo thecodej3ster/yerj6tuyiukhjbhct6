@@ -145,15 +145,15 @@ async function runGetAuthUrl() {
         getAuthUrlConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
     }
 
-    if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
-    let cookie = ""
+    // if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
+    // let cookie = ""
 
     // for (const cookieName in cookieStore[username]) {
     //     cookie += `${cookieName}=${cookieStore[username][cookieName]};`
     // }
 
     // getAuthUrlConfig.requestConfig.headers.Cookie = cookie
-    getAuthUrlConfig.resolverArgs.username = username
+    // getAuthUrlConfig.resolverArgs.username = username
 
     const response = await worker(getAuthUrlConfig)
     const authUrl = response[username]
