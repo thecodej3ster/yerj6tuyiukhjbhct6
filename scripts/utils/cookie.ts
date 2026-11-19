@@ -165,14 +165,14 @@ export class CookieStore {
             if (!CookieStore.globalStore[this.storeId][finalDomain][cookiePath]) {
                 CookieStore.globalStore[this.storeId][finalDomain][cookiePath] = {}
             }
-            
+
             CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
                 value,
                 attributes
             }
 
         }
-        // this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
+        this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
 
         return this.cookies
     }

@@ -34,7 +34,6 @@ const getAuthUrlConfig: WorkerConfig = {
         maxRedirects: 2,
         validateStatus: (status) => status < 400 && status > 199,
     },
-    resolverAction: saveCookie,
     resolverArgs: {}
 }
 
@@ -119,10 +118,10 @@ async function saveCookie({ headers, username, response }: ResolverArgs & { user
     // if (username) {
     //     setCookie(username, cookies)
     // }
-    if (!cookies || !foundRedirect) {
-        throw new Error("AuthUrl Not Found");
-    }
-    return headers.location
+    // if (!cookies || !foundRedirect) {
+    //     throw new Error("AuthUrl Not Found");
+    // }
+    // return headers.location
 }
 
 async function hydrateCookieStore() {
@@ -158,7 +157,7 @@ async function runGetAuthUrl() {
 
     const response = await worker(getAuthUrlConfig)
     const authUrl = response[username]
-    console.log(authUrl);
+    console.log(cookieStore.get({}))
 
 
     try {

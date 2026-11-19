@@ -54,7 +54,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 "TE": "trailers",
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
                 ...incomingHeaders,
-            } as Record<string, string>
+            } as Record<string, string>,
+            validateStatus: (status) => status < 400 && status > 199
         };
 
         if (selectedRequestConfig.body) {
@@ -76,27 +77,17 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             axios(selectedRequestConfig)
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
+                    const foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
 
                     if (headers["set-cookie"]) {
-                        if (!key) {
-                                                    console.log('KEY UNDEFIND');
-                                                    console.log(url);
-                                                    
-
-                        }
-                        
                         const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
-                            cookieStore.set(headers["set-cookie"])
+                        cookieStore.set(headers["set-cookie"])
                     }
 
-
-                    console.log(headers["set-cookie"]);
-
-                    if (headers.location && redirectCount[key] < maxRedirect) {
+                    if (headers.location || foundRedirect && redirectCount[key] < maxRedirect) {
                         isRedirect = true
                         redirectCount[key]++
-                        console.log(cookieStore.get({}));
-                        return headers.location
+                        return headers.location || foundRedirect[0]
                     }
 
                     if (resolverAction) {
@@ -118,8 +109,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     delay = 5000
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
-                        console.log('REdirecting ..... ');
-
+                        console.log('Redirecting ... ');
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
