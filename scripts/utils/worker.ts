@@ -10,6 +10,9 @@ const cookieStore: Record<string, Record<string, Record<string, string>>> = {}
 const result: Record<string, any> = {};
 let unFinishedWork: string[] = []
 let isInit = true
+    let redirectCount: Record<string, number> = {}
+        let maxRedirect = 0
+
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const workers: Promise<void>[] = [];
     const failedWorks: string[] = []
@@ -21,14 +24,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
-    let redirectCount: Record<string, number> = {}
 
 
     const fetchData = (url: string, key: string): Promise<void> => {
         if (!redirectCount[key]) {
             redirectCount[key] = 0
         }
-        let maxRedirect = 0
         if (requestConfig?.maxRedirects) {
             maxRedirect = requestConfig.maxRedirects
             requestConfig.maxRedirects = 0
