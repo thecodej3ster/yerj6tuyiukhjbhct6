@@ -68,11 +68,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
 
         const cookieStore = new CookieStore({ storeId: key, url: url })
-        const cookie = cookieStore.get({})
-        console.log(cookie);
+        const cookie = cookieStore.get({}) as string[]
+        const cookieString = cookie.join(';')
+        console.log(cookieString);
 
         if (selectedRequestConfig.headers) {
-            selectedRequestConfig.headers.Cookie = cookie
+            selectedRequestConfig.headers.Cookie = cookieString
         }
 
         return new Promise<void>((resolve, reject) => {
