@@ -93,8 +93,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         console.log(new CookieStore({ storeId: key, url: response.config.url! }).get({}))
                         
                         // console.log(response);
+                        console.log(`THIS IS SET COOKIE`);
                         
-                        // console.log(headers["set-cookie"]);
+                        console.log(headers["set-cookie"]);
                         
                     }
 
