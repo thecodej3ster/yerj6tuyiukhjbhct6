@@ -158,8 +158,8 @@ export class CookieStore {
             
             
             CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
-                value,
-                attributes
+                // value,
+                // attributes
             }            
 
         }
