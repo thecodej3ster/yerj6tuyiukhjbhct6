@@ -338,7 +338,7 @@ async function runGetAuthUrl() {
 
     const response = await worker(getAuthUrlConfig)
     const authUrl = response[username]
-    console.log(cookieStore.get({}))
+    // console.log(cookieStore.get({}))
 
     // try {
 
