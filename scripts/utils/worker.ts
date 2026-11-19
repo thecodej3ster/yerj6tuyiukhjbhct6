@@ -10,8 +10,8 @@ const cookieStore: Record<string, Record<string, Record<string, string>>> = {}
 const result: Record<string, any> = {};
 let unFinishedWork: string[] = []
 let isInit = true
-    const redirectCount: Record<string, number> = {}
-        let maxRedirect = 0
+const redirectCount: Record<string, number> = {}
+let maxRedirect = 0
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const workers: Promise<void>[] = [];
@@ -69,7 +69,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({})
         console.log(cookie);
-        
+
 
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookie
@@ -87,7 +87,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         cookieStore.set(headers["set-cookie"])
                     }
 
-                    if (headers.location || foundRedirect && redirectCount[key] < maxRedirect) {                        
+                    if (redirectCount[key] < maxRedirect && (headers.location || foundRedirect)) {
                         isRedirect = true
                         redirectCount[key]++
                         return headers.location || foundRedirect[0]
@@ -114,9 +114,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
                         console.log('Redirecting ... ');
                         console.log(Object.keys(redirectCount));
-                        
+
                         console.log(`COUNT IS ... ${redirectCount[key]}`);
-                        
+
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
