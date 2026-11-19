@@ -16,16 +16,16 @@ let delay = 0
 let usernames: string[] = []
 
 
-const commonHeaders = {
-    "Accept": 'application/graphql-response+json,application/json;q=0.9',
-    "Content-Type": 'application/json',
-    "Origin": 'https://publish.buffer.com',
-    "Referer": 'https://publish.buffer.com/',
-    "x-buffer-client-id": 'webapp-publishing',
-    "x-buffer-client-name": 'webapp-publishing',
-    "x-buffer-client-version": 'b905f56',
-    "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
-}
+// const commonHeaders = {
+//     "Accept": 'application/graphql-response+json,application/json;q=0.9',
+//     "Content-Type": 'application/json',
+//     "Origin": 'https://publish.buffer.com',
+//     "Referer": 'https://publish.buffer.com/',
+//     "x-buffer-client-id": 'webapp-publishing',
+//     "x-buffer-client-name": 'webapp-publishing',
+//     "x-buffer-client-version": 'b905f56',
+//     "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
+// }
 
 const getAuthUrlConfig: WorkerConfig = {
     urls: {},
@@ -37,48 +37,48 @@ const getAuthUrlConfig: WorkerConfig = {
     resolverArgs: {}
 }
 
-const revokeAuthTokenConfig: WorkerConfig = {
-    urls: {
-        authRevoke: 'https://graph.buffer.com/?_o=revokePersonalAccessToken',
-    },
-    requestConfig: {
-        headers: commonHeaders,
-        method: "POST",
-        responseType: "json",
-    }
-}
+// const revokeAuthTokenConfig: WorkerConfig = {
+//     urls: {
+//         authRevoke: 'https://graph.buffer.com/?_o=revokePersonalAccessToken',
+//     },
+//     requestConfig: {
+//         headers: commonHeaders,
+//         method: "POST",
+//         responseType: "json",
+//     }
+// }
 
-const getAuthSessionUrlConfig: WorkerConfig = {
-    urls: {},
-    requestConfig: {
-        headers: {},
-        maxRedirects: 0,
-        validateStatus: (status) => status < 400 && status > 199
-    },
-    resolverAction: saveCookie,
-    resolverArgs: {}
-}
+// const getAuthSessionUrlConfig: WorkerConfig = {
+//     urls: {},
+//     requestConfig: {
+//         headers: {},
+//         maxRedirects: 0,
+//         validateStatus: (status) => status < 400 && status > 199
+//     },
+//     resolverAction: saveCookie,
+//     resolverArgs: {}
+// }
 
-const getAuthTokenConfig: WorkerConfig = {
-    urls: {},
-    requestConfig: {
-        headers: {},
-        maxRedirects: 0,
-        validateStatus: (status) => status < 400 && status > 199
-    },
-    resolverAction: saveCookie,
-    resolverArgs: {}
-}
+// const getAuthTokenConfig: WorkerConfig = {
+//     urls: {},
+//     requestConfig: {
+//         headers: {},
+//         maxRedirects: 0,
+//         validateStatus: (status) => status < 400 && status > 199
+//     },
+//     resolverAction: saveCookie,
+//     resolverArgs: {}
+// }
 
-const getAccessTokensConfig: WorkerConfig = {
-    urls: { accessTokens: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' },
-    requestConfig: {
-        headers: commonHeaders,
-        method: "POST",
-        responseType: "json",
-        body: "{\"operationName\":\"getPersonalAccessTokens\",\"variables\":{},\"extensions\":{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.2.6\"}},\"query\":\"query getPersonalAccessTokens {\\n  personalAccessTokens {\\n    accessTokens {\\n      accessToken\\n      clientId\\n      name\\n      generatedAt\\n      expiresAt\\n      scopes\\n      __typename\\n    }\\n    maxTokens\\n    __typename\\n  }\\n}\"}"
-    }
-}
+// const getAccessTokensConfig: WorkerConfig = {
+//     urls: { accessTokens: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' },
+//     requestConfig: {
+//         headers: commonHeaders,
+//         method: "POST",
+//         responseType: "json",
+//         body: "{\"operationName\":\"getPersonalAccessTokens\",\"variables\":{},\"extensions\":{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.2.6\"}},\"query\":\"query getPersonalAccessTokens {\\n  personalAccessTokens {\\n    accessTokens {\\n      accessToken\\n      clientId\\n      name\\n      generatedAt\\n      expiresAt\\n      scopes\\n      __typename\\n    }\\n    maxTokens\\n    __typename\\n  }\\n}\"}"
+//     }
+// }
 
 function sortAuth() {
     for (const username in auths.manager) {
@@ -104,10 +104,10 @@ function sortAuth() {
 //     })
 // }
 
-async function saveCookie({ headers, username, response }: ResolverArgs & { username?: string }) {
-    const data = response as string
-    const cookies = headers["set-cookie"] as string[]
-    const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
+// async function saveCookie({ headers, username, response }: ResolverArgs & { username?: string }) {
+//     const data = response as string
+//     const cookies = headers["set-cookie"] as string[]
+//     const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
     // if (!cookies) {
     //     const foundRedirect = data.match(/(?<=Found. Redirecting to )[^<]+/m)
     //     if (foundRedirect) {
@@ -122,72 +122,17 @@ async function saveCookie({ headers, username, response }: ResolverArgs & { user
     //     throw new Error("AuthUrl Not Found");
     // }
     // return headers.location
-}
+// }
 
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
         cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([auth])
-        // const [name, value] = auth.split('=')
-        // cookieStore[username] = {}
-        // cookieStore[username][name] = value
     }
 }
 
 
-
-let getAuthUrlWorkIndex = 0
-async function runGetAuthUrl() {
-    const username = usernames[getAuthUrlWorkIndex]
-
-    if (getAuthUrlConfig.urls) {
-        getAuthUrlConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
-    }
-
-    // if (!getAuthUrlConfig.requestConfig || getAuthUrlConfig.resolverArgs === undefined || getAuthUrlConfig.requestConfig.headers === undefined) return
-    // let cookie = ""
-
-    // for (const cookieName in cookieStore[username]) {
-    //     cookie += `${cookieName}=${cookieStore[username][cookieName]};`
-    // }
-
-    // getAuthUrlConfig.requestConfig.headers.Cookie = cookie
-    // getAuthUrlConfig.resolverArgs.username = username
-
-    const response = await worker(getAuthUrlConfig)
-    const authUrl = response[username]
-    console.log(cookieStore.get({}))
-
-
-    try {
-
-        // if (!authUrl.toLowerCase().startsWith("http")) {
-        //     throw new Error("Invalid Url Recived");
-        // }
-        // authUrls[username] = authUrl
-        // getAuthUrlWorkIndex++
-        // delay = 0
-
-        // if (getAuthUrlWorkIndex === usernames.length) {
-        //     return
-        // }
-
-        // await runGetAuthUrl()
-    } catch (error) {
-        delay += 5000
-        if (delay === 30000) {
-            throw error
-        }
-
-        await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-                await runGetAuthUrl()
-                resolve()
-            }, delay);
-        })
-    }
-}
 
 
 
@@ -382,6 +327,52 @@ async function runGetAuthUrl() {
 //     }
 //     await revokeAllAccessTokens()
 // }
+
+
+
+let getAuthUrlWorkIndex = 0
+async function runGetAuthUrl() {
+    const username = usernames[getAuthUrlWorkIndex]
+
+    if (getAuthUrlConfig.urls) {
+        getAuthUrlConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
+    }
+
+    const response = await worker(getAuthUrlConfig)
+    const authUrl = response[username]
+    console.log(cookieStore.get({}))
+
+    try {
+
+        // if (!authUrl.toLowerCase().startsWith("http")) {
+        //     throw new Error("Invalid Url Recived");
+        // }
+        // authUrls[username] = authUrl
+        // getAuthUrlWorkIndex++
+        // delay = 0
+
+        // if (getAuthUrlWorkIndex === usernames.length) {
+        //     return
+        // }
+
+        // await runGetAuthUrl()
+    } catch (error) {
+        delay += 5000
+        if (delay === 30000) {
+            throw error
+        }
+
+        await new Promise<void>((resolve) => {
+            setTimeout(async () => {
+                await runGetAuthUrl()
+                resolve()
+            }, delay);
+        })
+    }
+}
+
+
+
 
 async function auth() {
     sortAuth()
