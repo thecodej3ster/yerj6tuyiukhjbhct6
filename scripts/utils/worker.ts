@@ -77,10 +77,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
 
-                    const cookies = headers["set-cookie"] || null
-                    if (cookies) {
-                        cookieStore.set(cookies)
-                    }
+                    // const cookies = headers["set-cookie"] || null
+                    // if (cookies) {
+                    //     cookieStore.set(cookies)
+                    // }
 
                     console.log(headers);
                     
