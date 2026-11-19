@@ -155,17 +155,14 @@ export class CookieStore {
                 attributes
             });
             
-            // CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
-            //     value,
-            //     attributes
-            // }
-
-            // console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] );
-            
+            CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
+                value,
+                attributes
+            }            
 
         }
-
         // this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
+
         return this.cookies
     }
 
