@@ -108,6 +108,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     delay = 5000
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
+                        console.log('REdirecting ..... ');
+                        
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
