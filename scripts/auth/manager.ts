@@ -31,7 +31,7 @@ const getAuthUrlConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
         headers: {},
-        maxRedirects: 2
+        maxRedirects: 3
     }
 }
 
