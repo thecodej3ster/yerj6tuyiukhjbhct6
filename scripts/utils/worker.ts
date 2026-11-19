@@ -77,13 +77,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 .then(response => {
                     const headers = response.headers as AxiosResponseHeaders
 
-                    // const cookies = headers["set-cookie"] || null
-                    // if (cookies) {
-                    //     cookieStore.set(cookies)
-                    // }
+                    if (headers["set-cookie"]) {
+                        cookieStore.set(headers["set-cookie"])
+                    }
+
 
                     console.log(headers);
-                    
+
                     if (headers.location && redirectCount[key] < maxRedirect) {
                         isRedirect = true
                         redirectCount[key]++
@@ -111,7 +111,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
                         console.log('REdirecting ..... ');
-                        
+
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
