@@ -10,7 +10,7 @@ const cookieStore: Record<string, Record<string, Record<string, string>>> = {}
 const result: Record<string, any> = {};
 let unFinishedWork: string[] = []
 let isInit = true
-    let redirectCount: Record<string, number> = {}
+    const redirectCount: Record<string, number> = {}
         let maxRedirect = 0
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
@@ -113,6 +113,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
                         console.log('Redirecting ... ');
+                        console.log(`COUNT IS ... ${redirectCount}`);
+                        
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];

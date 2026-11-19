@@ -31,10 +31,8 @@ const getAuthUrlConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
         headers: {},
-        maxRedirects: 2,
-        validateStatus: (status) => status < 400 && status > 199,
-    },
-    resolverArgs: {}
+        maxRedirects: 2
+    }
 }
 
 // const revokeAuthTokenConfig: WorkerConfig = {
