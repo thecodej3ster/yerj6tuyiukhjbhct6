@@ -153,6 +153,8 @@ export class CookieStore {
             console.log(finalDomain);
             console.log(cookiePath);
             console.log(this.storeId);
+            console.log(name);
+            
             
             
             CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
