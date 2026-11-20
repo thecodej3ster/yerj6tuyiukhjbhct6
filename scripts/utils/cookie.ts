@@ -181,6 +181,10 @@ export class CookieStore {
             if (domain === this.domain || this.domain.includes(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
+                    if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                        console.log(CookieStore.globalStore[this.storeId][domain][path]);
+
+                    }
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
                         matchedPaths.push(path)
                         matchedDomains.push(domain)
@@ -207,7 +211,7 @@ export class CookieStore {
                 }
                 if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                     console.log(cookies);
-                    
+
                 }
                 return cookies
             } else {
@@ -234,7 +238,7 @@ export class CookieStore {
                 }
                 if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                     console.log(cookies);
-                    
+
                 }
                 return cookies
             } else {
