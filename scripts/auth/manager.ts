@@ -153,9 +153,16 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
     await revokeAccesssToken({})
 }
 
-
+let o = false
 async function getAccessTokens(username: string) {
     console.log('GETTING ACCESS TOKEN ...');
+    if (!o) {
+        console.log('YOU WERE RIGHT !!!');
+        console.log('YOU WERE RIGHT !!!');
+        console.log('YOU WERE RIGHT !!!');
+        console.log('YOU WERE RIGHT !!!');
+        console.log('YOU WERE RIGHT !!!');
+    }
     const cookieStore = new CookieStore({ storeId: username, url: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' })
     console.log(cookieStore.get({}));
 
@@ -208,8 +215,9 @@ async function runGetAuthToken() {
     }
 
     await worker(getAuthTokenConfig)
+    o = true
     console.log('WORKER DONE');
-    
+
 }
 
 
