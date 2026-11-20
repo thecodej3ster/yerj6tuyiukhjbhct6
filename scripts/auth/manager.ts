@@ -46,6 +46,7 @@ const getAccessTokensConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
         headers: {
+            "x-buffer-client-version": 'b905f56',
             "x-buffer-client-id": 'webapp-publishing',
             "x-buffer-client-name": 'webapp-publishing',
         },

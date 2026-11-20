@@ -32,11 +32,11 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
         const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
             url: url,
-            ...requestConfig,
-            data: requestConfig?.body || null,
             method: "GET",
             responseEncoding: "utf-8",
             responseType: "text",
+            ...requestConfig,
+            data: requestConfig?.body || null,
             headers: {
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
