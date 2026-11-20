@@ -205,6 +205,10 @@ export class CookieStore {
                         cookies.push(cookieString)
                     }
                 }
+                if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                    console.log(cookies);
+                    
+                }
                 return cookies
             } else {
                 const cookie = CookieStore.globalStore[this.storeId][matchedDomains[0]][matchedPaths[0]][cookieName] || null
