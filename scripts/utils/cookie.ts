@@ -162,6 +162,7 @@ export class CookieStore {
                 value,
                 attributes
             }
+console.log(finalDomain);
 
         }
         this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
@@ -194,6 +195,8 @@ export class CookieStore {
 
 
         }
+
+        console.log(matchedDomains)
 
         if (!parse) {
             if (!cookieName) {
