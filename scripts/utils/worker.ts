@@ -35,7 +35,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             ...requestConfig,
             data: requestConfig?.body || null,
             method: "GET",
-            responseEncoding: "UTF-8",
+            responseEncoding: "utf-8",
             responseType: "text",
             headers: {
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -173,10 +173,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
-
             const failedUrls: Record<string, string> = {}
-
-
 
             failedWorks.map(key => {
                 if (delay === 30000) {
@@ -185,7 +182,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
                 failedUrls[key] = urls[key]
             })
-            
+
             if (delay === 30000) {
                 throw error
             }
