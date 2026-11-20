@@ -35,7 +35,7 @@ const getAuthTokenConfig: WorkerConfig = {
     },
     resolverAction: async ({ key, url }: ResolverArgs) => {
         const cookieStore = new CookieStore({ storeId: key, url })
-        const cookies = cookieStore.get({ parse: false })
+        const cookies = cookieStore.get({ parse: true })
         console.log(cookies);
     }
 }
