@@ -177,17 +177,20 @@ export class CookieStore {
         for (let i = 0; i < cookieDomains.length; i++) {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
+            if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                console.log(CookieStore.globalStore[this.storeId][domain]);
+            }
 
             if (domain === this.domain || this.domain.includes(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
-                    if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                        console.log(CookieStore.globalStore[this.storeId][domain][path]);
 
-                    }
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
                         matchedPaths.push(path)
                         matchedDomains.push(domain)
+                    } else {
+                        console.log('PATH DOES NOT MATCH');
+
                     }
                 }
             }
