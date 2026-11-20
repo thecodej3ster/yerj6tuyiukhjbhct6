@@ -16,11 +16,6 @@ interface ServerCred {
     auth: string
 }
 
-// let selectedServer: ServerCred
-
-
-let provider = 'pv-xxx'
-
 let lastUsed = -1
 export function selectKey(list: { keys: string[] }) {
     lastUsed++
@@ -31,19 +26,18 @@ export function selectKey(list: { keys: string[] }) {
 }
 
 
+async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selectedServer?: ServerCred, provider?: string }> {
+    const providers = ['pv-xxx', 'tv-xxx']
+    let selectedProvider = providers[Math.floor(Math.random() * providers.length)]
 
-/**
- * Robust helper to locate an operational TLS proxy endpoint.
- */
-let isServerSeachStarted = false
-async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selectedServer?: ServerCred }> {
+    console.log(`Provider is ${selectedProvider}`);
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
 
-    const connectInfo: { proxySocket?: tls.TLSSocket, selectedServer?: ServerCred } = {}
+    const connectInfo: { proxySocket?: tls.TLSSocket, selectedServer?: ServerCred, provider: string } = { provider: selectedProvider }
 
     const { data: lists, error } = await db.from('serverlists')
         .select("*")
-        .eq("id", provider)
+        .eq("id", selectedProvider)
         .limit(1)
         .single<{ data: string }>()
 
@@ -101,8 +95,8 @@ async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selected
 
     const socket = await testServer()
     connectInfo.proxySocket = socket
- 
-    
+
+
     return connectInfo
 }
 
@@ -114,10 +108,6 @@ function buildConnectRequst({ authHeader, targetHost, targetPort }: { authHeader
         `\r\n`;
 }
 
-/**
- * Custom HTTPS Agent subclass to properly override the createConnection method.
- * Built-in proxy authentication via hardcoded credentials.
- */
 let retried = false
 export class ProxyAgent extends HttpsAgent {
 
@@ -128,7 +118,7 @@ export class ProxyAgent extends HttpsAgent {
         let connectResponse = "";
 
         const hanleRequest = async () => {
-            let { proxySocket, selectedServer } = await getProxySocket()
+            let { proxySocket, selectedServer, provider } = await getProxySocket()
 
             const authHeader = `Proxy-Authorization: Basic ${selectedServer?.auth}\r\n`
             const targetHost = connectionOpts.host;
@@ -192,7 +182,7 @@ export class ProxyAgent extends HttpsAgent {
                             retried = true
                             break;
                         default:
-                            proxySocket?.off("data", onData);                            
+                            proxySocket?.off("data", onData);
                             if (callback) callback(new Error(`Proxy handshake failed:\n${connectResponse}`));
 
                     }

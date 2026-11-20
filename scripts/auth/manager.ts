@@ -195,7 +195,7 @@ async function auth() {
     hydrateCookieStore()
     await runGetAuthToken()
     await revokeAllAccessTokens()
-    await createAccesssToken()
+    // await createAccesssToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
     // console.log(cookieStore);
