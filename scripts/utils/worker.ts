@@ -91,21 +91,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
                         isRedirect = true
                         redirectCount[key]++
-                        console.log(key)
-                        console.log('REDIRECTING');
                         const redirectUrl = headers.location || foundRedirect[0]
-                        // console.log(redirectUrl);
-
                         return redirectUrl
-
-                    } else {
-                        console.log('HMMMMMMMMMMM');
 
                     }
 
                     if (resolverAction) {
-                        console.log("RESOLVING");
-
                         resolverArgs = resolverArgs || {}
                         return resolverAction({
                             ...resolverArgs,
@@ -131,17 +122,16 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     }
 
                     delay = 5000
-console.log(unFinishedWork);
-
-                    if (unFinishedWork.length > 0 ) {
+        
+                    if (unFinishedWork.length > 0) {
                         console.log('FINISHING');
-                        
+
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
                             console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
                             console.log(nextUrl);
-                            
+
                             workers.push(fetchData(nextUrl, nextKey))
                         }
                     }
