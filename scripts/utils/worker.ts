@@ -139,9 +139,15 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     }
                 }
 
+                if (!sucessfulWorks.includes(key)) {
+                    sucessfulWorks.push(key)
+                }
                 failedWorks = failedWorks.filter(work => !sucessfulWorks.includes(work))
             })
             .catch(() => {
+                if (!failedWorks.includes(key)) {
+                    failedWorks.push(key)
+                }
                 sucessfulWorks = sucessfulWorks.filter(work => !failedWorks.includes(work))
             })
             .finally(() => {
