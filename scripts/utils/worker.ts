@@ -11,7 +11,7 @@ const result: Record<string, any> = {};
 
 const redirectCount: Record<string, number> = {}
 let maxRedirect = 0
-let delay = 5000
+let delay = 0
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const workers: Promise<void>[] = [];
@@ -152,7 +152,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             .finally(() => {
 
                 if ((sucessfulWorks.length + failedWorks.length) === totalWork) {
-                    if (failedWorks.length) {
+                    if (failedWorks.length === totalWork) {
                         delay += 5000
                     } else {
                         delay = 5000
