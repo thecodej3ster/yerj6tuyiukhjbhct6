@@ -133,7 +133,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     delay = 5000
 console.log(unFinishedWork);
 
-                    if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
+                    if (unFinishedWork.length > 0 ) {
                         console.log('FINISHING');
                         
                         const nextKey = unFinishedWork.shift()
