@@ -145,7 +145,10 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 
 async function getAccessTokens(username: string) {
     console.log('GETTING ACCESS TOKEN ...');
+    const cookieStore = new CookieStore({ storeId: username, url: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' })
+    console.log(cookieStore.get({}));
 
+    return
     getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
     console.log(getAccessTokensConfig);
 
