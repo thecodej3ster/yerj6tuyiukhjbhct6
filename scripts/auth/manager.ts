@@ -130,6 +130,7 @@ function sortAuth() {
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
+        usernames.push(username)
         cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([auth])
     }
@@ -382,7 +383,6 @@ async function runGetAuthToken() {
 async function auth() {
     sortAuth()
     hydrateCookieStore()
-    usernames = Object.keys(auths.manager)
     await runGetAuthToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
