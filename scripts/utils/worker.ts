@@ -138,7 +138,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     resolve()
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.log("AM THE ONE");
                     reject(error)
                 })
         })
