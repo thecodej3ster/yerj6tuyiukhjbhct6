@@ -70,13 +70,11 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({}) as string[]
         const cookieString = cookie.join(';')
-        // console.log(cookieString);
 
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookieString
         }
 
-        // console.log(selectedRequestConfig);
         
         return new Promise<void>((resolve, reject) => {
             let isRedirect = false
@@ -87,14 +85,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                     if (headers["set-cookie"]) {
                         const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
-                        cookieStore.set(headers["set-cookie"])
-                        console.log('THIS IS COOKIE');
-                        
-                        console.log(new CookieStore({ storeId: key, url: response.config.url! }).get({}))
-                        
-                        // console.log(response);
-                        console.log(`THIS IS SET COOKIE`);
-                        
+                        cookieStore.set(headers["set-cookie"])                        
                         console.log(headers["set-cookie"]);
                         
                     }
@@ -125,12 +116,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     delay = 5000
 
                     if (unFinishedWork.length > 0 && unFinishedWork.length < workerLimit) {
-                        // console.log('Redirecting ... ');
-                        // console.log(Object.keys(redirectCount));
-
-                        // console.log(`COUNT IS ... ${redirectCount[key]}`);
-                        // console.log(data)
-
                         const nextKey = unFinishedWork.shift()
                         if (nextKey) {
                             const nextUrl = urls[nextKey];

@@ -108,7 +108,7 @@ export class CookieStore {
     /**
      * Parses a Set-Cookie string and saves it using the instance's context.
      */
-    public set(cookie: string[]): { [cookieName: string]: CookieDetails } {
+    public set(cookie: string[]) {
         for (let i = 0; i < cookie.length; i++) {
             const cookieString = cookie[i];
             const parts: string[] = cookieString.split(';');
@@ -162,11 +162,8 @@ export class CookieStore {
                 value,
                 attributes
             }
-            // console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name])
         }
         this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
-        console.log(CookieStore.globalStore[this.storeId])
-        return this.cookies
     }
 
     /**
@@ -194,8 +191,6 @@ export class CookieStore {
 
 
         }
-
-        console.log(matchedDomains)
 
         if (!parse) {
             if (!cookieName) {
