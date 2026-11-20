@@ -15,8 +15,8 @@ let maxRedirect = 0
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const workers: Promise<void>[] = [];
-    const failedWorks: string[] = []
-    const sucessfulWorks: string[] = []
+    let failedWorks: string[] = []
+    let sucessfulWorks: string[] = []
     let totalWork = 0
     const workerProcesses = Promise.withResolvers()
 
@@ -137,12 +137,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                         fetchData(nextUrl, nextKey)
                     }
-                } else {
-                    sucessfulWorks.push(key)
                 }
+
+                failedWorks = failedWorks.filter(work => !sucessfulWorks.includes(work))
             })
             .catch(() => {
-                failedWorks.push(key)
+                sucessfulWorks = sucessfulWorks.filter(work => !failedWorks.includes(work))
             })
             .finally(() => {
                 if ((sucessfulWorks.length + failedWorks.length) === totalWork) {
@@ -178,7 +178,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             await workerProcesses.promise
             console.log('Workers Done');
-            
+
             if (failedWorks.length) {
                 throw new Error("Failed Works Available");
             }
