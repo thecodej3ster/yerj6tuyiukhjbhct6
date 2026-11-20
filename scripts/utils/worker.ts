@@ -71,6 +71,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.headers.Cookie = cookieString
         }
 
+        if (url == 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+            console.log(selectedRequestConfig);
+        }
 
         let isRedirect = false
         axios(selectedRequestConfig)
