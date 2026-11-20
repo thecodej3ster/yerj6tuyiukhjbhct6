@@ -215,6 +215,7 @@ async function runGetAuthToken() {
 async function auth() {
     sortAuth()
     hydrateCookieStore()
+    console.log(usernames);
     await runGetAuthToken()
     await revokeAllAccessTokens()
     await createAccesssToken()
