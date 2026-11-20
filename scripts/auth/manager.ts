@@ -90,6 +90,8 @@ async function createAccesssToken() {
     const username = usernames[createAccesssTokenWorkIndex]
 
     createAccesssTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
+    console.log(createAccesssTokenConfig);
+    
     const authCreate = await worker(createAccesssTokenConfig) as {
         [username: string]: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
     }
@@ -121,6 +123,7 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 
     revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${token}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
     revokeAuthTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=revokePersonalAccessToken'
+console.log(revokeAuthTokenConfig);
 
     const authRevoke = await worker(revokeAuthTokenConfig)
     console.log(authRevoke[username]);
@@ -137,7 +140,10 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 
 
 async function getAccessTokens(username: string) {
+    console.log('GETTING ACCESS TOKEN ...');
+    
     getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
+console.log(getAccessTokensConfig);
 
     const accessTokens = await worker(getAccessTokensConfig) as { [username: string]: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
 
@@ -154,7 +160,6 @@ async function getAccessTokens(username: string) {
         throw accessTokens?.error
     }
     console.log(accessTokens);
-
 }
 
 let revokeAllAccessTokensWorkIndex = 0
