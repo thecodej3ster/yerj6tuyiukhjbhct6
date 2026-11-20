@@ -208,31 +208,32 @@ export class CookieStore {
                 }
                 return cookies
             } else {
-                for (let i = 0; i < matchedDomains.length; i++) {
-                    const domain = matchedDomains[i]
-                    const path = matchedPaths[i]
-
-                    const cookie = CookieStore.globalStore[this.storeId][domain][path][cookieName] || null
-                    if (cookie) {
-                        const cookieString = `${cookieName}=${cookie.value}`
-                        return [cookieString]
-                    }
+                const cookie = CookieStore.globalStore[this.storeId][matchedDomains[0]][matchedPaths[0]][cookieName] || null
+                if (cookie) {
+                    const cookieString = `${cookieName}=${cookie.value}`
+                    return [cookieString]
                 }
                 return null
             }
 
         } else {
-            for (let i = 0; i < matchedDomains.length; i++) {
-                const domain = matchedDomains[i]
-                const path = matchedPaths[i]
+            const cookies: { [cookieName: string]: CookieDetails } = {}
 
-                if (!cookieName) {
-                    return CookieStore.globalStore[this.storeId][domain][path]
-                } else {
-                    const cookie = CookieStore.globalStore[this.storeId][domain][path][cookieName]
-                    if (cookie) {
-                        return cookie
+            if (!cookieName) {
+                for (let i = 0; i < matchedDomains.length; i++) {
+                    const domain = matchedDomains[i]
+                    const path = matchedPaths[i]
+
+                    for (const cookieName in CookieStore.globalStore[this.storeId][domain][path]) {
+                        cookies[cookieName] = CookieStore.globalStore[this.storeId][domain][path][cookieName]                        
+                        
                     }
+                }
+                return cookies
+            } else {
+                const cookie = CookieStore.globalStore[this.storeId][matchedDomains[0]][matchedPaths[0]][cookieName]
+                if (cookie) {
+                    return cookie
                 }
             }
             return null

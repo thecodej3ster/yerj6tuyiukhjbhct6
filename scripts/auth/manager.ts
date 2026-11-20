@@ -343,7 +343,6 @@ async function runGetAuthToken() {
         if (getAuthTokenConfig.urls) {
             getAuthTokenConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
         }
-        break
     }
 
 
