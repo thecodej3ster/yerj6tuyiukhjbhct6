@@ -131,8 +131,26 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             .catch((error) => {
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
-                    result[key] = error
                 }
+
+                let payload = error.response.data
+
+                if (error.response) {
+                    if (typeof payload === 'object') {
+                        try {
+                            payload = JSON.stringify(payload)
+                        } catch { }
+                    }
+                    payload = `Server Responded with Status: ${error.response.status}\n${error.response.data}`
+                }
+                else if (error.request) {
+                    payload = `Request Failed With No Response:\n${error.message}`
+                }
+                else {
+                    payload = `Unable To Make Request:\n${error.message}`
+                }
+                
+                result[key] = payload
                 sucessfulWorks = sucessfulWorks.filter(work => work !== key)
             })
             .finally(() => {
