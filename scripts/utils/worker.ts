@@ -142,13 +142,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (!sucessfulWorks.includes(key)) {
                     sucessfulWorks.push(key)
                 }
-                failedWorks = failedWorks.filter(work => !sucessfulWorks.includes(work))
+                failedWorks = failedWorks.filter(work => work === key && !sucessfulWorks.includes(work))
             })
             .catch(() => {
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
-                sucessfulWorks = sucessfulWorks.filter(work => !failedWorks.includes(work))
+                sucessfulWorks = sucessfulWorks.filter(work => work === key && !failedWorks.includes(work))
             })
             .finally(() => {
                 if ((sucessfulWorks.length + failedWorks.length) === totalWork) {
@@ -204,6 +204,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
                 setTimeout(async () => {
                     try {
+                        console.log('AM INNNNNNNNNNNNNNNNN');
+                        
                         const response = await worker({
                             urls: failedUrls,
                             direct: direct,
@@ -214,7 +216,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         resolve(response)
                     } catch (error) {
                         console.log(error);
-                        
+
                         reject(error)
                     }
 
