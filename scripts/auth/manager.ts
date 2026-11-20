@@ -336,15 +336,12 @@ async function hydrateCookieStore() {
 
 let getAuthTokenWorkIndex = 0
 async function runGetAuthToken() {
-    // const username = usernames[getAuthTokenWorkIndex]
-
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i]
         if (getAuthTokenConfig.urls) {
             getAuthTokenConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
         }
     }
-
 
     const response = await worker(getAuthTokenConfig)
 
@@ -381,9 +378,9 @@ async function runGetAuthToken() {
 
 
 async function auth() {
-    // sortAuth()
-    // hydrateCookieStore()
-    // await runGetAuthToken()
+    sortAuth()
+    hydrateCookieStore()
+    await runGetAuthToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
     // console.log(cookieStore);
@@ -396,40 +393,7 @@ async function auth() {
     // await revokeAllAccessTokens()
 
 
-    const testurls = {
-        // 2xx Success
-        users: "https://httpbin.org/status/200",
-        settings: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/200&status_code=302",
-        createItem: "https://httpbin.org/status/201",
-        noContent: "https://httpbin.org/status/204",
-
-        // 302 Redirects -> 4xx Client Errors
-        redirectBadRequest: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/400&status_code=302",
-        redirectUnauthorized: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/401&status_code=302",
-        billing: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/402",
-        profile: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/403",
-        admin: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/403",
-        redirectNotFound: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/404",
-        redirectMethodNotAllowed: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/405",
-        redirectTimeout: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/408",
-        redirectConflict: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/409",
-        redirectGone: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/410&status_code=302",
-        redirectUnprocessable: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/422&status_code=302",
-        redirectRateLimited: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/429&status_code=302",
-
-        // Other Redirect Codes (301 / 307) -> 4xx Client Errors
-        permRedirectUnauthorized: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/401&status_code=301",
-        tempRedirectForbidden: "https://httpbin.org/redirect-to?url=https://httpbin.org/status/403&status_code=307",
-
-        // Direct 4xx & 5xx for comparison
-        directNotFound: "https://httpbin.org/status/404",
-        reports: "https://httpbin.org/status/500",
-        badGateway: "https://httpbin.org/status/502",
-        serviceUnavailable: "https://httpbin.org/status/503",
-    }
-
-    const config: WorkerConfig = { urls: testurls ,requestConfig:{maxRedirects:2}}
-    await worker(config)
+   
 }
 
 export default auth

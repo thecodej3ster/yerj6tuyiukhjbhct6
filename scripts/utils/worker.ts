@@ -1,35 +1,26 @@
-import axios, { AxiosResponse, RawAxiosRequestConfig, AxiosResponseTransformer, AxiosResponseHeaders } from "axios";
+import axios, {  RawAxiosRequestConfig, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
 import { CookieStore } from "./cookie";
 
-// {username:{domain:{}}}
 const workerLimit = 5
-// let workerResponse: AxiosResponse<any, any, {}, any>
-const cookieStore: Record<string, Record<string, Record<string, string>>> = {}
 const result: Record<string, any> = {};
-
 const redirectCount: Record<string, number> = {}
 let maxRedirect = 0
 let delay = 0
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
-    const workers: Promise<void>[] = [];
     let failedWorks: string[] = []
     let sucessfulWorks: string[] = []
     let totalWork = 0
     let unFinishedWork: string[] = []
-    let isInit = true
     const workerProcesses = Promise.withResolvers()
-
 
     const incomingHeaders = requestConfig?.headers
         ? (requestConfig.headers instanceof Headers
             ? Object.fromEntries(requestConfig.headers.entries())
             : requestConfig.headers)
         : {};
-
-
 
     const fetchData = (url: string, key: string) => {
         if (!redirectCount[key]) {
@@ -97,7 +88,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     redirectCount[key]++
                     const redirectUrl = headers.location || foundRedirect[0]
                     return redirectUrl
-
                 }
 
                 if (resolverAction) {
@@ -112,7 +102,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         }
                     })
                 }
-
                 return response.data
 
             })
@@ -126,14 +115,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
 
                 if (unFinishedWork.length > 0) {
-                    console.log('FINISHING');
-
                     const nextKey = unFinishedWork.shift()
                     if (nextKey) {
                         const nextUrl = urls[nextKey];
                         console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                        console.log(nextUrl);
-
                         fetchData(nextUrl, nextKey)
                     }
                 }
@@ -158,7 +143,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         delay = 5000
                     }
                     workerProcesses.resolve("Workers Done")
-                    console.log('FINALLLYY ...');
                 }
             })
     };
@@ -166,11 +150,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     async function processWorkers(works: Record<string, string>) {
 
         try {
-
-            // if (isInit) {
             unFinishedWork = Object.keys(urls);
-            //     isInit = false
-            // }
             totalWork = unFinishedWork.length
 
             const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
@@ -185,10 +165,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             }
 
-            // await Promise.all(workers)
-
             await workerProcesses.promise
-            console.log('Workers Done');
 
             if (failedWorks.length) {
                 throw new Error("Failed Works Available");
@@ -209,8 +186,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
                 setTimeout(async () => {
                     try {
-                        console.log('AM INNNNNNNNNNNNNNNNN');
-
                         const response = await worker({
                             urls: failedUrls,
                             direct: direct,
@@ -220,8 +195,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         })
                         resolve(response)
                     } catch (error) {
-                        console.log(error);
-
                         reject(error)
                     }
 
