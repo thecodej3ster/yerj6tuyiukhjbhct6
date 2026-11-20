@@ -133,18 +133,18 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     failedWorks.push(key)
                 }
 
-                let payload = error.response.data
+                let payload = error.response
 
                 if (error.response) {
-                    if (typeof payload === 'object') {
-                        try {
-                            payload = JSON.stringify(payload)
-                        } catch { }
-                    }
                     if (error.response.data) {
-                        payload = `Server Responded with Status: ${error.response.status}\n${error.response?.data}`
+                        payload = error.response.data
                     } else {
-                        payload = `Server Responded with Status: ${error.response.status}\n${error.response}`
+                        payload = error.response
+                    }
+                    if (typeof payload === 'object') {
+                        payload = `Server Responded with Status: ${error.response.status}\n${JSON.stringify(payload)}`
+                    } else {
+                        payload = `Server Responded with Status: ${error.response.status}\n${payload}`
                     }
                 }
                 else if (error.request) {
