@@ -11,6 +11,7 @@ const result: Record<string, any> = {};
 
 const redirectCount: Record<string, number> = {}
 let maxRedirect = 0
+let delay = 5000
 
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const workers: Promise<void>[] = [];
@@ -21,7 +22,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     let isInit = true
     const workerProcesses = Promise.withResolvers()
 
-    let delay = 5000
 
     const incomingHeaders = requestConfig?.headers
         ? (requestConfig.headers instanceof Headers
@@ -125,8 +125,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     result[key] = data
                 }
 
-                delay = 5000
-
                 if (unFinishedWork.length > 0) {
                     console.log('FINISHING');
 
@@ -152,7 +150,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 sucessfulWorks = sucessfulWorks.filter(work => work !== key)
             })
             .finally(() => {
+
                 if ((sucessfulWorks.length + failedWorks.length) === totalWork) {
+                    if (failedWorks.length) {
+                        delay += 5000
+                    } else {
+                        delay = 5000
+                    }
                     workerProcesses.resolve("Workers Done")
                     console.log('FINALLLYY ...');
                 }
@@ -164,7 +168,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         try {
 
             // if (isInit) {
-                unFinishedWork = Object.keys(urls);
+            unFinishedWork = Object.keys(urls);
             //     isInit = false
             // }
             totalWork = unFinishedWork.length
