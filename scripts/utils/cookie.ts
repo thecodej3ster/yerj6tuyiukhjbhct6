@@ -178,7 +178,7 @@ export class CookieStore {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
 
-            if (domain === this.domain || domain.includes(this.domain) || this.domain.includes(domain)) {
+            if (domain === this.domain || this.domain.includes(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {

@@ -199,7 +199,6 @@ async function revokeAllAccessTokens() {
     await revokeAllAccessTokens()
 }
 
-let getAuthTokenWorkIndex = 0
 async function runGetAuthToken() {
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i]
@@ -209,6 +208,8 @@ async function runGetAuthToken() {
     }
 
     await worker(getAuthTokenConfig)
+    console.log('WORKER DONE');
+    
 }
 
 
