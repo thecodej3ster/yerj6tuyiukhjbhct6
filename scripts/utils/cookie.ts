@@ -162,10 +162,10 @@ export class CookieStore {
                 value,
                 attributes
             }
-            console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name])
+            // console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name])
         }
         this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
-
+        console.log(this.get({}))
         return this.cookies
     }
 
