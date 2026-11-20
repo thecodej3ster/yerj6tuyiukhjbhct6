@@ -94,7 +94,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         console.log(key)
                         console.log('REDIRECTING');
                         const redirectUrl = headers.location || foundRedirect[0]
-                        console.log(redirectUrl);
+                        // console.log(redirectUrl);
 
                         return redirectUrl
 
@@ -140,6 +140,8 @@ console.log(unFinishedWork);
                         if (nextKey) {
                             const nextUrl = urls[nextKey];
                             console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                            console.log(nextUrl);
+                            
                             workers.push(fetchData(nextUrl, nextKey))
                         }
                     }
