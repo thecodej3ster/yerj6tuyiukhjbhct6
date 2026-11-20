@@ -16,6 +16,10 @@ let maxRedirect = 0
 export async function worker({ requestConfig, direct, urls, resolverAction, resolverArgs }: WorkerConfig) {
     const workers: Promise<void>[] = [];
     const failedWorks: string[] = []
+    const sucessfulWorks: string[] = []
+    let totalWork = 0
+    const workerProcesses = Promise.withResolvers()
+
     let delay = 5000
 
     const incomingHeaders = requestConfig?.headers
@@ -76,72 +80,76 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
 
 
-        return new Promise<void>((resolve, reject) => {
-            let isRedirect = false
-            axios(selectedRequestConfig)
-                .then(response => {
-                    const headers = response.headers as AxiosResponseHeaders
-                    const foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
+        let isRedirect = false
+        axios(selectedRequestConfig)
+            .then(response => {
+                const headers = response.headers as AxiosResponseHeaders
+                const foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
 
-                    if (headers["set-cookie"]) {
-                        const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
-                        cookieStore.set(headers["set-cookie"])
-                    }
+                if (headers["set-cookie"]) {
+                    const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
+                    cookieStore.set(headers["set-cookie"])
+                }
 
-                    if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
-                        isRedirect = true
-                        redirectCount[key]++
-                        const redirectUrl = headers.location || foundRedirect[0]
-                        return redirectUrl
+                if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
+                    isRedirect = true
+                    redirectCount[key]++
+                    const redirectUrl = headers.location || foundRedirect[0]
+                    return redirectUrl
 
-                    }
+                }
 
-                    if (resolverAction) {
-                        resolverArgs = resolverArgs || {}
-                        return resolverAction({
-                            ...resolverArgs,
-                            ...{
-                                response: response.data,
-                                headers: headers,
-                                key: key,
-                                url: url
-                            }
-                        })
-                    }
-
-                    return response.data
-
-                })
-                .then(data => {
-                    if (isRedirect) {
-                        urls[key] = data
-                        unFinishedWork.push(key)
-                        isRedirect = false
-                    } else {
-                        result[key] = data
-                    }
-
-                    delay = 5000
-        
-                    if (unFinishedWork.length > 0) {
-                        console.log('FINISHING');
-
-                        const nextKey = unFinishedWork.shift()
-                        if (nextKey) {
-                            const nextUrl = urls[nextKey];
-                            console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
-                            console.log(nextUrl);
-
-                            workers.push(fetchData(nextUrl, nextKey))
+                if (resolverAction) {
+                    resolverArgs = resolverArgs || {}
+                    return resolverAction({
+                        ...resolverArgs,
+                        ...{
+                            response: response.data,
+                            headers: headers,
+                            key: key,
+                            url: url
                         }
+                    })
+                }
+
+                return response.data
+
+            })
+            .then(data => {
+                if (isRedirect) {
+                    urls[key] = data
+                    unFinishedWork.push(key)
+                    isRedirect = false
+                } else {
+                    result[key] = data
+                }
+
+                delay = 5000
+
+                if (unFinishedWork.length > 0) {
+                    console.log('FINISHING');
+
+                    const nextKey = unFinishedWork.shift()
+                    if (nextKey) {
+                        const nextUrl = urls[nextKey];
+                        console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
+                        console.log(nextUrl);
+
+                        fetchData(nextUrl, nextKey)
                     }
-                    resolve()
-                })
-                .catch(error => {
-                    console.log("AM THE ONE");
-                    reject(error)
-                })
-        })
+                } else {
+                    sucessfulWorks.push(key)
+                }
+            })
+            .catch(() => {
+                console.log("AM THE ONE");
+                failedWorks.push(key)
+            })
+            .finally(() => {
+                if ((sucessfulWorks.length + failedWorks.length) === totalWork) {
+                    workerProcesses.resolve("Workers Done")
+                }
+            })
     };
 
     async function processWorkers(works: Record<string, string>) {
@@ -152,6 +160,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 unFinishedWork = Object.keys(urls);
                 isInit = false
             }
+            totalWork = unFinishedWork.length
 
             const concurrencyLimit = Math.min(workerLimit, unFinishedWork.length);
 
@@ -159,13 +168,17 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 const key = unFinishedWork.shift();
 
                 if (key) {
-                    workers.push(fetchData(works[key], key));
+                    fetchData(works[key], key)
                 }
                 console.log(`🔥 WORKER IN PROGRESS ... 🔥\n`);
 
             }
 
-            await Promise.all(workers)
+            // await Promise.all(workers)
+            await workerProcesses.promise
+            if (failedWorks.length) {
+                throw new Error("Failed Works Available");
+            }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
 
