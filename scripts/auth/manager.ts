@@ -148,7 +148,7 @@ async function getAccessTokens(username: string) {
     const cookieStore = new CookieStore({ storeId: username, url: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' })
     console.log(cookieStore.get({}));
 
-    return
+    // return
     getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
     console.log(getAccessTokensConfig);
 
