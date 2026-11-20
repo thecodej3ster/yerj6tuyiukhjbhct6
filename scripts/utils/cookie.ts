@@ -185,7 +185,7 @@ export class CookieStore {
             if (domain === this.domain || pattern.test(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
-                    if (path === '/') {
+                    if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
                         matchedPaths.push(path)
                         matchedDomains.push(domain)
                     }
