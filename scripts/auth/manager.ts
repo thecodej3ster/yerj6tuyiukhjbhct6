@@ -29,7 +29,16 @@ const getAuthTokenConfig: WorkerConfig = {
     requestConfig: {
         headers: { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" },
         maxRedirects: 2
+    },
+    resolverAction: async ({ key, url }: ResolverArgs) => {
+        const cookieStore = new CookieStore({ storeId: key, url: url })
+        const cookies = cookieStore.get({ parse: true })
+
+        if (cookies && !Object.keys(cookies).includes("buffer_access_token")) {
+            throw new Error("Access Token Not Found");
+        }
     }
+
 }
 
 const revokeAuthTokenConfig: WorkerConfig = {
