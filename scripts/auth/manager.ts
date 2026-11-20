@@ -33,7 +33,6 @@ const getAuthTokenConfig: WorkerConfig = {
     resolverAction: async ({ key, url }: ResolverArgs) => {
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookies = cookieStore.get({ parse: true })
-        console.log(cookies);
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
             throw new Error("Access Token Not Found");
@@ -155,18 +154,6 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 
 let o = false
 async function getAccessTokens(username: string) {
-    console.log('GETTING ACCESS TOKEN ...');
-    if (!o) {
-        console.log('YOU WERE RIGHT !!!');
-        console.log('YOU WERE RIGHT !!!');
-        console.log('YOU WERE RIGHT !!!');
-        console.log('YOU WERE RIGHT !!!');
-        console.log('YOU WERE RIGHT !!!');
-    }
-    const cookieStore = new CookieStore({ storeId: username, url: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' })
-    console.log(cookieStore.get({}));
-
-    // return
     getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
     console.log(getAccessTokensConfig);
 
