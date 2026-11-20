@@ -213,6 +213,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         })
                         resolve(response)
                     } catch (error) {
+                        console.log(error);
+                        
                         reject(error)
                     }
 
