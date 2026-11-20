@@ -141,7 +141,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                             payload = JSON.stringify(payload)
                         } catch { }
                     }
-                    payload = `Server Responded with Status: ${error.response.status}\n${error.response.data}`
+                    payload = `Server Responded with Status: ${error.response.status}\n${error.response?.data || error.response}`
                 }
                 else if (error.request) {
                     payload = `Request Failed With No Response:\n${error.message}`
@@ -149,7 +149,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 else {
                     payload = `Unable To Make Request:\n${error.message}`
                 }
-                
+
                 result[key] = payload
                 sucessfulWorks = sucessfulWorks.filter(work => work !== key)
             })
