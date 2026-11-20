@@ -178,8 +178,7 @@ export class CookieStore {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
 
-            const pattern = new RegExp(`${domain}.`)
-            if (domain === this.domain || pattern.test(domain)) {
+            if (domain === this.domain || domain.includes(this.domain) || this.domain.includes(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
@@ -225,8 +224,8 @@ export class CookieStore {
                     const path = matchedPaths[i]
 
                     for (const cookieName in CookieStore.globalStore[this.storeId][domain][path]) {
-                        cookies[cookieName] = CookieStore.globalStore[this.storeId][domain][path][cookieName]                        
-                        
+                        cookies[cookieName] = CookieStore.globalStore[this.storeId][domain][path][cookieName]
+
                     }
                 }
                 return cookies
