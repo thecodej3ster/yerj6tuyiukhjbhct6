@@ -91,9 +91,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
                         isRedirect = true
                         redirectCount[key]++
+                        console.log(key)
                                                 console.log('REDIRECTING');
 
                         return headers.location || foundRedirect[0]
+                        
+                    }else{
+                        console.log('HMMMMMMMMMMM');
                         
                     }
 
