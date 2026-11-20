@@ -165,7 +165,7 @@ export class CookieStore {
             // console.log(CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name])
         }
         this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
-        console.log(this.get({}))
+        console.log(CookieStore.globalStore[this.storeId])
         return this.cookies
     }
 
