@@ -4,7 +4,9 @@ export type RequestConfig = Omit<RawAxiosRequestConfig, "data"> & { body?: any }
 
 export type ResolverArgs = {
     response: any,
-    headers: AxiosResponseHeaders
+    headers: AxiosResponseHeaders,
+    key:string,
+    url:string
 } & Record<string, any>
 
 export type WorkerConfig = {

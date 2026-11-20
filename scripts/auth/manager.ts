@@ -27,11 +27,16 @@ const commonHeaders = {
     //     "x-buffer-feature-flags": 'geid-publish-board-view=off,show-mocking-devtool=off,is-buffer-team=off,composer-get-post-graphql=off,home-blog-carousel=on,templates-refresh=on,publish-filters-revamp=off,geid-channel-agnostic-draft=on,geid-home-value-led-empty-state=ineligible,start-page-migration-wizard=off,insights-announcement-modal=on,public-graphql-api-modal=on,native-support-form=on,move-beacon-to-help-menu=off,geid-feature-specific-trial=off,geid-set-my-posting-schedule=on,channel-connection-permission-warning=off,geid-monthly-to-annual=ineligible,ig-login-refresh-banner=on,beacon-web-widget=on,geid-cet-dms-tab=off,geid-content-item-collaboration-notes=on,board-view-contents-query=off,apollo-retry-disabled=off'
 }
 
-const getAuthUrlConfig: WorkerConfig = {
+const getAuthTokenConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
         headers: { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" },
         maxRedirects: 2
+    },
+    resolverAction: async ({ key, url }: ResolverArgs) => {
+        const cookieStore = new CookieStore({ storeId: key, url })
+        const cookies = cookieStore.get({ parse: true })
+        console.log(cookies);
     }
 }
 
@@ -328,45 +333,47 @@ async function hydrateCookieStore() {
 
 
 
-let getAuthUrlWorkIndex = 0
+let getAuthTokenWorkIndex = 0
 async function runGetAuthToken() {
-    const username = usernames[getAuthUrlWorkIndex]
+    // const username = usernames[getAuthTokenWorkIndex]
 
-    if (getAuthUrlConfig.urls) {
-        getAuthUrlConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
+    for (let i = 0; i < usernames.length; i++) {
+        const username = usernames[i]
+        if (getAuthTokenConfig.urls) {
+            getAuthTokenConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
+        }
     }
 
-    const response = await worker(getAuthUrlConfig)
-    const authUrl = response[username]
-    console.log(cookieStore.get({}))
 
-    try {
+    const response = await worker(getAuthTokenConfig)
 
-        if (!authUrl.toLowerCase().startsWith("http")) {
-            throw new Error("Invalid Url Recived");
-        }
-        authUrls[username] = authUrl
-        getAuthUrlWorkIndex++
-        delay = 0
+    // try {
 
-        if (getAuthUrlWorkIndex === usernames.length) {
-            return
-        }
+    // if (!authUrl.toLowerCase().startsWith("http")) {
+    //     throw new Error("Invalid Url Recived");
+    // }
+    // authUrls[username] = authUrl
+    // getAuthTokenWorkIndex++
+    // delay = 0
 
-        await runGetAuthToken()
-    } catch (error) {
-        delay += 5000
-        if (delay === 30000) {
-            throw error
-        }
+    // if (getAuthTokenWorkIndex === usernames.length) {
+    //     return
+    // }
 
-        await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-                await runGetAuthToken()
-                resolve()
-            }, delay);
-        })
-    }
+    // await runGetAuthToken()
+    // } catch (error) {
+    //     delay += 5000
+    //     if (delay === 30000) {
+    //         throw error
+    //     }
+
+    //     await new Promise<void>((resolve) => {
+    //         setTimeout(async () => {
+    //             await runGetAuthToken()
+    //             resolve()
+    //         }, delay);
+    //     })
+    // }
 }
 
 

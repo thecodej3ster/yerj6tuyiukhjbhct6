@@ -75,7 +75,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.headers.Cookie = cookieString
         }
 
-        
+
         return new Promise<void>((resolve, reject) => {
             let isRedirect = false
             axios(selectedRequestConfig)
@@ -85,7 +85,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                     if (headers["set-cookie"]) {
                         const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
-                        cookieStore.set(headers["set-cookie"])                                                
+                        cookieStore.set(headers["set-cookie"])
                     }
 
                     if (redirectCount[key] < maxRedirect && (headers.location || foundRedirect)) {
@@ -96,7 +96,15 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                     if (resolverAction) {
                         resolverArgs = resolverArgs || {}
-                        return resolverAction({ ...resolverArgs, ...{ response: response.data, headers: headers } })
+                        return resolverAction({
+                            ...resolverArgs,
+                            ...{
+                                response: response.data,
+                                headers: headers,
+                                key: key,
+                                url: url
+                            }
+                        })
                     }
 
                     return response.data
