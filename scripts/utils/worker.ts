@@ -1,4 +1,4 @@
-import axios, {  RawAxiosRequestConfig, AxiosResponseHeaders } from "axios";
+import axios, { RawAxiosRequestConfig, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
 import { CookieStore } from "./cookie";
@@ -128,9 +128,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
                 failedWorks = failedWorks.filter(work => work !== key)
             })
-            .catch(() => {
+            .catch((error) => {
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
+                    result[key] = error
                 }
                 sucessfulWorks = sucessfulWorks.filter(work => work !== key)
             })
@@ -175,14 +176,19 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             const failedUrls: Record<string, string> = {}
 
+
+
+            failedWorks.map(key => {
+                if (delay === 30000) {
+                    console.log(result[key]);
+                    return
+                }
+                failedUrls[key] = urls[key]
+            })
+            
             if (delay === 30000) {
                 throw error
             }
-
-            failedWorks.map(key => {
-                failedUrls[key] = urls[key]
-            })
-
             const response = await new Promise<Record<string, any>>((resolve, reject) => {
                 setTimeout(async () => {
                     try {
