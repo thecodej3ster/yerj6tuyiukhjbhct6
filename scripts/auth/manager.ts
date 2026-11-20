@@ -32,9 +32,7 @@ const getAuthTokenConfig: WorkerConfig = {
 }
 
 const revokeAuthTokenConfig: WorkerConfig = {
-    urls: {
-        authRevoke: 'https://graph.buffer.com/?_o=revokePersonalAccessToken',
-    },
+    urls: {},
     requestConfig: {
         headers: commonHeaders,
         method: "POST",
@@ -44,7 +42,7 @@ const revokeAuthTokenConfig: WorkerConfig = {
 
 
 const getAccessTokensConfig: WorkerConfig = {
-    urls: { accessTokens: 'https://graph.buffer.com/?_o=getPersonalAccessTokens' },
+    urls: {},
     requestConfig: {
         headers: commonHeaders,
         method: "POST",
@@ -54,9 +52,7 @@ const getAccessTokensConfig: WorkerConfig = {
 }
 
 const createAccesssTokenConfig: WorkerConfig = {
-    urls: {
-        authCreate: 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
-    },
+    urls: {},
     requestConfig: {
         headers: commonHeaders,
         method: "POST",
@@ -90,16 +86,15 @@ let createAccesssTokenWorkIndex = 0
 async function createAccesssToken() {
     const username = usernames[createAccesssTokenWorkIndex]
 
-    const { authCreate } = await worker(createAccesssTokenConfig) as {
-        authCreate: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
+    createAccesssTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
+    const authCreate = await worker(createAccesssTokenConfig) as {
+        [username: string]: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
     }
 
-    console.log(authCreate);
-
-    const accessToken = authCreate?.data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
+    const accessToken = authCreate[username].data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
 
     if (!accessToken) {
-        console.log(accessToken);
+        console.log(authCreate);
         throw new Error("UNEXPECTED VALUE Recived AS ACCESS TOKEN");
     }
 
@@ -117,14 +112,15 @@ async function createAccesssToken() {
 let revokeWorkIndex = 0
 async function revokeAccesssToken({ accessToken, user }: { accessToken?: string, user?: string }) {
     const username = user || usernames[revokeWorkIndex]
+    const token = accessToken || tokens[username]
 
     if (!revokeAuthTokenConfig.requestConfig) return
 
-    const token = accessToken || tokens[username]
     revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${token}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
+    revokeAuthTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=revokePersonalAccessToken'
 
-    const { authRevoke } = await worker(revokeAuthTokenConfig)
-    console.log(authRevoke);
+    const authRevoke = await worker(revokeAuthTokenConfig)
+    console.log(authRevoke[username]);
 
     if (accessToken && user) {
         return
@@ -138,11 +134,11 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 
 
 async function getAccessTokens(username: string) {
-    if (!getAccessTokensConfig.requestConfig || getAccessTokensConfig.requestConfig.headers === undefined) return
+    getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
 
-    const { accessTokens } = await worker(getAccessTokensConfig) as { accessTokens: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
+    const accessTokens = await worker(getAccessTokensConfig) as { [username: string]: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
 
-    const personalAccessTokens = accessTokens?.data?.personalAccessTokens?.accessTokens
+    const personalAccessTokens = accessTokens[username].data?.personalAccessTokens?.accessTokens
     if (personalAccessTokens) {
         if (personalAccessTokens.length) {
             return personalAccessTokens
@@ -195,7 +191,7 @@ async function auth() {
     hydrateCookieStore()
     await runGetAuthToken()
     await revokeAllAccessTokens()
-    // await createAccesssToken()
+    await createAccesssToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
     // console.log(cookieStore);
