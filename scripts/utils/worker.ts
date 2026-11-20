@@ -92,18 +92,20 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         isRedirect = true
                         redirectCount[key]++
                         console.log(key)
-                                                console.log('REDIRECTING');
+                        console.log('REDIRECTING');
+                        const redirectUrl = headers.location || foundRedirect[0]
+                        console.log(redirectUrl);
 
-                        return headers.location || foundRedirect[0]
-                        
-                    }else{
+                        return redirectUrl
+
+                    } else {
                         console.log('HMMMMMMMMMMM');
-                        
+
                     }
 
-                    if (resolverAction) {  
-                                                console.log("RESOLVING");
-                      
+                    if (resolverAction) {
+                        console.log("RESOLVING");
+
                         resolverArgs = resolverArgs || {}
                         return resolverAction({
                             ...resolverArgs,
