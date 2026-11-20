@@ -3,6 +3,7 @@ import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { CookieStore } from '../utils/cookie'
 import { save } from './utils/save'
 import { access } from 'fs'
+import { log } from 'console'
 
 
 let keys = process.env.Creds!
@@ -84,6 +85,8 @@ async function hydrateCookieStore() {
 
 let createAccesssTokenWorkIndex = 0
 async function createAccesssToken() {
+    console.log('CREATING ACCESS TOKEN ...');
+    
     const username = usernames[createAccesssTokenWorkIndex]
 
     createAccesssTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
@@ -156,6 +159,8 @@ async function getAccessTokens(username: string) {
 
 let revokeAllAccessTokensWorkIndex = 0
 async function revokeAllAccessTokens() {
+    console.log('REVOKING ACCESS TOKEN ...');
+    
     const username = usernames[revokeAllAccessTokensWorkIndex]
     const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
 
