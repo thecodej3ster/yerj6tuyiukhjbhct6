@@ -142,12 +142,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch(() => {
-                console.log("AM THE ONE");
                 failedWorks.push(key)
             })
             .finally(() => {
                 if ((sucessfulWorks.length + failedWorks.length) === totalWork) {
                     workerProcesses.resolve("Workers Done")
+                    console.log('FINALLLYY ...');
                 }
             })
     };
@@ -175,6 +175,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             }
 
             // await Promise.all(workers)
+
             await workerProcesses.promise
             console.log('Workers Done');
             
