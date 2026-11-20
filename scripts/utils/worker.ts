@@ -30,7 +30,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
 
 
-    const fetchData = (url: string, key: string): Promise<void> => {
+    const fetchData = (url: string, key: string) => {
         if (!redirectCount[key]) {
             redirectCount[key] = 0
         }
@@ -176,6 +176,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             // await Promise.all(workers)
             await workerProcesses.promise
+            console.log('Workers Done');
+            
             if (failedWorks.length) {
                 throw new Error("Failed Works Available");
             }

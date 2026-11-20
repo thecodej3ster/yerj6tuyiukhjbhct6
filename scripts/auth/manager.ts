@@ -428,7 +428,7 @@ async function auth() {
         serviceUnavailable: "https://httpbin.org/status/503",
     }
 
-    const config: WorkerConfig = { urls: testurls }
+    const config: WorkerConfig = { urls: testurls ,requestConfig:{maxRedirects:2}}
     await worker(config)
 }
 
