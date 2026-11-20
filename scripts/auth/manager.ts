@@ -329,7 +329,7 @@ async function hydrateCookieStore() {
 
 
 let getAuthUrlWorkIndex = 0
-async function runGetAuthUrl() {
+async function runGetAuthToken() {
     const username = usernames[getAuthUrlWorkIndex]
 
     if (getAuthUrlConfig.urls) {
@@ -340,33 +340,33 @@ async function runGetAuthUrl() {
     const authUrl = response[username]
     console.log(cookieStore.get({}))
 
-    // try {
+    try {
 
-    // if (!authUrl.toLowerCase().startsWith("http")) {
-    //     throw new Error("Invalid Url Recived");
-    // }
-    // authUrls[username] = authUrl
-    // getAuthUrlWorkIndex++
-    // delay = 0
+        if (!authUrl.toLowerCase().startsWith("http")) {
+            throw new Error("Invalid Url Recived");
+        }
+        authUrls[username] = authUrl
+        getAuthUrlWorkIndex++
+        delay = 0
 
-    // if (getAuthUrlWorkIndex === usernames.length) {
-    //     return
-    // }
+        if (getAuthUrlWorkIndex === usernames.length) {
+            return
+        }
 
-    // await runGetAuthUrl()
-    // } catch (error) {
-    //     delay += 5000
-    //     if (delay === 30000) {
-    //         throw error
-    //     }
+        await runGetAuthToken()
+    } catch (error) {
+        delay += 5000
+        if (delay === 30000) {
+            throw error
+        }
 
-    //     await new Promise<void>((resolve) => {
-    //         setTimeout(async () => {
-    //             await runGetAuthUrl()
-    //             resolve()
-    //         }, delay);
-    //     })
-    // }
+        await new Promise<void>((resolve) => {
+            setTimeout(async () => {
+                await runGetAuthToken()
+                resolve()
+            }, delay);
+        })
+    }
 }
 
 
@@ -376,7 +376,7 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     usernames = Object.keys(auths.manager)
-    await runGetAuthUrl()
+    await runGetAuthToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
     // console.log(cookieStore);
