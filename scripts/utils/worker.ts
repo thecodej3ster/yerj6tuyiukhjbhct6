@@ -87,6 +87,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieString = cookie.join(';')
 
         if (selectedRequestConfig.headers) {
+             if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+ console.log(cookieString);
+ console.log(selectedRequestConfig);
+ 
+             }
+           
+            
             selectedRequestConfig.headers.Cookie = cookieString
         }
 
@@ -160,8 +167,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
-
-                console.log(selectedRequestConfig);
                 
                 let payload = error.response
 
