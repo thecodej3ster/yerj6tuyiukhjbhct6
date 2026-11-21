@@ -189,14 +189,10 @@ async function getAccessTokens(username: string) {
 
 let revokeAllAccessTokensWorkIndex = 0
 async function revokeAllAccessTokens() {
-        const username = usernames[revokeAllAccessTokensWorkIndex]
-
     console.log('REVOKING ACCESS TOKEN ...');
-    const cookieStore = new CookieStore({storeId:username,url:"https://graph.buffer.com/?_o=getPersonalAccessTokens"})
-    console.log(cookieStore.get({parse:true}))
 
-    return
-    // const username = usernames[revokeAllAccessTokensWorkIndex]
+
+    const username = usernames[revokeAllAccessTokensWorkIndex]
     const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
 
     for (let i = 0; i < accessTokens.length; i++) {
