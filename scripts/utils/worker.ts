@@ -161,6 +161,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     failedWorks.push(key)
                 }
 
+                console.log(selectedRequestConfig);
+                
                 let payload = error.response
 
                 if (error.response) {
