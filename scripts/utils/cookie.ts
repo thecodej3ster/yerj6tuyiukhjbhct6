@@ -181,16 +181,17 @@ export class CookieStore {
                 console.log(CookieStore.globalStore[this.storeId][domain]);
             }
 
+            console.log(domain);
+
             if (domain === this.domain || this.domain.includes(domain)) {
+                console.log('MATCHHHHHHHHHHHHHHH');
+                
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
 
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
                         matchedPaths.push(path)
                         matchedDomains.push(domain)
-                    } else {
-                        console.log('PATH DOES NOT MATCH');
-
                     }
                 }
             }
