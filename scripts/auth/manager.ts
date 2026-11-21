@@ -34,16 +34,19 @@ const getAuthTokenConfig: WorkerConfig = {
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookies = cookieStore.get({ parse: true })
 
-        if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
-            console.log("Access Token Not Found");
+        // if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
+        //     console.log("Access Token Not Found");
             
-            throw new Error("Access Token Not Found");
-        } else {
-            console.log('Resolver Is Reciving ...');
+        //     throw new Error("Access Token Not Found");
+        // } else {
+        //     console.log('Resolver Is Reciving ...');
+            
+        //     console.log(cookies);
+
+        // }
+                    console.log('Resolver Is Reciving ...');
             
             console.log(cookies);
-
-        }
     }
 
 }
