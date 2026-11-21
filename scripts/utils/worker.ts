@@ -22,14 +22,16 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             : requestConfig.headers)
         : {};
 
+    if (requestConfig?.maxRedirects) {
+        maxRedirect = requestConfig.maxRedirects
+        requestConfig.maxRedirects = 0
+    }
+    
     const fetchData = (url: string, key: string) => {
         if (!redirectCount[key]) {
             redirectCount[key] = 0
         }
-        if (requestConfig?.maxRedirects) {
-            maxRedirect = requestConfig.maxRedirects
-            requestConfig.maxRedirects = 0
-        }
+
         const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
             url: url,
             method: "GET",
@@ -71,8 +73,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             if (u) {
                 console.log('WORKER IS RECIVING ...');
-                    console.log(u);
-                    
+                console.log(u);
+
                 // if (!Object.keys(u).includes("buffer_access_token")) {
                 //     console.log(u)
                 //     console.log(key);
@@ -105,9 +107,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     const redirectUrl = headers.location || foundRedirect[0]
                     console.log(`REDIRECT COUNT IS: ${redirectCount[key]}`);
                     return redirectUrl
-                }else{
+                } else {
                     console.log('REDIRECT LIMIT REACHED ...');
-                    
+
                 }
 
                 if (resolverAction) {
@@ -137,7 +139,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                 if (unFinishedWork.length > 0) {
                     console.log('REDIRECTING ...');
-                    
+
                     const nextKey = unFinishedWork.shift()
                     if (nextKey) {
                         const nextUrl = urls[nextKey];
@@ -215,7 +217,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             if (failedWorks.length) {
                 console.log(failedWorks);
-                
+
                 // throw new Error("Failed Works Available");
             }
         } catch (error) {
