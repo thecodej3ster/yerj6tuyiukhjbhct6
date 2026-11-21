@@ -76,6 +76,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log(u);
                 console.log('COOKIE IS RECIVING ...');
                 console.log(cookie);
+                console.log(cookie.join(';'));
+                
                 
                 
 
