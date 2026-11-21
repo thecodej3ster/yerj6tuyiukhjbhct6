@@ -219,9 +219,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             await workerProcesses.promise
 
             if (failedWorks.length) {
-                console.log(failedWorks);
-
-                // throw new Error("Failed Works Available");
+                throw new Error("Failed Works Available");
             }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
