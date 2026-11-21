@@ -103,7 +103,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                 if (redirectCount[key] === 1) {
                     console.log(foundRedirect);
-                    
+
                 }
                 if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
                     isRedirect = true
@@ -139,6 +139,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     isRedirect = false
                 } else {
                     result[key] = data
+                    if (!sucessfulWorks.includes(key)) {
+                        sucessfulWorks.push(key)
+                    }
+                    failedWorks = failedWorks.filter(work => work !== key)
                 }
 
                 if (unFinishedWork.length > 0) {
@@ -151,11 +155,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         fetchData(nextUrl, nextKey)
                     }
                 }
-
-                if (!sucessfulWorks.includes(key)) {
-                    sucessfulWorks.push(key)
-                }
-                failedWorks = failedWorks.filter(work => work !== key)
             })
             .catch((error) => {
                 if (!failedWorks.includes(key)) {
