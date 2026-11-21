@@ -35,6 +35,8 @@ const getAuthTokenConfig: WorkerConfig = {
         const cookies = cookieStore.get({ parse: true })
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
+            console.log("Access Token Not Found");
+            
             throw new Error("Access Token Not Found");
         } else {
             console.log(cookies);
@@ -217,8 +219,8 @@ async function auth() {
     hydrateCookieStore()
     console.log(usernames);
     await runGetAuthToken()
-    await revokeAllAccessTokens()
-    await createAccesssToken()
+    // await revokeAllAccessTokens()
+    // await createAccesssToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
     // console.log(cookieStore);
