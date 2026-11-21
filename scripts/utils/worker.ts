@@ -66,7 +66,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({}) as string[]
         if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-            console.log(cookie)
+            const u = cookieStore.get({ parse: true })
+            console.log(Object.keys(u!));
+
+            if (!Object.keys(u!).includes("buffer_access_token")) {
+                console.log(u)
+            }
         }
 
         const cookieString = cookie.join(';')
