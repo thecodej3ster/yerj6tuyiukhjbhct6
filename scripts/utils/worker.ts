@@ -69,9 +69,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             const u = cookieStore.get({ parse: true })
             console.log(Object.keys(u!));
 
-            if (!Object.keys(u!).includes("buffer_access_token")) {
-                console.log(u)
+            if (u) {
+                if (!Object.keys(u).includes("buffer_access_token")) {
+                    console.log(u)
+                    console.log('NOT AVAILABLE');
+                }
             }
+
         }
 
         const cookieString = cookie.join(';')
