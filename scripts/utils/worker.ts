@@ -26,7 +26,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         maxRedirect = requestConfig.maxRedirects
         requestConfig.maxRedirects = 0
     }
-    
+
     const fetchData = (url: string, key: string) => {
         if (!redirectCount[key]) {
             redirectCount[key] = 0
@@ -101,6 +101,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     cookieStore.set(headers["set-cookie"])
                 }
 
+                if (redirectCount[key] === 1) {
+                    console.log(foundRedirect);
+                    
+                }
                 if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
                     isRedirect = true
                     redirectCount[key]++
