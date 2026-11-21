@@ -74,6 +74,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             if (u) {
                 console.log('WORKER IS RECIVING ...');
                 console.log(u);
+                console.log('COOKIE IS RECIVING ...');
+                console.log(cookie);
+                
+                
 
                 // if (!Object.keys(u).includes("buffer_access_token")) {
                 //     console.log(u)
