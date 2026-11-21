@@ -108,6 +108,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                 if (resolverAction) {
                     resolverArgs = resolverArgs || {}
+                    redirectCount[key] = 0
                     return resolverAction({
                         ...resolverArgs,
                         ...{
@@ -207,7 +208,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             await workerProcesses.promise
 
             if (failedWorks.length) {
-                throw new Error("Failed Works Available");
+                console.log(failedWorks);
+                
+                // throw new Error("Failed Works Available");
             }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
