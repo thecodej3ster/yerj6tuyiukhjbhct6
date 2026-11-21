@@ -74,9 +74,6 @@ export class CookieStore {
     }
 
 
-    /**
- * Detects the default cookie path from a URL based on RFC 6265.
- */
     private getRootDomainFromUrl(): string {
         try {
             const hostname: string = this.url.includes('://')
@@ -177,15 +174,8 @@ export class CookieStore {
         for (let i = 0; i < cookieDomains.length; i++) {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
-            if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                console.log(CookieStore.globalStore[this.storeId][domain]);
-            }
 
-            console.log(domain);
-
-            if (domain === this.domain || this.domain.includes(domain)) {
-                console.log('MATCHHHHHHHHHHHHHHH');
-                
+            if (domain === this.domain || this.domain.includes(domain)) {                
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
 
@@ -215,7 +205,6 @@ export class CookieStore {
                 }
                 if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                     console.log(cookies);
-
                 }
                 return cookies
             } else {
@@ -240,10 +229,7 @@ export class CookieStore {
 
                     }
                 }
-                if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    console.log(cookies);
 
-                }
                 return cookies
             } else {
                 const cookie = CookieStore.globalStore[this.storeId][matchedDomains[0]][matchedPaths[0]][cookieName]
