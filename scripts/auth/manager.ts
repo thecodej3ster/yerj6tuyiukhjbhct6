@@ -36,6 +36,9 @@ const getAuthTokenConfig: WorkerConfig = {
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
             throw new Error("Access Token Not Found");
+        } else {
+            console.log(cookies);
+
         }
     }
 
@@ -91,7 +94,9 @@ function sortAuth() {
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
-        usernames.push(username)
+        if (username === 'thecharliekirk.daily_instagram') {
+            usernames.push(username)
+        }
         cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([auth])
     }
@@ -202,9 +207,6 @@ async function runGetAuthToken() {
     }
 
     await worker(getAuthTokenConfig)
-    o = true
-    console.log('WORKER DONE');
-
 }
 
 
