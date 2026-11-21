@@ -103,6 +103,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     isRedirect = true
                     redirectCount[key]++
                     const redirectUrl = headers.location || foundRedirect[0]
+                    console.log(`REDIRECT COUNT IS: ${redirectUrl}`);
+                    
                     return redirectUrl
                 }else{
                     console.log('REDIRECT LIMIT REACHED ...');
