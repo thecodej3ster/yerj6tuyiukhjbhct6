@@ -39,6 +39,8 @@ const getAuthTokenConfig: WorkerConfig = {
             
             throw new Error("Access Token Not Found");
         } else {
+            console.log('Resolver Is Reciving ...');
+            
             console.log(cookies);
 
         }
