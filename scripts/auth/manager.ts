@@ -34,11 +34,12 @@ const getAuthTokenConfig: WorkerConfig = {
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookies = cookieStore.get({ parse: true })
 
-        // if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
-        //     console.log("Access Token Not Found");
+        if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
+            console.log("Access Token Not Found");
             
-        //     throw new Error("Access Token Not Found");
-        // } else {
+            throw new Error("Access Token Not Found");
+        } 
+        // else {
         //     console.log('Resolver Is Reciving ...');
             
         //     console.log(cookies);
@@ -189,7 +190,9 @@ async function getAccessTokens(username: string) {
 let revokeAllAccessTokensWorkIndex = 0
 async function revokeAllAccessTokens() {
     console.log('REVOKING ACCESS TOKEN ...');
+    console.log(cookieStore.get({parse:true}))
 
+    return
     const username = usernames[revokeAllAccessTokensWorkIndex]
     const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
 
