@@ -79,8 +79,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 // console.log(cookie);
                 // const y = cookie.join(';')
                 // console.log(y);
-                
-                 // if (!Object.keys(u).includes("buffer_access_token")) {
+
+                // if (!Object.keys(u).includes("buffer_access_token")) {
                 //     console.log(u)
                 //     console.log(key);
                 //     console.log('NOT AVAILABLE');
@@ -89,19 +89,25 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         }
 
+
         const cookieString = cookie.join(';')
 
         if (selectedRequestConfig.headers) {
-                        selectedRequestConfig.headers.Cookie = cookieString
+            selectedRequestConfig.headers.Cookie = cookieString
 
-             if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-//  console.log(cookieString);
-//  console.log(selectedRequestConfig);
-                 console.log(selectedRequestConfig.headers.Cookie.split(';'));
+            if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                //  console.log(cookieString);
+                //  console.log(selectedRequestConfig);
+        console.log('JUST CHECKING');
 
-             }
-           
-            
+                console.log(selectedRequestConfig.headers.Cookie.match(/buffer_access_token/));
+        console.log('HEADER RECIVED');
+
+                console.log(selectedRequestConfig.headers.Cookie.split(';'));
+
+            }
+
+
         }
 
         let isRedirect = false
@@ -174,7 +180,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
-                
+
                 let payload = error.response
 
                 if (error.response) {
