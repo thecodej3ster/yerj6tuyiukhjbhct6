@@ -70,9 +70,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
 
-            const u = cookieStore.get({ parse: true })
+            // const u = cookieStore.get({ parse: true })
 
-            if (u) {
+            // if (u) {
                 // console.log('WORKER IS RECIVING ...');
                 // console.log(u);
                 // console.log('COOKIE IS RECIVING ...');
@@ -85,7 +85,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 //     console.log(key);
                 //     console.log('NOT AVAILABLE');
                 // }
-            }
+            // }
 
         }
 
@@ -98,12 +98,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                 //  console.log(cookieString);
                 //  console.log(selectedRequestConfig);
-        console.log('JUST CHECKING');
+        // console.log('JUST CHECKING');
 
-                console.log(selectedRequestConfig.headers.Cookie.match(/buffer_access_token/));
-        console.log('HEADER RECIVED');
+        //         console.log(selectedRequestConfig.headers.Cookie.match(/buffer_access_token/));
+        // console.log('HEADER RECIVED');
 
-                console.log(selectedRequestConfig.headers.Cookie.split(';'));
+        //         console.log(selectedRequestConfig.headers.Cookie.split(';'));
 
             }
 
@@ -121,18 +121,14 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     cookieStore.set(headers["set-cookie"])
                 }
 
-                if (redirectCount[key] === 1) {
-                    console.log(foundRedirect);
-
-                }
                 if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
                     isRedirect = true
                     redirectCount[key]++
                     const redirectUrl = headers.location || foundRedirect[0]
-                    console.log(`REDIRECT COUNT IS: ${redirectCount[key]}`);
+                    // console.log(`REDIRECT COUNT IS: ${redirectCount[key]}`);
                     return redirectUrl
                 } else {
-                    console.log('REDIRECT LIMIT REACHED ...');
+                    // console.log('REDIRECT LIMIT REACHED ...');
 
                 }
 
@@ -268,6 +264,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         })
                         resolve(response)
                     } catch (error) {
+                        console.log('I REJECTED');
+                        
                         reject(error)
                     }
 
