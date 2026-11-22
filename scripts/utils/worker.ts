@@ -67,6 +67,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookie = cookieStore.get({}) as string[]
+
         if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
 
             const u = cookieStore.get({ parse: true })
@@ -94,8 +95,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         selectedRequestConfig.headers.Cookie = cookieString
 
              if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
- console.log(cookieString);
- console.log(selectedRequestConfig);
+//  console.log(cookieString);
+//  console.log(selectedRequestConfig);
                  console.log(selectedRequestConfig.headers.Cookie.split(';'));
 
              }
