@@ -1,3 +1,5 @@
+import { isIP } from 'net';
+
 export interface CookieDetails {
     value: string;
     attributes: Record<string, string | boolean>;
@@ -166,14 +168,28 @@ export class CookieStore {
         const matchedDomains: string[] = []
         const cookieDomains = Object.keys(CookieStore.globalStore[this.storeId])
 
+
+
+        const domainMatches = ({ requestHost, cookieDomain, hostOnly }: { requestHost: string, cookieDomain: string, hostOnly?: boolean }) => {
+            const req = requestHost.toLowerCase().replace(/\.$/, '');
+            const dom = cookieDomain.toLowerCase().replace(/^\.+|\.+$/g, '');
+            if (!req || !dom) return false;
+            if (req === dom) return true;
+            if (hostOnly || isIP(req) !== 0) return false;
+            return req.endsWith(`.${dom}`);
+        }
+
+
         for (let i = 0; i < cookieDomains.length; i++) {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
             console.log(cookiePaths);
 
-            if (domain === this.domain || this.domain.includes(domain)) {
+            if (domain === this.domain || domain.startsWith(this.domain) || domain.endsWith(this.domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
+                    console.log(CookieStore.globalStore[this.storeId][domain][path]);
+                    
                     if (path === "/auth/oidc") {
                         console.log("AM HEREEEEEEEEEE");
                     }
