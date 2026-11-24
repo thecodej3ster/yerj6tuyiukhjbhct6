@@ -2,6 +2,7 @@ import axios, { RawAxiosRequestConfig, AxiosResponseHeaders } from "axios";
 import { ProxyAgent } from "./proxy/Proxy";
 import { WorkerConfig } from "./types";
 import { CookieStore } from "./cookie";
+import crypto from 'crypto'
 
 const workerLimit = 5
 const result: Record<string, any> = {};
@@ -14,6 +15,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     let sucessfulWorks: string[] = []
     let totalWork = 0
     let unFinishedWork: string[] = []
+    const redirects: Record<string, string> = {}
     const workerProcesses = Promise.withResolvers()
 
     const incomingHeaders = requestConfig?.headers
@@ -114,12 +116,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         axios(selectedRequestConfig)
             .then(response => {
                 console.log(response);
-                
+
                 let foundRedirect = null
 
                 const headers = response.headers as AxiosResponseHeaders
 
-                if (typeof response.data === 'string') {
+                if (selectedRequestConfig.responseType === 'text') {
                     foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
                 }
 
@@ -156,12 +158,19 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
             })
             .then(data => {
+                const redirectKey = crypto.randomBytes(8).toString("hex")
                 if (isRedirect) {
-                    urls[key] = data
+                    urls[redirectKey] = data
+                    redirects[redirectKey] = key
                     unFinishedWork.push(key)
                     isRedirect = false
                 } else {
-                    result[key] = data
+                    if (Object.keys(redirects).includes(key)) {
+                        const mainKey = redirects[key]
+                        result[mainKey] = data
+                    } else {
+                        result[key] = data
+                    }
                     if (!sucessfulWorks.includes(key)) {
                         sucessfulWorks.push(key)
                     }
@@ -182,7 +191,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             .catch((error) => {
 
                 if (!failedWorks.includes(key)) {
-                    failedWorks.push(key)
+                    if (Object.keys(redirects).includes(key)) {
+                        const mainKey = redirects[key]
+                        failedWorks.push(mainKey)
+                    } else {
+                        failedWorks.push(key)
+                    }
                 }
 
                 let payload = error.response
