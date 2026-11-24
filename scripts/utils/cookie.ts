@@ -160,7 +160,7 @@ export class CookieStore {
         this.cookies =
             CookieStore.globalStore[this.storeId]?.[this.domain.toLowerCase()]?.[this.path] ?? {};
     }
-    
+
     private getCookieOwner() {
         const matchedPaths: string[] = []
         const matchedDomains: string[] = []
@@ -183,6 +183,8 @@ export class CookieStore {
 
 
         }
+        console.log(matchedDomains,matchedPaths);
+        
         return { matchedPaths: matchedPaths, matchedDomains: matchedDomains }
     }
 
