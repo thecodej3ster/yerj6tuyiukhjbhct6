@@ -176,7 +176,6 @@ export class CookieStore {
                     const path = cookiePaths[j]
                     if (path === "/auth/oidc") {
                         console.log("AM HEREEEEEEEEEE");
-
                     }
 
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
@@ -185,10 +184,12 @@ export class CookieStore {
                     } else {
                         if (path === "/auth/oidc") {
                             console.log("AM NOTTTTT HEREEEEEEEEEE");
-
                         }
                     }
                 }
+            } else {
+                console.log(`THIS IS ${this.domain} ...`);
+                console.log(`I AM FOR DOMAIN ${domain} ...`);
             }
 
 
