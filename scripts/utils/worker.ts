@@ -239,7 +239,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             await workerProcesses.promise
 
             if (failedWorks.length) {
-                if (failedWorks[0] === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                if (urls[failedWorks[0]] === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                     console.log(result[failedWorks[0]]);
                     
                 }
