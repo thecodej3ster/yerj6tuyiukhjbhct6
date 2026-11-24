@@ -32,8 +32,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     const fetchData = (url: string, key: string) => {
         let mainKey = Object.keys(redirects).includes(key) ? redirects[key] : key
 
-        console.log(`Main Key Is ${mainKey}`);
-        
         if (!redirectCount[mainKey]) {
             redirectCount[mainKey] = 0
         }
@@ -60,6 +58,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
                 ...incomingHeaders,
             } as Record<string, string>,
+            maxRedirects: 0,
             validateStatus: (status) => status < 400 && status > 199
         }
 
@@ -74,50 +73,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookieStore = new CookieStore({ storeId: mainKey, url: url })
         const cookie = cookieStore.get({}) as string[]
         if (redirectCount[mainKey] > 0) {
-        console.log(cookie);
+            console.log(cookie);
         }
-        
-
-        if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-
-            // const u = cookieStore.get({ parse: true })
-
-            // if (u) {
-            // console.log('WORKER IS RECIVING ...');
-            // console.log(u);
-            // console.log('COOKIE IS RECIVING ...');
-            // console.log(cookie);
-            // const y = cookie.join(';')
-            // console.log(y);
-
-            // if (!Object.keys(u).includes("buffer_access_token")) {
-            //     console.log(u)
-            //     console.log(key);
-            //     console.log('NOT AVAILABLE');
-            // }
-            // }
-
-        }
-
 
         const cookieString = cookie.join(';')
 
         if (selectedRequestConfig.headers) {
             selectedRequestConfig.headers.Cookie = cookieString
-
-            if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                //  console.log(cookieString);
-                //  console.log(selectedRequestConfig);
-                // console.log('JUST CHECKING');
-
-                //         console.log(selectedRequestConfig.headers.Cookie.match(/buffer_access_token/));
-                // console.log('HEADER RECIVED');
-
-                //         console.log(selectedRequestConfig.headers.Cookie.split(';'));
-
-            }
-
-
         }
 
         let isRedirect = false
