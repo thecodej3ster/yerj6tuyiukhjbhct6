@@ -149,6 +149,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch((error) => {
+                console.log(error);
+                
                 let payload = error.response
 
                 if (error.response) {
