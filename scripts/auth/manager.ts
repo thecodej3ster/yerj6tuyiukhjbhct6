@@ -36,6 +36,7 @@ const getAuthTokenConfig: WorkerConfig = {
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
             console.log("Access Token Not Found");
+            console.log(cookies);
             
             throw new Error("Access Token Not Found");
         } 
