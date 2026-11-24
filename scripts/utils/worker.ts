@@ -177,6 +177,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch((error) => {
+                if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                    console.log(error)
+                }
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
