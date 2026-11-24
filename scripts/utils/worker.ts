@@ -113,6 +113,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         let isRedirect = false
         axios(selectedRequestConfig)
             .then(response => {
+                console.log(response);
+                
                 let foundRedirect = null
 
                 const headers = response.headers as AxiosResponseHeaders
