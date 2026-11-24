@@ -162,7 +162,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (isRedirect) {
                     urls[redirectKey] = data
                     redirects[redirectKey] = key
-                    unFinishedWork.push(key)
+                    unFinishedWork.push(redirectKey)
                     isRedirect = false
                 } else {
                     if (Object.keys(redirects).includes(key)) {
