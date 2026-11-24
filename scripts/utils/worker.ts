@@ -113,10 +113,13 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         let isRedirect = false
         axios(selectedRequestConfig)
             .then(response => {
-
+                let foundRedirect = null
 
                 const headers = response.headers as AxiosResponseHeaders
-                const foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
+
+                if (typeof response.data === 'string') {
+                    foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
+                }
 
                 if (headers["set-cookie"]) {
                     const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
@@ -126,7 +129,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
                     isRedirect = true
                     redirectCount[key]++
-                    const redirectUrl = headers.location || foundRedirect[0]
+                    const redirectUrl = foundRedirect?.length ? foundRedirect[0] : headers.location
                     // console.log(`REDIRECT COUNT IS: ${redirectCount[key]}`);
                     return redirectUrl
                 } else {
@@ -177,7 +180,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             .catch((error) => {
                 if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                     console.log(error.response);
-                    
+
                 }
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
