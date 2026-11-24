@@ -113,9 +113,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         let isRedirect = false
         axios(selectedRequestConfig)
             .then(response => {
-                if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    console.log(response)
-                }
+
 
                 const headers = response.headers as AxiosResponseHeaders
                 const foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
@@ -177,6 +175,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch((error) => {
+                if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                    console.log(error.response);
+                    
+                }
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
@@ -241,7 +243,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             if (failedWorks.length) {
                 if (urls[failedWorks[0]] === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                     console.log(result[failedWorks[0]]);
-                    
+
                 }
                 throw new Error("Failed Works Available");
             }
