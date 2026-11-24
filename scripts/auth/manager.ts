@@ -65,11 +65,7 @@ const revokeAuthTokenConfig: WorkerConfig = {
 const getAccessTokensConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
-        headers: {
-            "x-buffer-client-version": 'b905f56',
-            "x-buffer-client-id": 'webapp-publishing',
-            "x-buffer-client-name": 'webapp-publishing',
-        },
+        headers: commonHeaders,
         method: "POST",
         responseType: "json",
         body: "{\"operationName\":\"getPersonalAccessTokens\",\"variables\":{},\"extensions\":{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.2.6\"}},\"query\":\"query getPersonalAccessTokens {\\n  personalAccessTokens {\\n    accessTokens {\\n      accessToken\\n      clientId\\n      name\\n      generatedAt\\n      expiresAt\\n      scopes\\n      __typename\\n    }\\n    maxTokens\\n    __typename\\n  }\\n}\"}"
