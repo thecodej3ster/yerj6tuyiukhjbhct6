@@ -27,28 +27,32 @@ const commonHeaders = {
 const getAuthTokenConfig: WorkerConfig = {
     urls: {},
     requestConfig: {
-        headers: { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" },
+        headers: {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
+        },
         maxRedirects: 2
     },
-    resolverAction: async ({ key, url }: ResolverArgs) => {
+    resolverAction: async ({ key, url,headers }: ResolverArgs) => {
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookies = cookieStore.get({ parse: true })
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
+            console.log(headers);
+            
             console.log("Access Token Not Found");
             console.log(cookies);
-            
+
             throw new Error("Access Token Not Found");
-        } 
+        }
         // else {
         //     console.log('Resolver Is Reciving ...');
-            
+
         //     console.log(cookies);
 
         // }
-                    console.log('Resolver Is Reciving ...');
-            
-            console.log(cookies);
+        console.log('Resolver Is Reciving ...');
+
+        console.log(cookies);
     }
 
 }
@@ -187,7 +191,6 @@ let revokeAllAccessTokensWorkIndex = 0
 async function revokeAllAccessTokens() {
     console.log('REVOKING ACCESS TOKEN ...');
 
-
     const username = usernames[revokeAllAccessTokensWorkIndex]
     const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
 
@@ -213,8 +216,6 @@ async function runGetAuthToken() {
 
     await worker(getAuthTokenConfig)
 }
-
-
 
 
 async function auth() {
