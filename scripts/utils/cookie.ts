@@ -102,71 +102,66 @@ export class CookieStore {
         }
     }
 
-    /**
-     * Parses a Set-Cookie string and saves it using the instance's context.
-     */
-    public set(cookie: string[]) {
-        for (let i = 0; i < cookie.length; i++) {
-            const cookieString = cookie[i];
-            const parts: string[] = cookieString.split(';');
-            const mainPart: string = parts[0].trim();
+    public set(cookies: string[]) {
+        for (let i = 0; i < cookies.length; i++) {
+            const parts = cookies[i].split(';');
+            const mainPart = parts[0].trim();
 
-            if (mainPart.indexOf('=') === -1) {
+            const eqIndex = mainPart.indexOf('=');
+            if (eqIndex === -1) {
                 throw new Error("Could Not Parse Cookie");
             }
 
-            const [name, value] = mainPart.split("=")
+            const name = mainPart.slice(0, eqIndex).trim();
+            const value = mainPart.slice(eqIndex + 1).trim();
 
             let explicitDomain: string | null = null;
             let cookiePath: string = this.path;
             const attributes: Record<string, string | boolean> = {};
 
-            for (let i = 1; i < parts.length; i++) {
-                const part: string = parts[i].trim();
+            for (let j = 1; j < parts.length; j++) {
+                const part = parts[j].trim();
+                if (!part) continue;
 
+                const attrEqIndex = part.indexOf('=');
+                if (attrEqIndex !== -1) {
+                    const attrName = part.slice(0, attrEqIndex).trim().toLowerCase();
+                    const attrValue = part.slice(attrEqIndex + 1).trim();
 
-                if (part.indexOf('=') === -1) {
-                    const [name, value] = part.split('=')
-
-                    switch (name.toLowerCase()) {
+                    switch (attrName) {
                         case 'domain':
-                            explicitDomain = value.startsWith('.') ? value.substring(1) : value
+                            explicitDomain = attrValue.startsWith('.')
+                                ? attrValue.slice(1).toLowerCase()
+                                : attrValue.toLowerCase();
                             break;
-
                         case 'path':
-                            cookiePath = value
+                            cookiePath = attrValue || '/';
                             break;
                         default:
-                            attributes[name] = value
+                            attributes[attrName] = attrValue;
                     }
                 } else {
                     attributes[part.toLowerCase()] = true;
                 }
             }
 
-            const finalDomain = explicitDomain || this.domain;
+            const finalDomain = (explicitDomain || this.domain).toLowerCase();
 
-            if (!CookieStore.globalStore[this.storeId][finalDomain]) {
-                CookieStore.globalStore[this.storeId][finalDomain] = {}
-            }
-
-
-            if (!CookieStore.globalStore[this.storeId][finalDomain][cookiePath]) {
-                CookieStore.globalStore[this.storeId][finalDomain][cookiePath] = {}
-            }
+            CookieStore.globalStore[this.storeId] ??= {};
+            CookieStore.globalStore[this.storeId][finalDomain] ??= {};
+            CookieStore.globalStore[this.storeId][finalDomain][cookiePath] ??= {};
 
             CookieStore.globalStore[this.storeId][finalDomain][cookiePath][name] = {
                 value,
                 attributes
-            }
+            };
         }
-        this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
-    }
 
-    /**
-     * Retrieves cookies using the instance's context parameters.
-     */
-    public get({ cookieName, parse }: { cookieName?: string, parse?: boolean }): CookieDetails | { [cookieName: string]: CookieDetails } | null | string[] {
+        this.cookies =
+            CookieStore.globalStore[this.storeId]?.[this.domain.toLowerCase()]?.[this.path] ?? {};
+    }
+    
+    private getCookieOwner() {
         const matchedPaths: string[] = []
         const matchedDomains: string[] = []
         const cookieDomains = Object.keys(CookieStore.globalStore[this.storeId])
@@ -175,7 +170,7 @@ export class CookieStore {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
 
-            if (domain === this.domain || this.domain.includes(domain)) {                
+            if (domain === this.domain || this.domain.includes(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
 
@@ -188,6 +183,15 @@ export class CookieStore {
 
 
         }
+        return { matchedPaths: matchedPaths, matchedDomains: matchedDomains }
+    }
+
+    /**
+     * Retrieves cookies using the instance's context parameters.
+     */
+    public get({ cookieName, parse }: { cookieName?: string, parse?: boolean }): CookieDetails | { [cookieName: string]: CookieDetails } | null | string[] {
+
+        const { matchedDomains, matchedPaths } = this.getCookieOwner()
 
         if (!parse) {
             if (!cookieName) {
