@@ -38,10 +38,7 @@ const getAuthTokenConfig: WorkerConfig = {
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
             console.log(headers);
-            
-            console.log("Access Token Not Found");
-            console.log(cookies);
-
+        
             throw new Error("Access Token Not Found");
         }
         // else {
@@ -50,9 +47,6 @@ const getAuthTokenConfig: WorkerConfig = {
         //     console.log(cookies);
 
         // }
-        console.log('Resolver Is Reciving ...');
-
-        console.log(cookies);
     }
 
 }
@@ -198,7 +192,7 @@ async function revokeAllAccessTokens() {
         const { accessToken } = accessTokens[i];
         await revokeAccesssToken({ accessToken: accessToken, user: username })
     }
-
+return
     revokeAllAccessTokensWorkIndex++
     if (revokeAllAccessTokensWorkIndex === usernames.length) {
         return
