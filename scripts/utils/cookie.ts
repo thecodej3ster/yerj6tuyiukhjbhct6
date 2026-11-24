@@ -170,22 +170,31 @@ export class CookieStore {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
             console.log(cookiePaths);
-            
+
             if (domain === this.domain || this.domain.includes(domain)) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
+                    if (path === "/auth/oidc") {
+                        console.log("AM HEREEEEEEEEEE");
+
+                    }
 
                     if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
                         matchedPaths.push(path)
                         matchedDomains.push(domain)
+                    } else {
+                        if (path === "/auth/oidc") {
+                            console.log("AM NOTTTTT HEREEEEEEEEEE");
+
+                        }
                     }
                 }
             }
 
 
         }
-        console.log(matchedDomains,matchedPaths);
-        
+        console.log(matchedDomains, matchedPaths);
+
         return { matchedPaths: matchedPaths, matchedDomains: matchedDomains }
     }
 
