@@ -177,9 +177,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch((error) => {
-                if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    console.log(error)
-                }
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
@@ -252,6 +249,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (delay === 30000) {
                     console.log(result[key]);
                     return
+                }
+                if (urls[key] === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                    throw error
                 }
                 failedUrls[key] = urls[key]
             })
