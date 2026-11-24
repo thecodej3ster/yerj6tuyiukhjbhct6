@@ -32,22 +32,22 @@ const getAuthTokenConfig: WorkerConfig = {
         },
         // maxRedirects: 2
     },
-    resolverAction: async ({ key, url,headers }: ResolverArgs) => {
-        const cookieStore = new CookieStore({ storeId: key, url: url })
-        const cookies = cookieStore.get({ parse: true })
+    // resolverAction: async ({ key, url,headers }: ResolverArgs) => {
+    //     const cookieStore = new CookieStore({ storeId: key, url: url })
+    //     const cookies = cookieStore.get({ parse: true })
 
-        if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
-            console.log(headers);
+    //     if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
+    //         console.log(headers);
         
-            throw new Error("Access Token Not Found");
-        }
-        // else {
-        //     console.log('Resolver Is Reciving ...');
+    //         throw new Error("Access Token Not Found");
+    //     }
+    //     // else {
+    //     //     console.log('Resolver Is Reciving ...');
 
-        //     console.log(cookies);
+    //     //     console.log(cookies);
 
-        // }
-    }
+    //     // }
+    // }
 
 }
 
