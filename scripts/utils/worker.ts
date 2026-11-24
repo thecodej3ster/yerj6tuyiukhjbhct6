@@ -73,18 +73,18 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             // const u = cookieStore.get({ parse: true })
 
             // if (u) {
-                // console.log('WORKER IS RECIVING ...');
-                // console.log(u);
-                // console.log('COOKIE IS RECIVING ...');
-                // console.log(cookie);
-                // const y = cookie.join(';')
-                // console.log(y);
+            // console.log('WORKER IS RECIVING ...');
+            // console.log(u);
+            // console.log('COOKIE IS RECIVING ...');
+            // console.log(cookie);
+            // const y = cookie.join(';')
+            // console.log(y);
 
-                // if (!Object.keys(u).includes("buffer_access_token")) {
-                //     console.log(u)
-                //     console.log(key);
-                //     console.log('NOT AVAILABLE');
-                // }
+            // if (!Object.keys(u).includes("buffer_access_token")) {
+            //     console.log(u)
+            //     console.log(key);
+            //     console.log('NOT AVAILABLE');
+            // }
             // }
 
         }
@@ -98,12 +98,12 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
                 //  console.log(cookieString);
                 //  console.log(selectedRequestConfig);
-        // console.log('JUST CHECKING');
+                // console.log('JUST CHECKING');
 
-        //         console.log(selectedRequestConfig.headers.Cookie.match(/buffer_access_token/));
-        // console.log('HEADER RECIVED');
+                //         console.log(selectedRequestConfig.headers.Cookie.match(/buffer_access_token/));
+                // console.log('HEADER RECIVED');
 
-        //         console.log(selectedRequestConfig.headers.Cookie.split(';'));
+                //         console.log(selectedRequestConfig.headers.Cookie.split(';'));
 
             }
 
@@ -113,6 +113,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         let isRedirect = false
         axios(selectedRequestConfig)
             .then(response => {
+                if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
+                    console.log(response)
+                }
+
                 const headers = response.headers as AxiosResponseHeaders
                 const foundRedirect = response.data.match(/(?<=Found. Redirecting to )[^<]+/m)
 
@@ -265,7 +269,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                         resolve(response)
                     } catch (error) {
                         console.log('I REJECTED');
-                        
+
                         reject(error)
                     }
 
