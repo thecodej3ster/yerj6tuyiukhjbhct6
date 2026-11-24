@@ -1,5 +1,3 @@
-import { isIP } from 'net';
-
 export interface CookieDetails {
     value: string;
     attributes: Record<string, string | boolean>;
@@ -19,40 +17,50 @@ export interface StoreStructure {
     [storeId: string]: DomainMap;
 }
 
+const IPV4_REGEX =
+    /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
+
+const IPV6_REGEX =
+    /^(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}|:(?::[0-9a-fA-F]{1,4}){1,7}|::|(?:ffff(?::0{1,4})?:)?(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d))$/i;
+
+function isIpWithRegex(host: string): boolean {
+    const normalized = host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host;
+    return IPV4_REGEX.test(normalized) || IPV6_REGEX.test(normalized);
+}
+
 export class CookieStore {
     private static globalStore: StoreStructure = {};
     public cookies: { [cookieName: string]: CookieDetails } = {}
     private url: string
     private path: string
+    private hostname: string
     private domain: string
     private storeId: string
 
     constructor({ storeId, url }: { storeId: string, url: string }) {
         this.storeId = storeId
         this.url = url
-        let domainMap = CookieStore.globalStore[this.storeId] || null
+        this.hostname = this.getHostnameFromUrl()
         this.domain = this.getRootDomainFromUrl()
-        let pathMap = null
         this.path = this.getDefaultCookiePath()
 
-        if (!domainMap) {
-            CookieStore.globalStore[this.storeId] = {}
-            CookieStore.globalStore[this.storeId][this.domain] = {}
-            CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
-            domainMap = CookieStore.globalStore[this.storeId]
-            pathMap = domainMap[this.domain]
-        }
+        CookieStore.globalStore[this.storeId] ??= {}
+        CookieStore.globalStore[this.storeId][this.domain] ??= {}
+        CookieStore.globalStore[this.storeId][this.domain][this.path] ??= {}
 
-        pathMap = domainMap[this.domain]
-        if (!pathMap) {
-            CookieStore.globalStore[this.storeId][this.domain][this.path] = {}
-            pathMap = domainMap[this.domain]
-
-        }
-
-        this.cookies = pathMap[this.path]
+        this.cookies = CookieStore.globalStore[this.storeId][this.domain][this.path]
     }
 
+    private getHostnameFromUrl(): string {
+        try {
+            const rawHost = this.url.includes('://')
+                ? new URL(this.url).hostname
+                : this.url.split('/')[0].split(':')[0];
+            return rawHost.toLowerCase().replace(/\.$/, '');
+        } catch {
+            throw new Error("Domain Not Found");
+        }
+    }
 
     private getDefaultCookiePath(): string {
         try {
@@ -75,12 +83,16 @@ export class CookieStore {
         }
     }
 
-
     private getRootDomainFromUrl(): string {
         try {
-            const hostname: string = this.url.includes('://')
-                ? new URL(this.url).hostname
-                : this.url.split(':')[0];
+            const hostname = this.hostname;
+            if (!hostname) {
+                throw new Error("Domain Not Found");
+            }
+
+            if (isIpWithRegex(hostname)) {
+                return hostname;
+            }
 
             const parts: string[] = hostname.split('.');
             if (parts.length <= 2) {
@@ -104,6 +116,18 @@ export class CookieStore {
         }
     }
 
+    private pathMatches(requestPath: string, cookiePath: string): boolean {
+        const reqP = requestPath.startsWith('/') ? requestPath : '/';
+        const domP = cookiePath.startsWith('/') ? cookiePath : '/';
+
+        if (reqP === domP) return true;
+        if (domP === '/') return true;
+        if (domP.endsWith('/') && reqP.startsWith(domP)) return true;
+        if (reqP.startsWith(`${domP}/`)) return true;
+
+        return false;
+    }
+
     public set(cookies: string[]) {
         for (let i = 0; i < cookies.length; i++) {
             const parts = cookies[i].split(';');
@@ -118,7 +142,7 @@ export class CookieStore {
             const value = mainPart.slice(eqIndex + 1).trim();
 
             let explicitDomain: string | null = null;
-            let cookiePath: string = this.path;
+            let cookiePath: string = '/';
             const attributes: Record<string, string | boolean> = {};
 
             for (let j = 1; j < parts.length; j++) {
@@ -132,12 +156,10 @@ export class CookieStore {
 
                     switch (attrName) {
                         case 'domain':
-                            explicitDomain = attrValue.startsWith('.')
-                                ? attrValue.slice(1).toLowerCase()
-                                : attrValue.toLowerCase();
+                            explicitDomain = attrValue.replace(/^\.+|\.+$/g, '').toLowerCase();
                             break;
                         case 'path':
-                            cookiePath = attrValue || '/';
+                            cookiePath = attrValue.startsWith('/') ? attrValue : '/';
                             break;
                         default:
                             attributes[attrName] = attrValue;
@@ -147,7 +169,10 @@ export class CookieStore {
                 }
             }
 
-            const finalDomain = (explicitDomain || this.domain).toLowerCase();
+            const isHostOnly = !explicitDomain;
+            attributes.__hostOnly = isHostOnly;
+
+            const finalDomain = (explicitDomain || this.hostname).toLowerCase();
 
             CookieStore.globalStore[this.storeId] ??= {};
             CookieStore.globalStore[this.storeId][finalDomain] ??= {};
@@ -160,56 +185,46 @@ export class CookieStore {
         }
 
         this.cookies =
-            CookieStore.globalStore[this.storeId]?.[this.domain.toLowerCase()]?.[this.path] ?? {};
+            CookieStore.globalStore[this.storeId]?.[this.domain]?.[this.path]
+            ?? CookieStore.globalStore[this.storeId]?.[this.hostname]?.[this.path]
+            ?? {};
     }
 
     private getCookieOwner() {
         const matchedPaths: string[] = []
         const matchedDomains: string[] = []
-        const cookieDomains = Object.keys(CookieStore.globalStore[this.storeId])
+        const storeDomains = CookieStore.globalStore[this.storeId] || {}
+        const cookieDomains = Object.keys(storeDomains)
 
-
-
-        const domainMatches = ({ requestHost, cookieDomain }: { requestHost: string, cookieDomain: string }) => {
+        const domainMatches = ({ requestHost, cookieDomain, hostOnly }: { requestHost: string, cookieDomain: string, hostOnly: boolean }) => {
             const req = requestHost.toLowerCase().replace(/\.$/, '');
             const dom = cookieDomain.toLowerCase().replace(/^\.+|\.+$/g, '');
             if (!req || !dom) return false;
             if (req === dom) return true;
-            if (isIP(req) !== 0) return false;
+            if (hostOnly || isIpWithRegex(req)) return false;
             return req.endsWith(`.${dom}`);
         }
 
-
         for (let i = 0; i < cookieDomains.length; i++) {
             const domain = cookieDomains[i]
-            const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
-            
-            if (domainMatches({ requestHost: this.domain, cookieDomain: domain })) {
-                for (let j = 0; j < cookiePaths.length; j++) {
-                    const path = cookiePaths[j]
-                    console.log(CookieStore.globalStore[this.storeId][domain][path]);
+            const cookiePaths = Object.keys(storeDomains[domain])
 
-                    if (path === "/auth/oidc") {
-                        console.log("AM HEREEEEEEEEEE");
-                    }
+            for (let j = 0; j < cookiePaths.length; j++) {
+                const path = cookiePaths[j]
+                const pathBucket = storeDomains[domain][path]
+                const cookieEntries = Object.values(pathBucket)
+                const isHostOnlyBucket =
+                    cookieEntries.length > 0 &&
+                    cookieEntries.every((c) => c.attributes?.__hostOnly === true)
 
-                    if (path === '/' || path.startsWith(this.path) || this.path.startsWith(path)) {
+                if (domainMatches({ requestHost: this.hostname, cookieDomain: domain, hostOnly: isHostOnlyBucket })) {
+                    if (this.pathMatches(this.path, path)) {
                         matchedPaths.push(path)
                         matchedDomains.push(domain)
-                    } else {
-                        if (path === "/auth/oidc") {
-                            console.log("AM NOTTTTT HEREEEEEEEEEE");
-                        }
                     }
                 }
-            } else {
-                console.log(`THIS IS ${this.domain} ...`);
-                console.log(`I AM FOR DOMAIN ${domain} ...`);
             }
-
-
         }
-        console.log(matchedDomains, matchedPaths);
 
         return { matchedPaths: matchedPaths, matchedDomains: matchedDomains }
     }
@@ -228,22 +243,24 @@ export class CookieStore {
                 for (let i = 0; i < matchedDomains.length; i++) {
                     const domain = matchedDomains[i]
                     const path = matchedPaths[i]
+                    const bucket = CookieStore.globalStore[this.storeId]?.[domain]?.[path] || {}
 
-                    for (const cookieName in CookieStore.globalStore[this.storeId][domain][path]) {
-                        const cookie = CookieStore.globalStore[this.storeId][domain][path][cookieName]
-                        const cookieString = `${cookieName}=${cookie.value}`
+                    for (const name in bucket) {
+                        const cookie = bucket[name]
+                        const cookieString = `${name}=${cookie.value}`
                         cookies.push(cookieString)
                     }
                 }
-                if (this.url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    // console.log(cookies);
-                }
+
                 return cookies
             } else {
-                const cookie = CookieStore.globalStore[this.storeId][matchedDomains[0]][matchedPaths[0]][cookieName] || null
-                if (cookie) {
-                    const cookieString = `${cookieName}=${cookie.value}`
-                    return [cookieString]
+                for (let i = 0; i < matchedDomains.length; i++) {
+                    const domain = matchedDomains[i]
+                    const path = matchedPaths[i]
+                    const cookie = CookieStore.globalStore[this.storeId]?.[domain]?.[path]?.[cookieName]
+                    if (cookie) {
+                        return [`${cookieName}=${cookie.value}`]
+                    }
                 }
                 return null
             }
@@ -255,18 +272,22 @@ export class CookieStore {
                 for (let i = 0; i < matchedDomains.length; i++) {
                     const domain = matchedDomains[i]
                     const path = matchedPaths[i]
+                    const bucket = CookieStore.globalStore[this.storeId]?.[domain]?.[path] || {}
 
-                    for (const cookieName in CookieStore.globalStore[this.storeId][domain][path]) {
-                        cookies[cookieName] = CookieStore.globalStore[this.storeId][domain][path][cookieName]
-
+                    for (const name in bucket) {
+                        cookies[name] = bucket[name]
                     }
                 }
 
                 return cookies
             } else {
-                const cookie = CookieStore.globalStore[this.storeId][matchedDomains[0]][matchedPaths[0]][cookieName]
-                if (cookie) {
-                    return cookie
+                for (let i = 0; i < matchedDomains.length; i++) {
+                    const domain = matchedDomains[i]
+                    const path = matchedPaths[i]
+                    const cookie = CookieStore.globalStore[this.storeId]?.[domain]?.[path]?.[cookieName]
+                    if (cookie) {
+                        return cookie
+                    }
                 }
             }
             return null
