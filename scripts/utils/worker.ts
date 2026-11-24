@@ -32,6 +32,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     const fetchData = (url: string, key: string) => {
         let mainKey = Object.keys(redirects).includes(key) ? redirects[key] : key
 
+        console.log(`Main Key Is ${mainKey}`);
+        
         if (!redirectCount[mainKey]) {
             redirectCount[mainKey] = 0
         }
@@ -71,6 +73,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         const cookieStore = new CookieStore({ storeId: mainKey, url: url })
         const cookie = cookieStore.get({}) as string[]
+        if (redirectCount[mainKey] > 0) {
+        console.log(cookie);
+        }
+        
 
         if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
 
