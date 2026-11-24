@@ -170,12 +170,12 @@ export class CookieStore {
 
 
 
-        const domainMatches = ({ requestHost, cookieDomain, hostOnly }: { requestHost: string, cookieDomain: string, hostOnly?: boolean }) => {
+        const domainMatches = ({ requestHost, cookieDomain }: { requestHost: string, cookieDomain: string }) => {
             const req = requestHost.toLowerCase().replace(/\.$/, '');
             const dom = cookieDomain.toLowerCase().replace(/^\.+|\.+$/g, '');
             if (!req || !dom) return false;
             if (req === dom) return true;
-            if (hostOnly || isIP(req) !== 0) return false;
+            if (isIP(req) !== 0) return false;
             return req.endsWith(`.${dom}`);
         }
 
@@ -183,13 +183,12 @@ export class CookieStore {
         for (let i = 0; i < cookieDomains.length; i++) {
             const domain = cookieDomains[i]
             const cookiePaths = Object.keys(CookieStore.globalStore[this.storeId][domain])
-            console.log(cookiePaths);
-
-            if (domain === this.domain || domain.startsWith(this.domain) || domain.endsWith(this.domain)) {
+            
+            if (domainMatches({ requestHost: this.domain, cookieDomain: domain })) {
                 for (let j = 0; j < cookiePaths.length; j++) {
                     const path = cookiePaths[j]
                     console.log(CookieStore.globalStore[this.storeId][domain][path]);
-                    
+
                     if (path === "/auth/oidc") {
                         console.log("AM HEREEEEEEEEEE");
                     }
