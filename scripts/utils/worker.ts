@@ -178,10 +178,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch((error) => {
-                if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    console.log(error.response);
 
-                }
                 if (!failedWorks.includes(key)) {
                     failedWorks.push(key)
                 }
@@ -244,10 +241,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             await workerProcesses.promise
 
             if (failedWorks.length) {
-                if (urls[failedWorks[0]] === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    console.log(result[failedWorks[0]]);
-
-                }
                 throw new Error("Failed Works Available");
             }
         } catch (error) {
@@ -259,9 +252,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     console.log(result[key]);
                     return
                 }
-                if (urls[key] === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
-                    throw error
-                }
+
                 failedUrls[key] = urls[key]
             })
 
