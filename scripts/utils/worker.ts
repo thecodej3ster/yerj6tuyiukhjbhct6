@@ -88,7 +88,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 console.log(response);
 
                 let foundRedirect = null
-
                 const headers = response.headers as AxiosResponseHeaders
 
                 if (selectedRequestConfig.responseType === 'text') {
@@ -104,7 +103,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     isRedirect = true
                     redirectCount[mainKey]++
                     const redirectUrl = foundRedirect?.length ? foundRedirect[0] : headers.location
-                    // console.log(`REDIRECT COUNT IS: ${redirectCount[mainKey]}`);
+                    console.log('REDIRECT DETECTED ...')
                     return redirectUrl
                 }
 
@@ -131,6 +130,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     redirects[redirectKey] = mainKey
                     unFinishedWork.push(redirectKey)
                     isRedirect = false
+                    console.log('REDIRECTING ...');
                 } else {
                     result[mainKey] = data
                     if (!sucessfulWorks.includes(mainKey)) {
@@ -140,8 +140,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
 
                 if (unFinishedWork.length > 0) {
-                    console.log('REDIRECTING ...');
-
                     const nextKey = unFinishedWork.shift()
                     if (nextKey) {
                         const nextUrl = urls[nextKey];
@@ -151,33 +149,26 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
             })
             .catch((error) => {
-
-                if (!failedWorks.includes(mainKey)) {
-                    failedWorks.push(mainKey)
-                }
-
                 let payload = error.response
 
                 if (error.response) {
-                    if (error.response.data) {
-                        payload = error.response.data
-                    } else {
-                        payload = error.response
-                    }
+                    payload = error.response.data ? error.response.data : error.response
+
                     if (typeof payload === 'object') {
                         payload = `Server Responded with Status: ${error.response.status}\n${JSON.stringify(payload)}`
                     } else {
                         payload = `Server Responded with Status: ${error.response.status}\n${payload}`
                     }
-                }
-                else if (error.request) {
-                    payload = `Request Failed With No Response:\n${error.message}`
-                }
-                else {
-                    payload = `Unable To Make Request:\n${error.message}`
+
+                } else {
+                    payload = error.request ? `Request Failed With No Response:\n${error.message}` : `Unable To Make Request:\n${error.message}`
                 }
 
                 result[mainKey] = payload
+
+                if (!failedWorks.includes(mainKey)) {
+                    failedWorks.push(mainKey)
+                }
                 sucessfulWorks = sucessfulWorks.filter(work => work !== mainKey)
             })
             .finally(() => {
@@ -214,7 +205,9 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             await workerProcesses.promise
 
             if (failedWorks.length) {
-                throw new Error("Failed Works Available");
+                console.log(failedWorks);
+                
+                // throw new Error("Failed Works Available");
             }
         } catch (error) {
             console.log('REQUEST FAILED RETRYING ...')
