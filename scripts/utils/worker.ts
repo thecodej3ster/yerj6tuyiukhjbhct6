@@ -30,8 +30,10 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
     const fetchData = (url: string, key: string) => {
-        if (!redirectCount[key]) {
-            redirectCount[key] = 0
+        let mainKey = Object.keys(redirects).includes(key) ? redirects[key] : key
+
+        if (!redirectCount[mainKey]) {
+            redirectCount[mainKey] = 0
         }
 
         const selectedRequestConfig: RawAxiosRequestConfig & { body?: any } = {
@@ -67,7 +69,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             selectedRequestConfig.httpsAgent = new ProxyAgent({ keepAlive: true })
         }
 
-        const cookieStore = new CookieStore({ storeId: key, url: url })
+        const cookieStore = new CookieStore({ storeId: mainKey, url: url })
         const cookie = cookieStore.get({}) as string[]
 
         if (url === 'https://graph.buffer.com/?_o=getPersonalAccessTokens') {
@@ -126,30 +128,27 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 }
 
                 if (headers["set-cookie"]) {
-                    const cookieStore = new CookieStore({ storeId: key, url: response.config.url! })
+                    const cookieStore = new CookieStore({ storeId: mainKey, url: response.config.url! })
                     cookieStore.set(headers["set-cookie"])
                 }
 
-                if ((redirectCount[key] < maxRedirect) && (headers.location || foundRedirect)) {
+                if ((redirectCount[mainKey] < maxRedirect) && (headers.location || foundRedirect)) {
                     isRedirect = true
-                    redirectCount[key]++
+                    redirectCount[mainKey]++
                     const redirectUrl = foundRedirect?.length ? foundRedirect[0] : headers.location
-                    // console.log(`REDIRECT COUNT IS: ${redirectCount[key]}`);
+                    // console.log(`REDIRECT COUNT IS: ${redirectCount[mainKey]}`);
                     return redirectUrl
-                } else {
-                    // console.log('REDIRECT LIMIT REACHED ...');
-
                 }
 
                 if (resolverAction) {
                     resolverArgs = resolverArgs || {}
-                    redirectCount[key] = 0
+                    redirectCount[mainKey] = 0
                     return resolverAction({
                         ...resolverArgs,
                         ...{
                             response: response.data,
                             headers: headers,
-                            key: key,
+                            key: mainKey,
                             url: url
                         }
                     })
@@ -161,20 +160,15 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 const redirectKey = crypto.randomBytes(8).toString("hex")
                 if (isRedirect) {
                     urls[redirectKey] = data
-                    redirects[redirectKey] = key
+                    redirects[redirectKey] = mainKey
                     unFinishedWork.push(redirectKey)
                     isRedirect = false
                 } else {
-                    if (Object.keys(redirects).includes(key)) {
-                        const mainKey = redirects[key]
-                        result[mainKey] = data
-                    } else {
-                        result[key] = data
+                    result[mainKey] = data
+                    if (!sucessfulWorks.includes(mainKey)) {
+                        sucessfulWorks.push(mainKey)
                     }
-                    if (!sucessfulWorks.includes(key)) {
-                        sucessfulWorks.push(key)
-                    }
-                    failedWorks = failedWorks.filter(work => work !== key)
+                    failedWorks = failedWorks.filter(work => work !== mainKey)
                 }
 
                 if (unFinishedWork.length > 0) {
@@ -190,13 +184,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
             })
             .catch((error) => {
 
-                if (!failedWorks.includes(key)) {
-                    if (Object.keys(redirects).includes(key)) {
-                        const mainKey = redirects[key]
-                        failedWorks.push(mainKey)
-                    } else {
-                        failedWorks.push(key)
-                    }
+                if (!failedWorks.includes(mainKey)) {
+                    failedWorks.push(mainKey)
                 }
 
                 let payload = error.response
@@ -220,8 +209,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     payload = `Unable To Make Request:\n${error.message}`
                 }
 
-                result[key] = payload
-                sucessfulWorks = sucessfulWorks.filter(work => work !== key)
+                result[mainKey] = payload
+                sucessfulWorks = sucessfulWorks.filter(work => work !== mainKey)
             })
             .finally(() => {
 
