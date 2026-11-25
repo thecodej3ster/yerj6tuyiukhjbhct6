@@ -98,12 +98,8 @@ async function hydrateCookieStore() {
             usernames.push(username)
         }
         const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
-        cookieStore.set([auth])
-        console.log(cookieStore.get({}));
-        
-    }
-    console.log(authGroups);
-    
+        cookieStore.set([auth])        
+    }    
 }
 
 let createAccesssTokenWorkIndex = 0
