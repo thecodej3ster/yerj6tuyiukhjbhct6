@@ -1,9 +1,7 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { CookieStore } from '../utils/cookie'
-import { save } from './utils/save'
-import { access } from 'fs'
-import { log } from 'console'
+
 
 
 let keys = process.env.Creds!

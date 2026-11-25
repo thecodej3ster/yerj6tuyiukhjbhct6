@@ -29,7 +29,6 @@ export function selectKey(list: { keys: string[] }) {
 async function getProxySocket(): Promise<{ proxySocket?: tls.TLSSocket, selectedServer?: ServerCred, provider?: string }> {
     const providers = ['pv-xxx', 'tv-xxx']
     let selectedProvider = providers[Math.floor(Math.random() * providers.length)]
-    selectedProvider = 'pv-xxx'
     console.log(`Provider is ${selectedProvider}`);
     console.log(`🌐 NEW IP LOADING... 🌐 \n`);
 
