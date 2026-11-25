@@ -97,8 +97,10 @@ async function hydrateCookieStore() {
         if (username === 'thedebatebrief_instagram') {
             usernames.push(username)
         }
-        cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
+        const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([auth])
+        console.log(cookieStore.get({}));
+        
     }
     console.log(authGroups);
     
