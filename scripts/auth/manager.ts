@@ -36,7 +36,7 @@ const getAuthTokenConfig: WorkerConfig = {
 
     //     if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
     //         console.log(headers);
-        
+
     //         throw new Error("Access Token Not Found");
     //     }
     //     // else {
@@ -98,8 +98,8 @@ async function hydrateCookieStore() {
             usernames.push(username)
         }
         const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
-        cookieStore.set([auth])        
-    }    
+        cookieStore.set([auth])
+    }
 }
 
 let createAccesssTokenWorkIndex = 0
@@ -190,7 +190,7 @@ async function revokeAllAccessTokens() {
         const { accessToken } = accessTokens[i];
         await revokeAccesssToken({ accessToken: accessToken, user: username })
     }
-return
+    return
     revokeAllAccessTokensWorkIndex++
     if (revokeAllAccessTokensWorkIndex === usernames.length) {
         return
@@ -214,7 +214,13 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     console.log(usernames);
-    await runGetAuthToken()
+    const cookiem = new CookieStore({ storeId: usernames[0], url: 'https://callbacks.buffer.com/auth/oidc/authorize' }).get({ parse: true })
+console.log(cookiem);
+
+    const cookiemk = new CookieStore({ storeId: usernames[0], url: 'https://buffer.com/' }).get({ parse: true })
+console.log(cookiemk);
+
+    // await runGetAuthToken()
     // await revokeAllAccessTokens()
     // await createAccesssToken()
     // console.log(cookieStore);
