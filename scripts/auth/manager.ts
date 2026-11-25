@@ -94,6 +94,7 @@ function sortAuth() {
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
+        const cookie = `${auth};domain=.buffer.com;path=/`
         if (username === 'thedebatebrief_instagram') {
             usernames.push(username)
         }
