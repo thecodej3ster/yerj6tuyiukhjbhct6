@@ -99,7 +99,7 @@ async function hydrateCookieStore() {
             usernames.push(username)
         }
         const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
-        cookieStore.set([auth])
+        cookieStore.set([cookie])
     }
 }
 
@@ -221,7 +221,7 @@ console.log(cookiem);
     const cookiemk = new CookieStore({ storeId: usernames[0], url: 'https://buffer.com/' }).get({ parse: true })
 console.log(cookiemk);
 
-    // await runGetAuthToken()
+    await runGetAuthToken()
     // await revokeAllAccessTokens()
     // await createAccesssToken()
     // console.log(cookieStore);
