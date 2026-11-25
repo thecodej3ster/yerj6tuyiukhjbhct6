@@ -214,13 +214,6 @@ async function runGetAuthToken() {
 async function auth() {
     sortAuth()
     hydrateCookieStore()
-    console.log(usernames);
-    const cookiem = new CookieStore({ storeId: usernames[0], url: 'https://callbacks.buffer.com/auth/oidc/authorize' }).get({ parse: true })
-console.log(cookiem);
-
-    const cookiemk = new CookieStore({ storeId: usernames[0], url: 'https://buffer.com/' }).get({ parse: true })
-console.log(cookiemk);
-
     await runGetAuthToken()
     // await revokeAllAccessTokens()
     // await createAccesssToken()

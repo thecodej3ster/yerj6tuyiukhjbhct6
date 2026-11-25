@@ -84,16 +84,16 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookie = cookieStore.get({}) as string[];
         const cookieString = cookie.join(";");
 
-        if (selectedRequestConfig.headers && cookieString) {
-            console.log(cookieString);
-            
+        if (selectedRequestConfig.headers && cookieString) {            
             selectedRequestConfig.headers.Cookie = cookieString;
         }
 
         let isRedirect = false;
 
         axios(selectedRequestConfig)
-            .then((response) => {                
+            .then((response) => {
+                console.log(response);
+                                
                 let foundRedirect: RegExpMatchArray | null = null;
                 const headers = response.headers as AxiosResponseHeaders;
                 const currentUrl = response.config.url ? resolveUrl(resolvedUrl, response.config.url) : resolvedUrl;
