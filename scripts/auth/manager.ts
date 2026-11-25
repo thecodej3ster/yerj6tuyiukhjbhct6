@@ -100,6 +100,8 @@ async function hydrateCookieStore() {
         cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([auth])
     }
+    console.log(authGroups);
+    
 }
 
 let createAccesssTokenWorkIndex = 0
@@ -214,7 +216,7 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     console.log(usernames);
-    await runGetAuthToken()
+    // await runGetAuthToken()
     // await revokeAllAccessTokens()
     // await createAccesssToken()
     // console.log(cookieStore);
