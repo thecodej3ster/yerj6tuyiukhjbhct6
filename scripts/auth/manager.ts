@@ -153,7 +153,7 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 }
 
 async function getAccessTokens() {
-    console.log('GETTING ACCESS TOKEN ...');
+    console.log('GETTING ACCESS TOKEN ...')
 
     type AccessToken = {
         data?: {

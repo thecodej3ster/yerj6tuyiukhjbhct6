@@ -108,7 +108,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
                 if (selectedRequestConfig.responseType === "text" && typeof response.data === "string") {
                     foundRedirect = response.data.match(/(?<=Found\. Redirecting to )[^<]+/m);
-                    console.log(foundRedirect);
                 }
 
                 if (headers["set-cookie"]) {
@@ -122,6 +121,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (redirectCount[mainKey] < maxRedirect && rawRedirect) {
                     isRedirect = true;
                     redirectCount[mainKey]++;
+                    console.log(`REDIRECT COUNT IS ${redirectCount[mainKey]}`)
                     return resolveUrl(currentUrl, rawRedirect);
                 }
 
