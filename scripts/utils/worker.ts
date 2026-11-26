@@ -84,7 +84,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         const cookie = cookieStore.get({}) as string[];
         const cookieString = cookie.join(";");
 
-        if (selectedRequestConfig.headers && cookieString) {            
+        if (selectedRequestConfig.headers && cookieString) {
             selectedRequestConfig.headers.Cookie = cookieString;
         }
 
@@ -92,14 +92,15 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         axios(selectedRequestConfig)
             .then((response) => {
-                console.log(response);
-                                
+                console.log(response.request);
+
                 let foundRedirect: RegExpMatchArray | null = null;
                 const headers = response.headers as AxiosResponseHeaders;
                 const currentUrl = response.config.url ? resolveUrl(resolvedUrl, response.config.url) : resolvedUrl;
 
                 if (selectedRequestConfig.responseType === "text" && typeof response.data === "string") {
                     foundRedirect = response.data.match(/(?<=Found\. Redirecting to )[^<]+/m);
+                    console.log(foundRedirect);
                 }
 
                 if (headers["set-cookie"]) {

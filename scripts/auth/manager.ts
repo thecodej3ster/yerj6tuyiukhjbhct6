@@ -104,7 +104,7 @@ async function hydrateCookieStore() {
         }
         const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([cookie])
-        cookieStore.set(p)
+        // cookieStore.set(p)
     }
 }
 
@@ -210,8 +210,8 @@ async function runGetAuthToken() {
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i]
         if (getAuthTokenConfig.urls) {
-            // getAuthTokenConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
-            getAuthTokenConfig.urls[username] = n
+            getAuthTokenConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
+            // getAuthTokenConfig.urls[username] = n
         }
     }
 
