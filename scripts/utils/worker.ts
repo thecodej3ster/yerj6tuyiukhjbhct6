@@ -102,7 +102,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
         axios(selectedRequestConfig)
             .then((response) => {
-                console.log(response.request);
+                console.log(response);
 
                 let foundRedirect: RegExpMatchArray | null = null;
                 const headers = response.headers as AxiosResponseHeaders;

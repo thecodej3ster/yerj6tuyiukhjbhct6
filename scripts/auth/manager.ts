@@ -90,10 +90,7 @@ function sortAuth() {
     }
 }
 
-const cookie = [
-      'AWSALBTG=lVTzQwBqsvBRPagrSzSUpiKBfasKTxew0b6QQBIvNY/z+ZGvWbb9u+gB8ep+hT0Wdf6aayfttKdvrE0xjlq4JHHoiGynGk20+FYICrs17mwJuBO8lDuNS9FEus6OI7ZBB/di/9ydqbofsd7j1AkA7zvDSzOZhCyMFzmzzKY6KYTG; Expires=Thu, 03 Dec 2026 12:00:14 GMT; Path=/',
-      'AWSALBTGCORS=lVTzQwBqsvBRPagrSzSUpiKBfasKTxew0b6QQBIvNY/z+ZGvWbb9u+gB8ep+hT0Wdf6aayfttKdvrE0xjlq4JHHoiGynGk20+FYICrs17mwJuBO8lDuNS9FEus6OI7ZBB/di/9ydqbofsd7j1AkA7zvDSzOZhCyMFzmzzKY6KYTG; Expires=Thu, 03 Dec 2026 12:00:14 GMT; Path=/; SameSite=None; Secure',
-    ]
+
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
         const username = authGroups[auth][0]
@@ -103,7 +100,6 @@ async function hydrateCookieStore() {
         }
         const cookieStore = new CookieStore({ storeId: username, url: 'https://buffer.com/' })
         cookieStore.set([cookie])
-        // cookieStore.set(p)
     }
 }
 
@@ -203,14 +199,11 @@ async function revokeAllAccessTokens() {
     await revokeAllAccessTokens()
 }
 
-const n = 'https://callbacks.buffer.com/auth/oidc/callback?code=e6ofyH0xbO25pbHdzEsmyXTi4jLhsmGHV0nm76CMvZz&state=NVz8xyVExGc4aKt_lvXkVg&iss=https%3A%2F%2Fauth.buffer.com'
-
 async function runGetAuthToken() {
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i]
         if (getAuthTokenConfig.urls) {
             getAuthTokenConfig.urls[username] = 'https://callbacks.buffer.com/auth/oidc/authorize'
-            // getAuthTokenConfig.urls[username] = n
         }
     }
 
