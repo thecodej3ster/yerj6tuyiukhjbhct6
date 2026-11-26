@@ -221,7 +221,7 @@ async function runGetAuthToken() {
 async function auth() {
     sortAuth()
     hydrateCookieStore()
-    // await runGetAuthToken()
+    await runGetAuthToken()
     // await revokeAllAccessTokens()
     // await createAccesssToken()
     // console.log(cookieStore);
@@ -233,31 +233,7 @@ async function auth() {
     // console.log(JSON.parse(keys));
     // await save({ name: 'CREDS', value: keys })
 
-await worker({
-    urls: {
-        bufferAuth: "https://callbacks.buffer.com/auth/oidc/authorize",
-    },
-    direct: false, // or true if running direct
-    requestConfig: {
-        maxRedirects: 2,
-        headers: {
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-            "Sec-CH-UA": '"Brave";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
-            "Sec-CH-UA-Mobile": "?0",
-            "Sec-CH-UA-Platform": '"Linux"',
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-User": "?1",
-            "Sec-GPC": "1",
-            "Upgrade-Insecure-Requests": "1",
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-        },
-    },
-});
+
 
 }
 
