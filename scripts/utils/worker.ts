@@ -37,7 +37,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
     };
 
-
     const decodeHtmlEntities = (str: string): string => {
         const HTML_ENTITIES: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&#x27;": "'", }
         return str.replace(/&(?:amp|lt|gt|quot|#39|#x27);|&#(\d+);|&#x([0-9a-fA-F]+);/g, (match, dec, hex) => {
