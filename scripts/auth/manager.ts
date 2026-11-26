@@ -91,9 +91,9 @@ function sortAuth() {
 }
 
 const p = [
-      'AWSALBTG=0EDl3b1Rwjyl03gPwfMM7pFtrZgyUNxbVYoGKj8BtVGdvkIieiGKJHUruwuhxDAnd8ELSQ7XO2jtKJpq71vzfskombcD/bIO5mRHPc1MsASmaVBi4sLSQ11KEmw5I6TCIo3rS1qOXfxQCHUqWPOqH8Bg7g1WqnTSCVVg6CH2EgzO; Expires=Thu, 03 Dec 2026 11:54:39 GMT; Path=/',
-      'AWSALBTGCORS=0EDl3b1Rwjyl03gPwfMM7pFtrZgyUNxbVYoGKj8BtVGdvkIieiGKJHUruwuhxDAnd8ELSQ7XO2jtKJpq71vzfskombcD/bIO5mRHPc1MsASmaVBi4sLSQ11KEmw5I6TCIo3rS1qOXfxQCHUqWPOqH8Bg7g1WqnTSCVVg6CH2EgzO; Expires=Thu, 03 Dec 2026 11:54:39 GMT; Path=/; SameSite=None; Secure',
-      '_oidc_pkce_NVz8xyVExGc4aKt_lvXkVg=pkce-v1%2Ff-ANZ19hDlDMSDF9.vcHFuMbZMEtKB2Un4aWMkg.7qtnW8OoD-bQxnsnxfuzvUHJyp7thPt1ls8A7_V8XADlSl4PBs-VRb75DSkqaXPIjvbLDt6YZzTpi8rDtufMZhgw-2RkooRRPETvtFhLEtLKp5C0lMy8qe-RQugTucrNcKj1iwM1ZA; Max-Age=3600; Domain=callbacks.buffer.com; Path=/auth/oidc; Expires=Thu, 26 Nov 2026 12:54:39 GMT; HttpOnly; Secure; SameSite=Lax'
+      'AWSALBTG=lVTzQwBqsvBRPagrSzSUpiKBfasKTxew0b6QQBIvNY/z+ZGvWbb9u+gB8ep+hT0Wdf6aayfttKdvrE0xjlq4JHHoiGynGk20+FYICrs17mwJuBO8lDuNS9FEus6OI7ZBB/di/9ydqbofsd7j1AkA7zvDSzOZhCyMFzmzzKY6KYTG; Expires=Thu, 03 Dec 2026 12:00:14 GMT; Path=/',
+      'AWSALBTGCORS=lVTzQwBqsvBRPagrSzSUpiKBfasKTxew0b6QQBIvNY/z+ZGvWbb9u+gB8ep+hT0Wdf6aayfttKdvrE0xjlq4JHHoiGynGk20+FYICrs17mwJuBO8lDuNS9FEus6OI7ZBB/di/9ydqbofsd7j1AkA7zvDSzOZhCyMFzmzzKY6KYTG; Expires=Thu, 03 Dec 2026 12:00:14 GMT; Path=/; SameSite=None; Secure',
+      '_oidc_session=X58PeENAwEEScAPwv3mb6eerkhrAgSk_q_SRjmUQyzq; path=/; domain=.buffer.com; samesite=none; secure; httponly; expires=Fri, 26 Nov 2027 12:00:14 GMT'
     ]
 async function hydrateCookieStore() {
     for (const auth in authGroups) {
@@ -204,7 +204,7 @@ async function revokeAllAccessTokens() {
     await revokeAllAccessTokens()
 }
 
-const n = 'https://auth.buffer.com/auth?client_id=buffer-web-client&redirect_uri=https%3A%2F%2Fcallbacks.buffer.com%2Fauth%2Foidc%2Fcallback&response_type=code&scope=openid+email+avatar+offline_access+posts%3Aread+posts%3Awrite+ideas%3Aread+ideas%3Awrite+account%3Aread+account%3Awrite+insights%3Aread&code_challenge=ODGERMXaMmYe85Ev8R37hBplaxChJcryfDSF4-xd1BU&code_challenge_method=S256&state=NVz8xyVExGc4aKt_lvXkVg&prompt=consent'
+const n = 'https://callbacks.buffer.com/auth/oidc/callback?code=e6ofyH0xbO25pbHdzEsmyXTi4jLhsmGHV0nm76CMvZz&state=NVz8xyVExGc4aKt_lvXkVg&iss=https%3A%2F%2Fauth.buffer.com'
 
 async function runGetAuthToken() {
     for (let i = 0; i < usernames.length; i++) {
