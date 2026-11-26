@@ -37,6 +37,16 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
         }
     };
 
+
+    const decodeHtmlEntities = (str: string): string => {
+        const HTML_ENTITIES: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&#x27;": "'", }
+        return str.replace(/&(?:amp|lt|gt|quot|#39|#x27);|&#(\d+);|&#x([0-9a-fA-F]+);/g, (match, dec, hex) => {
+            if (dec) return String.fromCharCode(Number(dec));
+            if (hex) return String.fromCharCode(parseInt(hex, 16));
+            return HTML_ENTITIES[match] ?? match;
+        });
+    }
+
     const fetchData = (url: string, key: string) => {
         activeWorkers++;
         const mainKey = Object.keys(redirects).includes(key) ? redirects[key] : key;
@@ -110,7 +120,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                     );
                 }
 
-                const rawRedirect = foundRedirect?.length ? foundRedirect[0].trim() : headers.location;
+                const rawRedirect = foundRedirect?.length ? decodeHtmlEntities(foundRedirect[0]).trim() : headers.location;
                 if (redirectCount[mainKey] < maxRedirect && rawRedirect) {
                     isRedirect = true;
                     redirectCount[mainKey]++;
