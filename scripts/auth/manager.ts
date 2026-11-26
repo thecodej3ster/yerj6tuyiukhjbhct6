@@ -1,5 +1,5 @@
 import { worker } from '../utils/worker'
-import { WorkerConfig } from '../utils/types'
+import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { CookieStore } from '../utils/cookie'
 
 
@@ -30,22 +30,16 @@ const getAuthTokenConfig: WorkerConfig = {
         },
         maxRedirects: 2
     },
-    // resolverAction: async ({ key, url,headers }: ResolverArgs) => {
-    //     const cookieStore = new CookieStore({ storeId: key, url: url })
-    //     const cookies = cookieStore.get({ parse: true })
+    resolverAction: async ({ key, url, headers }: ResolverArgs) => {
+        const cookieStore = new CookieStore({ storeId: key, url: url })
+        const cookies = cookieStore.get({ parse: true })
 
-    //     if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
-    //         console.log(headers);
+        if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
+            console.log(headers);
 
-    //         throw new Error("Access Token Not Found");
-    //     }
-    //     // else {
-    //     //     console.log('Resolver Is Reciving ...');
-
-    //     //     console.log(cookies);
-
-    //     // }
-    // }
+            throw new Error("Access Token Not Found");
+        }
+    }
 
 }
 
@@ -158,26 +152,67 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
     await revokeAccesssToken({})
 }
 
-let o = false
-async function getAccessTokens(username: string) {
-    getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
-    console.log(getAccessTokensConfig);
+async function getAccessTokens() {
+    console.log('GETTING ACCESS TOKEN ...');
 
-    const accessTokens = await worker(getAccessTokensConfig) as { [username: string]: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
+    type AccessToken = {
+        data?: {
+            personalAccessTokens?: {
+                accessTokens?: {
+                    accessToken?: string
+                }[]
+            }
+        }, error?: {}
+    }
 
-    const personalAccessTokens = accessTokens[username].data?.personalAccessTokens?.accessTokens
-    if (personalAccessTokens) {
-        if (personalAccessTokens.length) {
-            return personalAccessTokens
-        } else {
-            return []
+    // getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
+    // console.log(getAccessTokensConfig);
+
+    // const accessTokens = await worker(getAccessTokensConfig) as { [username: string]: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
+
+    // const personalAccessTokens = accessTokens[username].data?.personalAccessTokens?.accessTokens
+    // if (personalAccessTokens) {
+    //     if (personalAccessTokens.length) {
+    //         return personalAccessTokens
+    //     } else {
+    //         return []
+    //     }
+    // }
+
+    // if (accessTokens?.error) {
+    //     throw accessTokens?.error
+    // }
+    // console.log(accessTokens);
+
+
+    const tokens: { [username: string]: { accessToken?: string | undefined }[] } = {}
+
+    for (let i = 0; i < usernames.length; i++) {
+        const username = usernames[i]
+        if (getAccessTokensConfig.urls) {
+            getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
         }
     }
 
-    if (accessTokens?.error) {
-        throw accessTokens?.error
+    const response = await worker(getAccessTokensConfig)
+
+    for (const username in response) {
+        const accessTokens: AccessToken = response[username]
+
+        const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
+
+        if (personalAccessTokens) {
+            if (personalAccessTokens.length) {
+                tokens[username] = personalAccessTokens
+            }
+        }
+
+        if (accessTokens?.error) {
+            throw accessTokens?.error
+        }
     }
-    console.log(accessTokens);
+
+    return tokens
 }
 
 let revokeAllAccessTokensWorkIndex = 0
@@ -185,13 +220,14 @@ async function revokeAllAccessTokens() {
     console.log('REVOKING ACCESS TOKEN ...');
 
     const username = usernames[revokeAllAccessTokensWorkIndex]
-    const accessTokens = await getAccessTokens(username) as { accessToken?: string }[]
+    const personalAccessTokens = await getAccessTokens()
+    const accessTokens: { accessToken?: string }[] = personalAccessTokens[username]
 
     for (let i = 0; i < accessTokens.length; i++) {
         const { accessToken } = accessTokens[i];
         await revokeAccesssToken({ accessToken: accessToken, user: username })
     }
-    return
+
     revokeAllAccessTokensWorkIndex++
     if (revokeAllAccessTokensWorkIndex === usernames.length) {
         return
@@ -215,7 +251,7 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     await runGetAuthToken()
-    // await revokeAllAccessTokens()
+    await revokeAllAccessTokens()
     // await createAccesssToken()
     // console.log(cookieStore);
     // await runGetAuthSessionUrl()
