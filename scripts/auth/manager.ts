@@ -30,13 +30,11 @@ const getAuthTokenConfig: WorkerConfig = {
         },
         maxRedirects: 2
     },
-    resolverAction: async ({ key, url, headers }: ResolverArgs) => {
+    resolverAction: async ({ key, url }: ResolverArgs) => {
         const cookieStore = new CookieStore({ storeId: key, url: url })
         const cookies = cookieStore.get({ parse: true })
 
         if (!cookies || !Object.keys(cookies).includes("buffer_access_token")) {
-            console.log(headers);
-
             throw new Error("Access Token Not Found");
         }
     }
@@ -123,7 +121,6 @@ async function createAccesssToken() {
     }
     await createAccesssToken()
 }
-
 
 
 let revokeWorkIndex = 0
@@ -230,18 +227,8 @@ async function auth() {
     hydrateCookieStore()
     await runGetAuthToken()
     await revokeAllAccessTokens()
-    // await createAccesssToken()
-    // console.log(cookieStore);
-    // await runGetAuthSessionUrl()
-    // console.log(cookieStore);
-    // await runGetAuthToken()
-    // console.log(cookieStore);
-    // await revokeAccesssToken()
-    // console.log(JSON.parse(keys));
-    // await save({ name: 'CREDS', value: keys })
-
-
-
+    await createAccesssToken()
+    console.log('MANAGER AUTH PIPELINE SUCESSFULLY EXECUTED');
 }
 
 export default auth
