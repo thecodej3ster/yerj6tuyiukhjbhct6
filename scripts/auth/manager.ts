@@ -165,26 +165,6 @@ async function getAccessTokens() {
         }, error?: {}
     }
 
-    // getAccessTokensConfig.urls[username] = 'https://graph.buffer.com/?_o=getPersonalAccessTokens'
-    // console.log(getAccessTokensConfig);
-
-    // const accessTokens = await worker(getAccessTokensConfig) as { [username: string]: { data?: { personalAccessTokens?: { accessTokens?: { accessToken?: string }[] } }, error?: {} } }
-
-    // const personalAccessTokens = accessTokens[username].data?.personalAccessTokens?.accessTokens
-    // if (personalAccessTokens) {
-    //     if (personalAccessTokens.length) {
-    //         return personalAccessTokens
-    //     } else {
-    //         return []
-    //     }
-    // }
-
-    // if (accessTokens?.error) {
-    //     throw accessTokens?.error
-    // }
-    // console.log(accessTokens);
-
-
     const tokens: { [username: string]: { accessToken?: string | undefined }[] } = {}
 
     for (let i = 0; i < usernames.length; i++) {
@@ -205,6 +185,8 @@ async function getAccessTokens() {
             if (personalAccessTokens.length) {
                 tokens[username] = personalAccessTokens
             }
+        } else {
+            tokens[username] = []
         }
 
         if (accessTokens?.error) {
