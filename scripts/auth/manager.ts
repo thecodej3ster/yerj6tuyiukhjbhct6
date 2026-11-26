@@ -2,14 +2,13 @@ import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { CookieStore } from '../utils/cookie'
 
-
-
 let keys = process.env.Creds!
 const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
 const authGroups: Record<string, string[]> = {}
-let cookieStore: CookieStore
+let personalAccessTokens: { [username: string]: { accessToken?: string | undefined }[] } = {}
 let usernames: string[] = []
+
 
 const commonHeaders = {
     "Accept": 'application/graphql-response+json,application/json;q=0.9',
@@ -93,37 +92,33 @@ async function hydrateCookieStore() {
     }
 }
 
-let createAccesssTokenWorkIndex = 0
 async function createAccesssToken() {
     console.log('CREATING ACCESS TOKEN ...');
 
-    const username = usernames[createAccesssTokenWorkIndex]
+    for (let i = 0; i < usernames.length; i++) {
+        const username = usernames[i];
 
-    createAccesssTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
-    console.log(createAccesssTokenConfig);
+        createAccesssTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
+        console.log(createAccesssTokenConfig);
 
-    const authCreate = await worker(createAccesssTokenConfig) as {
-        [username: string]: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
+        const authCreate = await worker(createAccesssTokenConfig) as {
+            [username: string]: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
+        }
+
+        const accessToken = authCreate[username].data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
+
+        if (!accessToken) {
+            console.log(authCreate);
+            throw new Error("UNEXPECTED VALUE Recived AS ACCESS TOKEN");
+        }
+
+        keys = keys.replaceAll(tokens[username], accessToken)
     }
-
-    const accessToken = authCreate[username].data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
-
-    if (!accessToken) {
-        console.log(authCreate);
-        throw new Error("UNEXPECTED VALUE Recived AS ACCESS TOKEN");
-    }
-
-    keys = keys.replaceAll(tokens[username], accessToken)
-
-    createAccesssTokenWorkIndex++
-    if (createAccesssTokenWorkIndex === usernames.length) {
-        return
-    }
-    await createAccesssToken()
 }
 
 
 let revokeWorkIndex = 0
+
 async function revokeAccesssToken({ accessToken, user }: { accessToken?: string, user?: string }) {
     const username = user || usernames[revokeWorkIndex]
     const token = accessToken || tokens[username]
@@ -173,7 +168,6 @@ async function getAccessTokens() {
 
     for (const username in response) {
         const accessTokens: AccessToken = response[username]
-
         const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
 
         if (personalAccessTokens && personalAccessTokens.length) {
@@ -190,24 +184,17 @@ async function getAccessTokens() {
     return tokens
 }
 
-let revokeAllAccessTokensWorkIndex = 0
 async function revokeAllAccessTokens() {
     console.log('REVOKING ACCESS TOKEN ...');
 
-    const username = usernames[revokeAllAccessTokensWorkIndex]
-    const personalAccessTokens = await getAccessTokens()
-    const accessTokens: { accessToken?: string }[] = personalAccessTokens[username]
-
-    for (let i = 0; i < accessTokens.length; i++) {
-        const { accessToken } = accessTokens[i];
-        await revokeAccesssToken({ accessToken: accessToken, user: username })
+    for (let j = 0; j < usernames.length; j++) {
+        const username = usernames[j];
+        const accessTokens: { accessToken?: string }[] = personalAccessTokens[username]
+        for (let i = 0; i < accessTokens.length; i++) {
+            const { accessToken } = accessTokens[i];
+            await revokeAccesssToken({ accessToken: accessToken, user: username })
+        }
     }
-
-    revokeAllAccessTokensWorkIndex++
-    if (revokeAllAccessTokensWorkIndex === usernames.length) {
-        return
-    }
-    await revokeAllAccessTokens()
 }
 
 async function runGetAuthToken() {
@@ -226,6 +213,7 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     await runGetAuthToken()
+    await getAccessTokens()
     await revokeAllAccessTokens()
     await createAccesssToken()
     console.log('MANAGER AUTH PIPELINE SUCESSFULLY EXECUTED');
