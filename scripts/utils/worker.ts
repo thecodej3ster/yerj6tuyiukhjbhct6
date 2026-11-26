@@ -48,6 +48,8 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
     }
 
     const fetchData = (url: string, key: string) => {
+        console.log('🔥 WORKER IN PROGRESS ... 🔥')
+        
         activeWorkers++;
         const mainKey = Object.keys(redirects).includes(key) ? redirects[key] : key;
         const resolvedUrl = resolveUrl(urls[mainKey] || url, url);
@@ -121,7 +123,6 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
                 if (redirectCount[mainKey] < maxRedirect && rawRedirect) {
                     isRedirect = true;
                     redirectCount[mainKey]++;
-                    console.log(`REDIRECT COUNT IS ${redirectCount[mainKey]}`)
                     return resolveUrl(currentUrl, rawRedirect);
                 }
 

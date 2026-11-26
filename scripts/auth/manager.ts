@@ -181,10 +181,8 @@ async function getAccessTokens() {
 
         const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
 
-        if (personalAccessTokens) {
-            if (personalAccessTokens.length) {
-                tokens[username] = personalAccessTokens
-            }
+        if (personalAccessTokens && personalAccessTokens.length) {
+            tokens[username] = personalAccessTokens
         } else {
             tokens[username] = []
         }
