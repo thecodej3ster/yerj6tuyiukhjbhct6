@@ -1,5 +1,5 @@
 import { worker } from '../utils/worker'
-import { WorkerConfig, ResolverArgs } from '../utils/types'
+import { WorkerConfig } from '../utils/types'
 import { CookieStore } from '../utils/cookie'
 
 
@@ -28,7 +28,7 @@ const getAuthTokenConfig: WorkerConfig = {
         headers: {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
         },
-        maxRedirects: 1
+        // maxRedirects: 1
     },
     // resolverAction: async ({ key, url,headers }: ResolverArgs) => {
     //     const cookieStore = new CookieStore({ storeId: key, url: url })
