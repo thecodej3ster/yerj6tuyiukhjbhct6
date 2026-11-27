@@ -155,7 +155,7 @@ async function getAccessTokens() {
         }, error?: {}
     }
 
-    const tokens: { [username: string]: { accessToken?: string | undefined }[] } = {}
+    // const tokens: { [username: string]: { accessToken?: string | undefined }[] } = {}
 
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i]
@@ -170,20 +170,18 @@ async function getAccessTokens() {
     
     for (const username in response) {
         const accessTokens: AccessToken = response[username]
-        const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
+        const tokens = accessTokens.data?.personalAccessTokens?.accessTokens
 
-        if (personalAccessTokens && personalAccessTokens.length) {
-            tokens[username] = personalAccessTokens
+        if (tokens && tokens.length) {
+            personalAccessTokens[username] = tokens
         } else {
-            tokens[username] = []
+            personalAccessTokens[username] = []
         }
 
         if (accessTokens?.error) {
             throw accessTokens?.error
         }
     }
-
-    return tokens
 }
 
 async function revokeAllAccessTokens() {
