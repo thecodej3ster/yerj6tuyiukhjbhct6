@@ -166,6 +166,8 @@ async function getAccessTokens() {
 
     const response = await worker(getAccessTokensConfig)
 
+    console.log(response);
+    
     for (const username in response) {
         const accessTokens: AccessToken = response[username]
         const personalAccessTokens = accessTokens.data?.personalAccessTokens?.accessTokens
