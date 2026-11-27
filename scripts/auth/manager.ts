@@ -1,7 +1,7 @@
 import { worker } from '../utils/worker'
 import { WorkerConfig, ResolverArgs } from '../utils/types'
 import { CookieStore } from '../utils/cookie'
-
+import { save } from './utils/save'
 let keys = process.env.Creds!
 const tokens = JSON.parse(keys)
 const auths = JSON.parse(process.env.Auths!)
@@ -97,23 +97,22 @@ async function createAccesssToken() {
 
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i];
-
         createAccesssTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=generatePersonalAccessToken'
-        console.log(createAccesssTokenConfig);
+    }
 
-        const authCreate = await worker(createAccesssTokenConfig) as {
-            [username: string]: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
-        }
+    const authCreate = await worker(createAccesssTokenConfig) as {
+        [username: string]: { data?: { generatePersonalAccessToken?: { personalAccessToken?: { accessToken?: string } } } }
+    }
 
+    for (const username in authCreate) {
         const accessToken = authCreate[username].data?.generatePersonalAccessToken?.personalAccessToken?.accessToken
-
         if (!accessToken) {
             console.log(authCreate);
-            throw new Error("UNEXPECTED VALUE Recived AS ACCESS TOKEN");
+            throw new Error(`UNEXPECTED VALUE Recived AS ACCESS TOKEN FOR ${username.toUpperCase()}`);
         }
-
         keys = keys.replaceAll(tokens[username], accessToken)
     }
+
 }
 
 
@@ -155,8 +154,6 @@ async function getAccessTokens() {
         }, error?: {}
     }
 
-    // const tokens: { [username: string]: { accessToken?: string | undefined }[] } = {}
-
     for (let i = 0; i < usernames.length; i++) {
         const username = usernames[i]
         if (getAccessTokensConfig.urls) {
@@ -167,7 +164,7 @@ async function getAccessTokens() {
     const response = await worker(getAccessTokensConfig)
 
     console.log(response);
-    
+
     for (const username in response) {
         const accessTokens: AccessToken = response[username]
         const tokens = accessTokens.data?.personalAccessTokens?.accessTokens
@@ -216,9 +213,10 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     await runGetAuthToken()
-    await getAccessTokens()    
+    await getAccessTokens()
     await revokeAllAccessTokens()
     await createAccesssToken()
+    await save({ name: 'CREDS', value: keys })
     console.log('MANAGER AUTH PIPELINE SUCESSFULLY EXECUTED');
 }
 
