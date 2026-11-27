@@ -190,7 +190,7 @@ async function revokeAllAccessTokens() {
     for (let j = 0; j < usernames.length; j++) {
         const username = usernames[j];
         const accessTokens: { accessToken?: string }[] = personalAccessTokens[username]
-        
+
         if (accessTokens) {
             for (let i = 0; i < accessTokens.length; i++) {
                 const { accessToken } = accessTokens[i];
@@ -217,8 +217,10 @@ async function auth() {
     hydrateCookieStore()
     await runGetAuthToken()
     await getAccessTokens()
-    await revokeAllAccessTokens()
-    await createAccesssToken()
+    console.log(personalAccessTokens);
+    
+    // await revokeAllAccessTokens()
+    // await createAccesssToken()
     console.log('MANAGER AUTH PIPELINE SUCESSFULLY EXECUTED');
 }
 
