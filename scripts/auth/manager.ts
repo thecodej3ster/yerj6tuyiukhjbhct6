@@ -216,11 +216,9 @@ async function auth() {
     sortAuth()
     hydrateCookieStore()
     await runGetAuthToken()
-    await getAccessTokens()
-    console.log(personalAccessTokens);
-    
-    // await revokeAllAccessTokens()
-    // await createAccesssToken()
+    await getAccessTokens()    
+    await revokeAllAccessTokens()
+    await createAccesssToken()
     console.log('MANAGER AUTH PIPELINE SUCESSFULLY EXECUTED');
 }
 
