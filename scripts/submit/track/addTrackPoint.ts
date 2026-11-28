@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { worker } from "../../utils/worker";
+import { worker } from "../../worker";
 import { WorkerConfig } from "../../utils/types";
 import { PostRecord } from "./types";
 import { ResolverArgs } from "../../utils/types";
