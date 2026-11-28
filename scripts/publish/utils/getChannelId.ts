@@ -1,4 +1,4 @@
-import { worker } from "../../utils/worker"
+import { worker } from "../../worker"
 import { WorkerConfig } from "../../utils/types"
 import { getDispatchPayload } from "./getDIspatchPayload"
 
