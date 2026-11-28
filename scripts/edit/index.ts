@@ -52,6 +52,8 @@ async function selectVideo() {
 async function processVideoEditPipeline() {
     const jobsQueue: Promise<any>[] = []
     const { inputVideoPath, ratio, code } = await selectVideo()
+    console.log('VIDEO FOUND ...');
+    
     let pipVideo = ""
 
     jobsQueue.push(processHookPipeline({ videoPath: inputVideoPath, code: code }))
