@@ -1,4 +1,4 @@
-import { worker } from "../../utils/worker"
+import { worker } from "../../worker"
 import { WorkerConfig } from "../../utils/types"
 
 async function publish({ payload, key }: { payload: { query: string, variables: Record<string, any> }, key: string }) {
