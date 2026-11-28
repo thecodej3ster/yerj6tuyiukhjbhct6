@@ -1,7 +1,6 @@
-import { worker } from "./worker"
+import { worker } from "../worker"
 import { WorkerConfig } from './types';
 import { createClient } from '@supabase/supabase-js'
-
 
 type Video = {
     code: string
@@ -28,7 +27,7 @@ function cleanUrl(rawUrl: string): string {
 export async function getVideo(
     { isRandom, table, code, autoDelete }
         : { isRandom?: boolean, table: string, code?: string, autoDelete?: boolean }
-): Promise<Record<string, string> | null> {
+): Promise<{ url: string, code: string } | null> {
 
     const selectVideo = async (): Promise<Video | null> => {
         let video: Video | null
@@ -72,7 +71,7 @@ export async function getVideo(
             video = data
             videoSelectError = error
         }
-        
+
         if (videoSelectError || !video || !video.code) {
             console.error('Error selecting video:', videoSelectError)
             return null

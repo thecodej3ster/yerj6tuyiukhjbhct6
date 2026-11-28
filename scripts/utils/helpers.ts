@@ -1,16 +1,16 @@
 import fs from 'fs';
-import { worker } from './worker';
+import { worker } from '../worker';
 import { WorkerConfig } from './types';
 import { GoogleGenAI } from '@google/genai';
 import { pipeline } from 'stream/promises';
 
-export async function downloadVideo(targetUrl: string, outputPath: string,): Promise<void> {
+export async function downloadVideo({ url, outputPath }: { url: string, outputPath: string }) {
 
   const stream = fs.createWriteStream(outputPath)
 
   const config: WorkerConfig = {
     urls: {
-      videoDownload: targetUrl
+      videoDownload: url
     },
     requestConfig: {
       responseType: "stream"

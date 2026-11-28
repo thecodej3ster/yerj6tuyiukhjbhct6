@@ -1,6 +1,6 @@
 import axios, { RawAxiosRequestConfig, AxiosResponseHeaders } from "axios";
-import { ProxyAgent } from "./proxy/Proxy";
-import { WorkerConfig } from "./types";
+import { ProxyAgent } from "./Proxy";
+import { WorkerConfig } from "../utils/types";
 import { CookieStore } from "./cookie";
 import crypto from "crypto";
 
@@ -48,7 +48,7 @@ export async function worker({ requestConfig, direct, urls, resolverAction, reso
 
     const fetchData = (url: string, key: string) => {
         console.log('🔥 WORKER IN PROGRESS ... 🔥')
-        
+
         activeWorkers++;
         const mainKey = Object.keys(redirects).includes(key) ? redirects[key] : key;
         const resolvedUrl = resolveUrl(urls[mainKey] || url, url);

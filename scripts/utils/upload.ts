@@ -1,4 +1,4 @@
-import { worker } from './worker';
+import { worker } from '../worker';
 import { WorkerConfig } from './types';
 import crypto from "crypto"
 import { createClient } from '@supabase/supabase-js';

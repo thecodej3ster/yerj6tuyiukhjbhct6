@@ -1,95 +1,90 @@
-import { worker } from "../utils/worker"
-import { WorkerConfig } from "../utils/types"
+import { worker } from "../worker"
+import { WorkerConfig, ResolverArgs } from "../utils/types"
 import { rotate } from "./helpers"
 import { uploadFile } from "./upload"
 
-let retryDelay = 5000
+let retryCount = 0
 const aiKeys = JSON.parse(process.env.Ai_Key!).keys
 
 async function sendToAI({ prompt, filePath, apiKey }: { prompt: string, filePath?: string, apiKey?: string }): Promise<{ content: string }> {
+
     apiKey = apiKey || aiKeys[0]
-
     const geminiAPi = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent`
-    let fileUpload = { file: { uri: "", name: "" } }
 
-    if (filePath) {
-        fileUpload = await uploadFile({ filePath: filePath, apiKey: apiKey })
-    }
+    let fileUpload = filePath ? await uploadFile({ filePath: filePath, apiKey: apiKey }) : null
 
-
-    const config: WorkerConfig = {
-        urls: {
-            chat: geminiAPi
-        },
-        requestConfig: {
-            headers: {
-                'x-goog-api-key': `${apiKey}`,
-                "Content-Type": "application/json"
+    try {
+        const config: WorkerConfig = {
+            urls: {
+                chat: geminiAPi
             },
-            method: "POST",
-            body: {
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [
-                            { text: prompt },
-                            {
-                                fileData: {
-                                    fileUri: fileUpload.file.uri,
-                                    mimeType: "video/mp4",
-                                },
-                            },
-                        ],
-                    },
-                ],
+            requestConfig: {
+                headers: {
+                    'x-goog-api-key': `${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: {
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [
+                                { text: prompt }
+                            ],
+                        },
+                    ],
+                },
+                responseType: "json"
             },
-            responseType: "json"
+            resolverAction: ({ response }: ResolverArgs) => {
+                if (!response?.chat?.candidates[0]?.content?.parts[0]?.text) {
+                    throw new Error("Ai Chat Failed");
+                }
+            }
         }
-    }
 
-    const { chat } = await worker(config)
-
-    const fileDeleteConfig: WorkerConfig = {
-        urls: {
-            deleteFile: `https://generativelanguage.googleapis.com/v1beta/${fileUpload.file.name}`
-        },
-        requestConfig: {
-            headers: {
-                'x-goog-api-key': `${apiKey}`
-            },
-            method: "DELETE"
+        if (filePath) {
+            const fileConfig = {
+                fileData: {
+                    fileUri: fileUpload?.file.uri,
+                    mimeType: "video/mp4",
+                },
+            }
+            config.requestConfig?.body.contents[0].parts.push(fileConfig)
         }
-    }
+        
+        const { chat } = await worker(config)
 
-    await worker(fileDeleteConfig)
+        const fileDeleteConfig: WorkerConfig = {
+            urls: {
+                deleteFile: `https://generativelanguage.googleapis.com/v1beta/${fileUpload?.file.name}`
+            },
+            requestConfig: {
+                headers: {
+                    'x-goog-api-key': `${apiKey}`
+                },
+                method: "DELETE"
+            }
+        }
 
-    if (
-        chat.candidates &&
-        chat.candidates.length &&
-        chat.candidates[0] &&
-        chat.candidates[0].content &&
-        chat.candidates[0].content.parts &&
-        chat.candidates[0].content.parts.length &&
-        chat.candidates[0].content.parts[0].text
-    ) {
+        try {
+            await worker(fileDeleteConfig)
+        } catch { }
+
         const response: string = chat.candidates[0].content.parts[0].text
         return { content: response }
-    } else {
-        retryDelay += 5000
-        if (retryDelay > 60000) {
-            console.log(chat);
+    } catch (error) {
+        retryCount++
+
+        if (retryCount >= 4) {
             throw new Error("Ai Chat Failed");
         }
 
-        return await new Promise<{ content: string }>((resolve) => {
-            setTimeout(async () => {
-                apiKey = rotate(aiKeys, apiKey)
-                const data = await sendToAI({ prompt: prompt, filePath: filePath, apiKey: apiKey })
-                resolve(data)
-            }, retryDelay)
-        })
-
+        apiKey = rotate(aiKeys, apiKey)
+        return await sendToAI({ prompt: prompt, filePath: filePath, apiKey: apiKey })
     }
+
+
 }
 
 export { sendToAI }

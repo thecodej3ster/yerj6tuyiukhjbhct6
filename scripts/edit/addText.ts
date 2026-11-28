@@ -2,14 +2,13 @@
 import { Resvg } from '@resvg/resvg-js';
 import { execFile } from 'child_process';
 import ffmpegPath from 'ffmpeg-static';
-import fs, { readFile } from 'fs/promises';
+import { mkdirSync, unlinkSync } from 'fs';
+import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { promisify } from 'util';
 import sharp from 'sharp';
 import fontkit from 'fontkit';
 
-import { retrive } from '../utils/retriveVideo';
-import { uploadVideo } from '../utils/upload';
 
 const execFileAsync = promisify(execFile);
 
@@ -130,7 +129,6 @@ async function generateTitlePng(
     'InterDisplay-ExtraBold.ttf',
   );
 
-  await fs.access(fontPath);
 
   const lines = hook.lines.map((line) =>
     splitTextAndEmoji(line),
@@ -241,12 +239,10 @@ async function generateTitlePng(
     .toFile(outputPath);
 }
 
-let retries = 0
-export async function processTextPipeline(
-  inputPath: string,
-  id: string,
-): Promise<void> {
+
+export async function processTextPipeline({ videoPath, code }: { videoPath: string, code: string }) {
   console.log('RUNNING TEXT PIPELINE');
+
   const tempDir = path.resolve('scripts', 'temp');
   const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`);
   const tempPngPath = path.resolve(tempDir, `temp_png_${Date.now()}.png`);
@@ -257,7 +253,7 @@ export async function processTextPipeline(
 
   const args = [
     '-i',
-    inputPath,
+    videoPath,
     '-i',
     tempPngPath,
     '-filter_complex',
@@ -272,46 +268,24 @@ export async function processTextPipeline(
     outputPath,
   ]
 
-  try {
-    const video = await retrive({ table: 'video_hooks', id: id }) as VideoHookRecord;
-    await fs.mkdir(tempDir, { recursive: true });
-    await generateTitlePng(video.hook, tempPngPath);
-    await execFileAsync(ffmpegPath!, args);
-    const buffer = await readFile(outputPath);
-    const fileName = path.basename(outputPath);
-    const file = new File(
-      [new Uint8Array(buffer)],
-      fileName,
-      {
-        type: 'application/octet-stream',
-        lastModified: Date.now(),
-      },
-    );
-    await uploadVideo({
-      table: 'editted_videos',
-      storageUpload: true,
-      file,
-      id,
-    });
+  const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
+  const { data: video, error }: { data: VideoHookRecord | null, error: any } = await db.from("video_hooks")
+    .select('*')
+    .eq('video_id', code)
+    .limit(1)
+    .single()
 
-    console.log('Video generated successfully at:', outputPath);
-  }
-  catch (error) {
-    retries++
-    if (retries < 3) {
-      await new Promise<void>((resolve) => {
-        setTimeout(async () => {
-          await processTextPipeline(inputPath, id)
-          resolve()
-        }, 3000);
-      })
-    }
+  if (!video) {
     console.log(error);
-    throw new Error("COULD NOT SUCESSFULLY EXECUTE TEXT PIPELINE");
+    throw new Error("Video Hook Was Not Found");
   }
-  finally {
-    await fs.unlink(tempPngPath).catch(() => { });
-    await fs.unlink(inputPath).catch(() => { });
-    await fs.unlink(outputPath).catch(() => { });
-  }
+
+  mkdirSync(tempDir, { recursive: true });
+  await generateTitlePng(video.hook, tempPngPath);
+  await execFileAsync(ffmpegPath!, args);
+
+  unlinkSync(tempPngPath)
+  unlinkSync(videoPath)
+  return outputPath
 }
+

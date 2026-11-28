@@ -1,12 +1,11 @@
 import path from 'path';
-import fsPromises from 'fs/promises';
+import { readFileSync, mkdirSync } from 'fs';
 import { createClient } from '@supabase/supabase-js';
 import { sendToAI } from '../ai/chat';
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
 function wrapText(text: string, maxCharsPerLine: number = 26): string {
-
   const words = text.trim().replace('.', '').split(/\s+/)
   const resultLines: string[] = [];
   let line = ""
@@ -35,68 +34,51 @@ function wrapText(text: string, maxCharsPerLine: number = 26): string {
 
 
 
-export async function processHookPipeline(tempFilePath: string, id: string) {
+export async function processHookPipeline({ videoPath, code }: { videoPath: string, code: string }) {
   console.log('RUNNING HOOK PIPELINE');
+
   const hookPromptFilePath = path.resolve("scripts/ai/prompts/onScreenTextPrompt.txt")
   const hookSelectionPromptFilePath = path.resolve("scripts/ai/prompts/hookSelectionPrompt.txt")
   const videoDescriptionPromptFilePath = path.resolve("scripts/ai/prompts/videoDescriptionPrompt.txt")
   const tempDir = path.resolve("scripts", 'temp');
 
-  let getResourcesRetries = 0
-  const getResources = async () => {
-    try {
-      const hookPromptFile = await fsPromises.readFile(hookPromptFilePath)
-      const hookPrompt = hookPromptFile.toString()
-      const videoDescriptionPromptFile = await fsPromises.readFile(videoDescriptionPromptFilePath)
-      const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
-      const hookSelectionPromptFile = await fsPromises.readFile(hookSelectionPromptFilePath)
-      const hookSelectionPrompt = hookSelectionPromptFile.toString()
-      await fsPromises.mkdir(tempDir, { recursive: true });
-      return { hookPrompt: hookPrompt, videoDescriptionPrompt: videoDescriptionPrompt, hookSelectionPrompt: hookSelectionPrompt }
-    } catch (error) {
-      getResourcesRetries++
-      if (getResourcesRetries === 3) {
-        throw error
-      }
+  const hookPromptFile = readFileSync(hookPromptFilePath)
+  const hookPrompt = hookPromptFile.toString()
+  const videoDescriptionPromptFile = readFileSync(videoDescriptionPromptFilePath)
+  const videoDescriptionPrompt = videoDescriptionPromptFile.toString()
+  const hookSelectionPromptFile = readFileSync(hookSelectionPromptFilePath)
+  const hookSelectionPrompt = hookSelectionPromptFile.toString()
+  mkdirSync(tempDir, { recursive: true })
 
-      return await new Promise<any>((resolve) => {
-        setTimeout(async () => {
-          const data = await getResources()
-          resolve(data)
-        }, 5000)
-      })
-    }
-  }
-
-  const { hookPrompt, videoDescriptionPrompt, hookSelectionPrompt } = await getResources()
-
-
-  let onScreenTextRetries = 0
-  let onScreenTextRetriesDelay = 5000
+  let retries = 0
   const getOnscreenText = async function name() {
-    try {
-      const onScreenTextResponse = await sendToAI({
-        prompt: hookPrompt,
-        filePath: tempFilePath
-      })
+    const onScreenTextResponse = await sendToAI({
+      prompt: hookPrompt,
+      filePath: videoPath
+    })
 
-      const onScreenTextSelectResponse = await sendToAI({
-        prompt: hookSelectionPrompt.replace('{{TITLES}}', onScreenTextResponse.content),
-        filePath: tempFilePath
-      })
+    const onScreenTextSelectResponse = await sendToAI({
+      prompt: hookSelectionPrompt.replace('{{TITLES}}', onScreenTextResponse.content),
+      filePath: videoPath
+    })
 
-      const onScreenTextSearch = onScreenTextSelectResponse.content.match(/^.+?\s[^\w.\s]{2,}$/m)
+    const onScreenTextSearch = onScreenTextSelectResponse.content.match(/^.+?\s[^\w.\s]{2,}$/m)
 
-      if (!onScreenTextSearch) {
+    if (!onScreenTextSearch) {
+      retries++
+      if (retries >= 4) {
         throw new Error("OnScreenText Does Not Match");
       }
+      await getOnscreenText()
+    } else {
+      retries = 0
 
       const onScreenText = wrapText(onScreenTextSearch[0])
       console.log(onScreenText);
 
       const { error } = await db.from("video_hooks")
         .insert([{
-          video_id: id,
+          video_id: code,
           hook: onScreenText
         }])
 
@@ -104,40 +86,26 @@ export async function processHookPipeline(tempFilePath: string, id: string) {
         console.log(error);
         throw error
       }
-
-    } catch (error) {
-      if (onScreenTextRetries === 3) {
-        if (onScreenTextRetriesDelay < 60000) {
-          onScreenTextRetriesDelay += 5000
-        } else {
-          throw error
-        }
-      }
-
-      onScreenTextRetries++
-
-      return await new Promise<any>((resolve) => {
-        setTimeout(async () => {
-          const data = await getOnscreenText()
-          resolve(data)
-        }, onScreenTextRetriesDelay)
-      })
     }
+
   }
 
   await getOnscreenText()
 
-  const descriptionResponse = await sendToAI({
-    prompt: videoDescriptionPrompt,
-    filePath: tempFilePath
-  })
+  const getDescription = async () => {
+    const descriptionResponse = await sendToAI({
+      prompt: videoDescriptionPrompt,
+      filePath: videoPath
+    })
 
-  const { error } = await db.from("video_descriptions")
-    .insert([{ video_id: id, content: descriptionResponse.content }])
+    const { error } = await db.from("video_descriptions")
+      .insert([{ video_id: code, content: descriptionResponse.content }])
 
-  if (error) {
-    throw error
+    if (error) {
+      console.log(error);
+      throw error
+    }
   }
-  await fsPromises.unlink(tempFilePath).catch(() => { });
 
+  await getDescription()
 }

@@ -5,14 +5,14 @@ export type RequestConfig = Omit<RawAxiosRequestConfig, "data"> & { body?: any }
 export type ResolverArgs = {
     response: any,
     headers: AxiosResponseHeaders,
-    key:string,
-    url:string
+    key: string,
+    url: string
 } & Record<string, any>
 
 export type WorkerConfig = {
     urls: Record<string, string>;
     requestConfig?: RequestConfig;
-    resolverAction?: (args: ResolverArgs) => Promise<any>;
+    resolverAction?: (args: ResolverArgs) => Promise<any> | any;
     resolverArgs?: Record<string, string>;
     direct?: boolean
 };

@@ -1,8 +1,7 @@
 import { EventPayload } from "./utils/types"
 import { initSchedule, createSchedule, deleteSchedule } from './schedule'
 import { createClient } from '@supabase/supabase-js'
-import { processCropPipeline } from '../edit/crop'
-import { retrive } from '../utils/retriveVideo'
+import { processVideoEditPipeline } from "../edit"
 import igPublish from './instagram'
 import ytPublish from './youtube'
 import fs from 'fs'
@@ -18,53 +17,37 @@ interface Video {
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 
-let getVideoRetries = 0
-async function getVideo(id: string) {
-    console.log('GETTING VIDEO');
+async function getVideoMetaData(id: string) {
+    console.log('GETTING VIDEO METADATA');
 
-    try {
-        const video = await retrive({ table: "editted_videos", autoDelete: true, download: true, id: id }) as { url: string; video_id: string; }
+    const { data: videoDescription, error } = await db
+        .from("video_descriptions")
+        .select("*")
+        .eq("video_id", id)
+        .limit(1)
+        .single()
 
-        const { data: videoDescription, error } = await db
-            .from("video_descriptions")
-            .select("*")
-            .eq("video_id", id)
-            .limit(1)
-            .single()
-
-        if (error) {
-            console.log('DESCRIPTION ERROR');
-            console.log(error);
-            throw error
-        }
-
-        const { data: hook, error: hookError } = await db
-            .from("video_hooks")
-            .select("*")
-            .eq("video_id", id)
-            .limit(1)
-            .single()
-
-        if (hookError) {
-            console.log("HOOK ERROR");
-
-            console.log(hookError);
-            throw error
-        }
-        return { videoUrl: video.url, description: videoDescription.content, id: video.video_id, hook: hook }
-    } catch (error) {
-        getVideoRetries++
-        if (getVideoRetries === 3) {
-            throw error
-        }
-
-        return await new Promise<Video>((resolve) => {
-            setTimeout(async () => {
-                const result = await getVideo(id)
-                resolve(result)
-            }, 3000);
-        })
+    if (error) {
+        console.log('DESCRIPTION ERROR');
+        console.log(error);
+        throw error
     }
+
+    const { data: hook, error: hookError } = await db
+        .from("video_hooks")
+        .select("*")
+        .eq("video_id", id)
+        .limit(1)
+        .single()
+
+    if (hookError) {
+        console.log("HOOK ERROR");
+
+        console.log(hookError);
+        throw error
+    }
+    return { description: videoDescription.content, hook: hook }
+
 }
 
 
@@ -86,60 +69,53 @@ async function init() {
     const ytPostingHours = [18, 2]
     let postingHours: number[] = []
 
-    let videoId = ""
-
     console.log(`POSTING FOR ${username.toUpperCase()}`);
 
-    try {
-        if (time === 'init' && username === 'init' && jobId === 'init') {
-            await initSchedule()
-            await register()
-            return
-        }
 
-        const video = await processCropPipeline()
-        videoId = video.videoId
+    if (time === 'init' && username === 'init' && jobId === 'init') {
+        await initSchedule()
+        await register()
+        return
+    }
 
-        const { videoUrl, description, hook } = await getVideo(videoId)
-        console.log(videoUrl);
+    const { videoUrl, code } = await processVideoEditPipeline()
+    const { description, hook } = await getVideoMetaData(code)
 
-        const title = JSON.parse(hook.hook)
-        let payload: any = {}
-        switch (true) {
-            case username.includes("instagram"):
-                payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
-                postingHours = igPostingHours
-                await igPublish(payload)
-                break;
-            case username.includes("youtube"):
-                payload = { url: videoUrl, key: key, title: title.lines.join(' ') }
-                postingHours = ytPostingHours
-                await ytPublish(payload)
-                break;
-        }
+    if (time !== 'init' && username !== 'init' && jobId !== "init") {
+        try {
+            const title = JSON.parse(hook.hook)
+            let payload: any = {}
+            switch (true) {
+                case username.includes("instagram"):
+                    payload = { url: videoUrl, key: key, description: description, title: title.lines.join(' ') }
+                    postingHours = igPostingHours
+                    await igPublish(payload)
+                    break;
+                case username.includes("youtube"):
+                    payload = { url: videoUrl, key: key, title: title.lines.join(' ') }
+                    postingHours = ytPostingHours
+                    await ytPublish(payload)
+                    break;
+            }
 
-        if (time !== 'init' && username !== 'init') {
             const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
             const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
-
             await createSchedule({ hours: selectedHours, username: username, minutes: selectedMinutes })
-        }
+            return
+        } catch (_) {
+            const minutes = (new Date().getMinutes()) + 5
+            if (minutes < 60) {
+                await createSchedule({ hours: Number(time), username: username, minutes: minutes })
+            } else {
+                const selectedMinutes = Math.max(5, Math.round(Math.random() * 20))
+                const selectedHours = rotate(postingHours, Number(inputs.time.trim()))
+                await createSchedule({ hours: selectedHours, username: username, minutes: selectedMinutes })
+                throw new Error(`COULD NOT POST FOR ${username.toUpperCase()}`);
+            }
+        } finally {
 
+            let apiJobId = 0
 
-    }
-
-    catch (error) {
-        const minutes = (new Date().getMinutes()) + 5
-        if (minutes < 60) {
-            await createSchedule({ hours: Number(time), username: username, minutes: minutes })
-        }
-    }
-
-    finally {
-
-        let apiJobId = 0
-
-        if (jobId !== 'init' && username !== 'init' && time !== 'init') {
             const { data, error } = await db.from("jobs")
                 .select("*")
                 .eq("id", jobId)
@@ -152,36 +128,31 @@ async function init() {
             }
 
             apiJobId = data.job_id
-        }
-
-
-        if (time !== 'init') {
             await deleteSchedule(`${apiJobId}`)
-        }
 
-        if (videoId) {
-            const { error } = await db
+            const { error: descriptionError } = await db
                 .from("video_descriptions")
                 .delete()
-                .eq("video_id", videoId)
+                .eq("video_id", code)
 
-            if (error) {
-                console.log(error);
+            if (descriptionError) {
+                console.log(descriptionError);
                 throw error
             }
-
 
             const { error: hookError } = await db
                 .from("video_hooks")
                 .delete()
-                .eq("video_id", videoId)
+                .eq("video_id", code)
 
             if (hookError) {
                 console.log(hookError);
                 throw error
             }
+
         }
     }
+
 }
 
 init()

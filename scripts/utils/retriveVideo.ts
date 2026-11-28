@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { worker } from './worker';
+import { worker } from '../worker';
 import crypto from "node:crypto"
 import { WorkerConfig } from './types';
 import FormData from 'form-data';
@@ -184,7 +184,7 @@ export async function retrive(
       responseType: "document",
       headers: { ...form.getHeaders() }
     },
-    direct:true
+    direct: true
   }
 
   const fileUploadResponse = await worker(config)

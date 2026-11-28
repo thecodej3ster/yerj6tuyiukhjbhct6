@@ -1,39 +1,12 @@
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-import { execSync } from 'child_process';
-import fs from 'fs';
 import path from "path"
-import fsPromises from 'fs/promises';
-import { uploadVideo } from '../utils/upload';
+import { unlinkSync } from 'fs'
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);
 }
 
-
-
-
-// Helper to check if system ffmpeg exists
-function getFfmpegExecutable(): string {
-  try {
-    const systemPath = execSync('which ffmpeg').toString().trim();
-    if (systemPath && fs.existsSync(systemPath)) {
-      console.log(`[FFmpeg] Using system binary at: ${systemPath}`);
-      return systemPath;
-    }
-  } catch {
-    if (ffmpegPath) {
-      console.log(`[FFmpeg] Falling back to ffmpeg-static at: ${ffmpegPath}`);
-      return ffmpegPath;
-    }
-
-  }
-
-
-  throw new Error('No valid FFmpeg binary found.');
-}
-
-ffmpeg.setFfmpegPath(getFfmpegExecutable());
 
 interface ProcessVideoOptions {
   inputPath: string
@@ -52,7 +25,6 @@ export function createVerticalVideoFromRemote({
 }: ProcessVideoOptions): Promise<string> {
   return new Promise(async (resolve, reject) => {
     const sideMargin = 20;
-
     const filterString = `scale=${targetWidth - sideMargin * 2}:-1,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2+60:${backgroundColor}`;
 
     ffmpeg()
@@ -82,41 +54,16 @@ export function createVerticalVideoFromRemote({
   });
 };
 
+export async function processPipPipeline(videoPath: string) {
+  const tempDir = path.resolve("scripts", "temp")
+  const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
 
-let retries = 0
-export async function processPipPipeline(inputPath: string, video_id: string) {
-  const handlePip = async () => {
-    const tempDir = path.resolve("scripts", "temp")
-    const outputPath = path.resolve(tempDir, `temp_output_${Date.now()}.mp4`)
-
-    try {
-      await createVerticalVideoFromRemote({
-        inputPath: inputPath,
-        outputPath: outputPath,
-        backgroundColor: 'white',
-      })
-
-      // await uploadVideo({ table: 'pip_videos', id: video_id })
-
-      return outputPath
-    } catch (error) {
-      retries++
-      if (retries < 3) {
-        return await new Promise<any>((resolve) => {
-          setTimeout(async () => {
-            const result = await handlePip()
-            resolve(result)
-          }, 3000);
-        })
-      }
-      console.log(error);
-      throw new Error("COULD NOT SUCESSFULLY EXECUTE PIP PIPELINE");
-    }
-    finally {
-      await fsPromises.unlink(inputPath)
-    }
-  }
-
-  const outputPath = await handlePip()
+  await createVerticalVideoFromRemote({
+    inputPath: videoPath,
+    outputPath: outputPath,
+    backgroundColor: 'white',
+  })
+  unlinkSync(videoPath)
   return outputPath
+
 }

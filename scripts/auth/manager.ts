@@ -126,7 +126,6 @@ async function revokeAccesssToken({ accessToken, user }: { accessToken?: string,
 
     revokeAuthTokenConfig.requestConfig.body = `{"operationName":"revokePersonalAccessToken","variables":{"input":{"accessToken":"${token}"}},"extensions":{"clientLibrary":{"name":"@apollo/client","version":"4.2.6"}},"query":"mutation revokePersonalAccessToken($input: RevokePersonalAccessTokenInput\u0021) {\\n  revokePersonalAccessToken(input: $input) {\\n    ... on RevokePersonalAccessTokenSuccess {\\n      active\\n      __typename\\n    }\\n    ... on InvalidInputError {\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}"}`
     revokeAuthTokenConfig.urls[username] = 'https://graph.buffer.com/?_o=revokePersonalAccessToken'
-    console.log(revokeAuthTokenConfig);
 
     const authRevoke = await worker(revokeAuthTokenConfig)
     console.log(authRevoke[username]);
@@ -162,8 +161,6 @@ async function getAccessTokens() {
     }
 
     const response = await worker(getAccessTokensConfig)
-
-    console.log(response);
 
     for (const username in response) {
         const accessTokens: AccessToken = response[username]
