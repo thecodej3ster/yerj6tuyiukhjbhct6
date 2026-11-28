@@ -1,8 +1,7 @@
 import { WorkerConfig } from "../utils/types";
-import { worker } from "../utils/worker";
+import { worker } from "../worker";
 import crypto from 'crypto'
 import { createClient } from "@supabase/supabase-js";
-import { ifError } from "assert";
 
 const db = createClient(process.env.SB_Url!, process.env.SB_Key!)
 const keys = JSON.parse(process.env.Creds!)
